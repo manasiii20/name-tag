@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>hello, i'm</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Make a name tag, swing it around, save it as a PNG.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..900&family=Archivo+Narrow:wght@600;700&family=Caveat:wght@500;700&family=Courier+Prime:wght@400;700&family=Dancing+Script:wght@600;700&family=Instrument+Sans:wght@400..700&family=Permanent+Marker&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="app">
+
+  <section class="stage" id="stage" aria-label="Your name tag">
+    <svg class="doodle d1" viewBox="0 0 160 200" aria-hidden="true"><path pathLength="1" d="M80 178 C 40 140, 6 104, 14 62 C 22 22, 70 20, 80 64 C 90 20, 140 22, 146 62 C 152 104, 118 140, 80 178 C 60 196, 34 192, 22 176"/></svg>
+    <svg class="doodle d2" viewBox="0 0 160 200" aria-hidden="true"><path pathLength="1" d="M80 178 C 40 140, 6 104, 14 62 C 22 22, 70 20, 80 64 C 90 20, 140 22, 146 62 C 152 104, 118 140, 80 178 C 60 196, 34 192, 22 176"/></svg>
+
+    <div class="mount" id="mount">
+      <div class="drop" id="drop">
+        <div class="rig" id="rig">
+          <div class="strap" id="strap"><span id="strapText"></span></div>
+          <div class="clip" aria-hidden="true"><span class="clip-body"></span><span class="clip-stem"></span><span class="clip-ring"></span></div>
+          <div class="card" id="card" tabindex="0" role="button">
+            <div class="flip">
+              <div class="face front" id="front"></div>
+              <div class="face back" id="back"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="hint"></p>
+  </section>
+
+  <aside class="panel">
+    <header class="brand">
+      <h1>hello, i'm <span class="echo" id="echo">alex</span></h1>
+      <p>Make a name tag, give it a swing, save it as a picture.</p>
+    </header>
+
+    <fieldset class="group">
+      <legend>style</legend>
+      <div class="styles" id="styles">
+        <button type="button" class="sty" data-tpl="classic"><span class="mini m-classic"></span>classic</button>
+        <button type="button" class="sty" data-tpl="chatty"><span class="mini m-chatty"></span>chatty</button>
+        <button type="button" class="sty" data-tpl="member"><span class="mini m-member"></span>member</button>
+        <button type="button" class="sty" data-tpl="volunteer"><span class="mini m-volunteer"></span>lanyard</button>
+        <button type="button" class="sty" data-tpl="glow"><span class="mini m-glow"></span>glow</button>
+      </div>
+    </fieldset>
+
+    <div class="fields">
+      <div class="field">
+        <label for="f-name">your name</label>
+        <input id="f-name" data-key="name" maxlength="24" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="f-pronouns">pronouns</label>
+          <input id="f-pronouns" data-key="pronouns" maxlength="16" placeholder="optional" autocomplete="off">
+        </div>
+        <div class="field" data-for="greet">
+          <label for="f-greet">greeting</label>
+          <select id="f-greet" data-key="greet" data-num></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field" data-for="role">
+          <label for="f-role">role or team</label>
+          <input id="f-role" data-key="role" maxlength="20" autocomplete="off">
+        </div>
+        <div class="field" data-for="event">
+          <label for="f-event">event</label>
+          <input id="f-event" data-key="event" maxlength="24" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field" data-for="q">
+        <label for="f-q">icebreaker</label>
+        <div class="with-btn">
+          <select id="f-q" data-key="q" data-num></select>
+          <button type="button" class="icon-btn" id="shuffleQ" aria-label="Pick another question" title="Pick another question">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h3.5c2 0 3.2 1 4.3 2.6l2.4 4.8c1.1 1.6 2.3 2.6 4.3 2.6H21M3 17h3.5c1.4 0 2.4-.5 3.2-1.3M14.3 8.3c.8-.8 1.8-1.3 3.2-1.3H21M18 4l3 3-3 3M18 14l3 3-3 3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="field" data-for="answer">
+        <label for="f-answer">your answer</label>
+        <input id="f-answer" data-key="answer" maxlength="22" autocomplete="off">
+      </div>
+
+      <div class="row">
+        <div class="field" data-for="since">
+          <label for="f-since">member since</label>
+          <input id="f-since" data-key="since" maxlength="12" autocomplete="off">
+        </div>
+        <div class="field" data-for="photo">
+          <span class="label">photo</span>
+          <div class="with-btn">
+            <label class="btn file-btn" for="f-photo">add photo</label>
+            <input id="f-photo" type="file" accept="image/*" class="sr-only">
+            <button type="button" class="icon-btn" id="clearPhoto" aria-label="Remove photo" title="Remove photo" hidden>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field" data-for="mood">
+        <label for="f-mood">energy <output id="moodOut" for="f-mood"></output></label>
+        <input id="f-mood" type="range" min="0" max="100" data-key="mood" data-num>
+      </div>
+
+      <div class="field" data-for="back">
+        <label for="f-back">the flip side says</label>
+        <input id="f-back" data-key="back" maxlength="40" autocomplete="off">
+      </div>
+    </div>
+
+    <fieldset class="group">
+      <legend>color</legend>
+      <div class="swatches" id="swatches" role="radiogroup" aria-label="Color"></div>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="btn" id="flipBtn" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6M20 12a8 8 0 0 1-13.7 5.6M18 3v4h-4M6 21v-4h4"/></svg>flip
+      </button>
+      <button type="button" class="btn" id="surprise">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle class="dot" cx="9" cy="9" r="1.2"/><circle class="dot" cx="15" cy="15" r="1.2"/><circle class="dot" cx="15" cy="9" r="1.2"/><circle class="dot" cx="9" cy="15" r="1.2"/></svg>surprise me
+      </button>
+      <button type="button" class="btn primary" id="saveBtn">save png</button>
+    </div>
+  </aside>
+</main>
+
+<dialog class="dlg" id="saveDlg" aria-labelledby="dlgTitle">
+  <h2 id="dlgTitle">here's your tag</h2>
+  <div class="dlg-img"><img id="saveImg" alt="Your name tag as an image"></div>
+  <p>Right-click or long-press the picture to save it, or use the button.</p>
+  <div class="dlg-actions">
+    <button type="button" class="btn" id="dlgClose">keep editing</button>
+    <a class="btn primary" id="dlgDownload" download="name-tag.png" href="#">download png</a>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
