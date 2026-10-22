@@ -361,12 +361,10 @@
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
     const room = stage.clientWidth < 600 ? 190 : (lan ? 120 : 150); // keep clear of the Save / Flip stack
-    scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 1.08 : 1.1);
+    scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 0.92 : 0.95);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 - 16);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
-    // the hint sits centred just under the card's resting spot
-    $('#hint').style.top = `${Math.round(ty + natH * scale + (lan ? 22 : 30))}px`;
   }
   new ResizeObserver(layout).observe(stage);
   new ResizeObserver(moveIndicator).observe($('#styles'));
@@ -519,7 +517,8 @@
 
   // the sticker presses onto the paper: a quick squash, the shadow tightens, the tilt settles
   function stickDown() {
-    restRot = clamp(lastRot, -7, 7);
+    // settle at a fresh tilt each time, either way, leaning a little toward the throw
+    restRot = clamp(lastRot * 0.35 + (Math.random() * 10 - 5), -6, 6);
     vx = vy = 0;
     rig.classList.remove('lifted');
     flipEl.classList.remove('stick', 'slap');
@@ -556,7 +555,7 @@
       render();
       layout();
       th = toSticker ? 0 : (Math.random() < 0.5 ? -1 : 1) * 0.4;
-      w = 0; x = y = vx = vy = 0; restRot = lastRot = -2;
+      w = 0; x = y = vx = vy = 0; restRot = lastRot = Math.random() * 6 - 3;
       save();
     };
     if (reduceMotion.matches) { swap(); return; }
@@ -704,6 +703,10 @@
   syncInputs();
   render();
   layout();
-  if (document.fonts) document.fonts.ready.then(() => { render(); layout(); });
+  if (document.fonts) {
+    document.fonts.ready.then(() => { render(); layout(); });
+    // web fonts can arrive after the first fit; refit whenever one finishes so names never get clipped
+    document.fonts.addEventListener('loadingdone', () => { render(); layout(); });
+  }
   requestAnimationFrame((time) => { last = time; frame(time); });
 })();
