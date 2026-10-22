@@ -65,8 +65,8 @@
   };
   const ORDER = Object.keys(TPLS);
   const SPECS = {
-    classic: ['Sticker label', '3⅜ × 2⅓ in'],
-    chatty: ['Conversation sticker', '3⅜ × 2⅓ in'],
+    classic: ['Sticker', '3⅜ × 2⅓ in'],
+    chatty: ['Sticker', '3⅜ × 2⅓ in'],
     member: ['Member card', '54 × 86 mm'],
     volunteer: ['Lanyard badge', '54 × 86 mm'],
     glow: ['Glow card', '54 × 86 mm'],
@@ -282,8 +282,8 @@
   const front = $('#front');
   const back = $('#back');
 
-  $('#greets').innerHTML = GREETS.map((g, i) =>
-    `<button type="button" class="chip" role="radio" data-i="${i}" aria-checked="false">${esc(g)}</button>`).join('');
+  const greetSel = $('#f-greet');
+  GREETS.forEach((g, i) => greetSel.add(new Option(g, i)));
 
   function fitAll(root = rig) {
     $$('.fit', root).forEach((el) => {
@@ -330,25 +330,33 @@
     $('#flipBtn').disabled = !lan;
     $('#flipBtn').setAttribute('aria-pressed', String(lan && state.flipped));
     $('#moodOut').textContent = `${state.mood}% · ${moodWord(state.mood)}`;
-    if (t.fields.includes('mood')) {
-      $('#f-mood').style.setProperty('--track', `linear-gradient(90deg, ${hsl(p.h + 30, 80, 90)}, ${hsl(p.h + 12, 96, 68)} 55%, ${hsl(p.h - 4, 98, 56)})`);
-    }
     $('#clearPhoto').hidden = !state.photo;
     const tile = $('#photoTile');
-    tile.classList.toggle('has-photo', !!state.photo);
     tile.style.backgroundImage = state.photo ? `url('${state.photo}')` : '';
-    $('#hint').textContent = lan ? 'Drag to swing, tap to flip' : 'Drag it around, tap to stick it';
+    $('#hint').textContent = `${SPECS[state.tpl][0]}, ${SPECS[state.tpl][1]}. ${lan ? 'Drag to swing, tap to flip.' : 'Drag it around, tap to stick it.'}`;
     stage.style.setProperty('--doodle', state.tpl === 'member' ? p.i : '#2B2B2E');
-    $('#greets').style.setProperty('--tint-bg', `var(--t-${state.tpl}-bg)`);
-    $('#greets').style.setProperty('--tint', `var(--t-${state.tpl})`);
-    $('#specName').textContent = SPECS[state.tpl][0];
-    $('#specSize').textContent = SPECS[state.tpl][1];
     $('#colorName').textContent = p.n;
-    $$('#greets .chip').forEach((c) => c.setAttribute('aria-checked', String(+c.dataset.i === state.greet)));
     $('#questionText').textContent = QUESTIONS[state.q] || QUESTIONS[0];
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
+    renderThumbs();
+  }
+
+  // live mini versions of each preset, with your name on them
+  function renderThumbs() {
+    $$('.preset').forEach((b) => {
+      const key = b.dataset.tpl;
+      const t = TPLS[key];
+      const box = $('.thumb', b);
+      const bw = box.clientWidth;
+      const bh = box.clientHeight;
+      if (!bw || !bh) return;
+      const k = Math.min((bw - 4) / t.w, (bh - 4) / t.h);
+      box.innerHTML = `<div class="thumb-in${t.kind === 'sticker' ? ' is-sticker' : ''}" style="transform:scale(${k.toFixed(4)}) translate(-50%, -50%)">
+        <div class="face-mini" style="width:${t.w}px;height:${t.h}px">${frontHTML(key)}</div></div>`;
+      fitAll(box);
+    });
   }
 
   function renderSwatches() {
@@ -378,7 +386,7 @@
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
-  new ResizeObserver(layout).observe(stage);
+  new ResizeObserver(() => { layout(); renderThumbs(); }).observe(stage);
 
   // ---------- physics ----------
   const K = 17;          // pendulum stiffness (g / L)
@@ -599,12 +607,6 @@
     freshName = false;
   });
 
-  $('#greets').addEventListener('click', (e) => {
-    const c = e.target.closest('.chip');
-    if (!c) return;
-    state.greet = +c.dataset.i;
-    render(); save(); kick(1.2);
-  });
 
   $$('[data-key]').forEach((el) => {
     el.addEventListener('input', () => {
@@ -615,9 +617,7 @@
     });
   });
 
-  $('#question').addEventListener('click', (e) => {
-    const btn = e.currentTarget;
-    btn.classList.remove('rolling'); void btn.offsetWidth; btn.classList.add('rolling');
+  $('#shuffleQ').addEventListener('click', () => {
     let q;
     do { q = Math.floor(Math.random() * QUESTIONS.length); } while (q === state.q);
     state.q = q;
@@ -691,7 +691,7 @@
       toast("Couldn't make the picture. Try again in a moment.");
     } finally {
       btn.disabled = false;
-      label.textContent = 'Save as PNG';
+      label.textContent = 'Save PNG';
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());
