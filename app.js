@@ -274,8 +274,7 @@
     $$('[data-for]').forEach((el) => { el.hidden = !t.fields.includes(el.dataset.for); });
     $$('.row').forEach((row) => { row.hidden = [...row.children].every((c) => c.hidden); });
     renderSwatches();
-    $('#flipBtn').disabled = !lan;
-    $('#flipBtn').setAttribute('aria-pressed', String(lan && state.flipped));
+    syncFlip(lan);
     $('#hint').textContent = lan ? 'Drag to swing it, tap to flip it.' : 'Drag it anywhere, tap to stick it down.';
     $$('#greets .greet').forEach((g) => g.setAttribute('aria-checked', String(+g.dataset.i === state.greet)));
     renderTickets();
@@ -517,7 +516,7 @@
     if (!isLanyard()) return;
     state.flipped = !state.flipped;
     card.classList.toggle('is-flipped', state.flipped);
-    $('#flipBtn').setAttribute('aria-pressed', String(state.flipped));
+    syncFlip(true);
     if (!reduceMotion.matches) w += (state.flipped ? 1 : -1) * 1.1;
     save();
   }
@@ -616,6 +615,12 @@
     render(); save(); kick(1.5);
   });
 
+  function syncFlip(lan) {
+    const btn = $('#flipBtn');
+    btn.disabled = !lan;
+    btn.setAttribute('aria-pressed', String(lan && state.flipped));
+    $('#flipState').textContent = !lan ? 'Stickers are one-sided' : state.flipped ? 'Showing the back' : 'Showing the front';
+  }
   $('#flipBtn').addEventListener('click', flip);
 
   // ---------- save as png ----------
@@ -627,8 +632,9 @@
       return;
     }
     btn.disabled = true;
-    const label = $('span', btn);
+    const label = $('.act-t', btn);
     label.textContent = 'Printing…';
+    btn.classList.add('busy');
     try {
       if (document.fonts) await document.fonts.ready;
       const canvas = await window.html2canvas(card, {
@@ -649,6 +655,7 @@
     } finally {
       btn.disabled = false;
       label.textContent = 'Save PNG';
+      btn.classList.remove('busy');
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());
