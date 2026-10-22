@@ -63,15 +63,6 @@
       swatch: (p) => hsl(p.h, 95, 58), strap: (p) => hsl(p.h, 70, 46),
     },
   };
-  const ORDER = Object.keys(TPLS);
-  const SPECS = {
-    classic: ['Sticker', '3⅜ × 2⅓ in'],
-    chatty: ['Sticker', '3⅜ × 2⅓ in'],
-    member: ['Member card', '54 × 86 mm'],
-    volunteer: ['Lanyard badge', '54 × 86 mm'],
-    glow: ['Glow card', '54 × 86 mm'],
-  };
-
   const now = new Date();
   const DEFAULTS = {
     tpl: 'volunteer', name: 'Alex', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
@@ -282,8 +273,8 @@
   const front = $('#front');
   const back = $('#back');
 
-  const greetSel = $('#f-greet');
-  GREETS.forEach((g, i) => greetSel.add(new Option(g, i)));
+  $('#greets').innerHTML = GREETS.map((g, i) =>
+    `<button type="button" class="greet" role="radio" aria-checked="false" data-i="${i}">${esc(g)}</button>`).join('');
 
   function fitAll(root = rig) {
     $$('.fit', root).forEach((el) => {
@@ -329,19 +320,83 @@
     renderSwatches();
     $('#flipBtn').disabled = !lan;
     $('#flipBtn').setAttribute('aria-pressed', String(lan && state.flipped));
-    $('#moodOut').textContent = `${state.mood}% · ${moodWord(state.mood)}`;
     $('#clearPhoto').hidden = !state.photo;
     const tile = $('#photoTile');
     tile.style.backgroundImage = state.photo ? `url('${state.photo}')` : '';
-    $('#hint').textContent = `${SPECS[state.tpl][0]}, ${SPECS[state.tpl][1]}. ${lan ? 'Drag to swing, tap to flip.' : 'Drag it around, tap to stick it.'}`;
+    $('#hint').textContent = lan ? 'Drag to swing it, tap to flip it.' : 'Drag it around, tap to stick it down.';
     stage.style.setProperty('--doodle', state.tpl === 'member' ? p.i : '#2B2B2E');
-    $('#colorName').textContent = p.n;
+    $$('#greets .greet').forEach((g) => g.setAttribute('aria-checked', String(+g.dataset.i === state.greet)));
+    renderTickets(p);
     $('#questionText').textContent = QUESTIONS[state.q] || QUESTIONS[0];
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
     renderThumbs();
   }
+
+  // ticket stubs: number the visible ones and show what's filled in
+  function renderTickets(p) {
+    const vals = {
+      name: state.name.trim(),
+      pronouns: state.pronouns.trim(),
+      role: state.role.trim(),
+      event: state.event.trim(),
+      since: state.since.trim(),
+      greet: GREETS[state.greet],
+      q: state.answer.trim(),
+      photo: state.photo ? 'Added' : '',
+      mood: `${state.mood}%, ${moodWord(state.mood)}`,
+      back: state.back.trim(),
+    };
+    let n = 0;
+    $$('.ticket').forEach((tk) => {
+      if (tk.hidden) return;
+      $('.t-no', tk).textContent = String(++n).padStart(2, '0');
+      const key = tk.dataset.ticket;
+      const el = $('.t-val', tk);
+      if (key === 'color') {
+        el.innerHTML = `<i class="dot" style="background:${tpl().swatch(p)}"></i>${esc(p.n)}`;
+        el.classList.remove('empty');
+        return;
+      }
+      el.textContent = vals[key] || 'Not filled in';
+      el.classList.toggle('empty', !vals[key]);
+    });
+    const open = $('.ticket.is-open');
+    if (open && open.hidden) setOpen(null);
+  }
+
+  function setOpen(tk, focus = false) {
+    $$('.ticket').forEach((t) => {
+      const on = t === tk;
+      t.classList.toggle('is-open', on);
+      $('.t-head', t).setAttribute('aria-expanded', String(on));
+    });
+    if (tk && focus) {
+      const field = $('input:not([type="file"]), .greet[aria-checked="true"], .swatch[aria-checked="true"], button.link', $('.t-body', tk));
+      if (field) setTimeout(() => field.focus({ preventScroll: true }), 120);
+    }
+  }
+  $('#tickets').addEventListener('click', (e) => {
+    const head = e.target.closest('.t-head');
+    if (!head) return;
+    const tk = head.closest('.ticket');
+    setOpen(tk.classList.contains('is-open') ? null : tk, true);
+  });
+  // Enter moves on to the next ticket
+  $('#tickets').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !e.target.matches('.t-input')) return;
+    e.preventDefault();
+    const list = $$('.ticket').filter((t) => !t.hidden);
+    const i = list.indexOf(e.target.closest('.ticket'));
+    setOpen(list[i + 1] || null, true);
+  });
+  $('#greets').addEventListener('click', (e) => {
+    const g = e.target.closest('.greet');
+    if (!g) return;
+    state.greet = +g.dataset.i;
+    render(); save(); kick(1.2);
+  });
 
   // live mini versions of each preset, with your name on them
   function renderThumbs() {
@@ -625,19 +680,6 @@
   });
 
   $('#flipBtn').addEventListener('click', flip);
-
-  $('#surprise').addEventListener('click', (e) => {
-    const btn = e.currentTarget;
-    btn.classList.remove('rolling'); void btn.offsetWidth; btn.classList.add('rolling');
-    const others = ORDER.filter((k) => k !== state.tpl);
-    const next = others[Math.floor(Math.random() * others.length)];
-    state.colors[next] = Math.floor(Math.random() * TPLS[next].palettes.length);
-    state.q = Math.floor(Math.random() * QUESTIONS.length);
-    state.greet = Math.floor(Math.random() * GREETS.length);
-    state.mood = 10 + Math.floor(Math.random() * 90);
-    syncInputs();
-    setTemplate(next);
-  });
 
   // photo for the member card: downscale so it stays light
   $('#f-photo').addEventListener('change', (e) => {

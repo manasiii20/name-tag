@@ -13,16 +13,9 @@
 <body>
 <main class="app">
 
-  <header class="top">
-    <h1 class="site">hello, i'm</h1>
-    <div class="top-actions">
-      <button type="button" class="txt" id="surprise">Surprise me</button>
-      <button type="button" class="txt" id="flipBtn" aria-pressed="false">Flip</button>
-      <button type="button" class="solid" id="saveBtn"><span>Save PNG</span></button>
-    </div>
-  </header>
-
   <section class="stage" id="stage" aria-label="Your name tag">
+    <h1 class="site">hello, i'm<span class="cursor" aria-hidden="true">_</span></h1>
+
     <svg class="doodle d1" viewBox="0 0 160 200" aria-hidden="true"><path pathLength="1" d="M80 178 C 40 140, 6 104, 14 62 C 22 22, 70 20, 80 64 C 90 20, 140 22, 146 62 C 152 104, 118 140, 80 178 C 60 196, 34 192, 22 176"/></svg>
     <svg class="doodle d2" viewBox="0 0 160 200" aria-hidden="true"><path pathLength="1" d="M80 178 C 40 140, 6 104, 14 62 C 22 22, 70 20, 80 64 C 90 20, 140 22, 146 62 C 152 104, 118 140, 80 178 C 60 196, 34 192, 22 176"/></svg>
 
@@ -44,78 +37,177 @@
     <p class="hint" id="hint"></p>
   </section>
 
-  <aside class="form" aria-label="Edit your tag">
-    <div class="f-row f-name">
-      <label for="f-name">Name</label>
-      <input id="f-name" data-key="name" maxlength="24" autocomplete="off" spellcheck="false" autocapitalize="words" placeholder="Your name">
-    </div>
-    <div class="f-row">
-      <label for="f-pronouns">Pronouns</label>
-      <input id="f-pronouns" data-key="pronouns" maxlength="16" placeholder="Optional" autocomplete="off">
-    </div>
-    <div class="f-row" data-for="role">
-      <label for="f-role">Role</label>
-      <input id="f-role" data-key="role" maxlength="20" autocomplete="off">
-    </div>
-    <div class="f-row" data-for="event">
-      <label for="f-event">Event</label>
-      <input id="f-event" data-key="event" maxlength="24" autocomplete="off">
-    </div>
-    <div class="f-row" data-for="since">
-      <label for="f-since">Since</label>
-      <input id="f-since" data-key="since" maxlength="12" autocomplete="off">
-    </div>
-    <div class="f-row" data-for="greet">
-      <label for="f-greet">Greeting</label>
-      <select id="f-greet" data-key="greet" data-num></select>
-    </div>
-    <div class="f-row f-tall" data-for="q">
-      <span class="label">Question</span>
-      <div class="f-stack">
-        <p class="q-text" id="questionText"></p>
-        <button type="button" class="txt small" id="shuffleQ">Another question</button>
+  <aside class="panel" aria-label="Edit your tag">
+    <section class="pick" aria-labelledby="h-pick">
+      <h2 class="pick-h" id="h-pick">Which tag are you?</h2>
+      <div class="presets" id="styles">
+        <button type="button" class="sty preset" data-tpl="classic"><span class="thumb"></span><span class="p-name">Classic</span></button>
+        <button type="button" class="sty preset" data-tpl="chatty"><span class="thumb"></span><span class="p-name">Chatty</span></button>
+        <button type="button" class="sty preset" data-tpl="member"><span class="thumb"></span><span class="p-name">Member</span></button>
+        <button type="button" class="sty preset" data-tpl="volunteer"><span class="thumb"></span><span class="p-name">Lanyard</span></button>
+        <button type="button" class="sty preset" data-tpl="glow"><span class="thumb"></span><span class="p-name">Glow</span></button>
+      </div>
+    </section>
+
+    <div class="tickets" id="tickets">
+      <div class="ticket is-open" data-ticket="name">
+        <button type="button" class="t-head" id="th-name" aria-expanded="true" aria-controls="tb-name">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">What do we call you?</span><span class="t-val" data-val="name"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-name" role="region" aria-labelledby="th-name">
+          <div class="t-inner">
+            <label class="sr-only" for="f-name">Name</label>
+            <input id="f-name" class="t-input" data-key="name" autocomplete="off" maxlength="24" spellcheck="false" autocapitalize="words" placeholder="Your name">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="pronouns">
+        <button type="button" class="t-head" id="th-pronouns" aria-expanded="false" aria-controls="tb-pronouns">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">How should people refer to you?</span><span class="t-val" data-val="pronouns"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-pronouns" role="region" aria-labelledby="th-pronouns">
+          <div class="t-inner">
+            <label class="sr-only" for="f-pronouns">Pronouns</label>
+            <input id="f-pronouns" class="t-input" data-key="pronouns" autocomplete="off" maxlength="16" placeholder="she/her, they/them…">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="role" data-for="role">
+        <button type="button" class="t-head" id="th-role" aria-expanded="false" aria-controls="tb-role">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">What are you here as?</span><span class="t-val" data-val="role"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-role" role="region" aria-labelledby="th-role">
+          <div class="t-inner">
+            <label class="sr-only" for="f-role">Role</label>
+            <input id="f-role" class="t-input" data-key="role" autocomplete="off" maxlength="20" placeholder="Speaker, volunteer, guest…">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="event" data-for="event">
+        <button type="button" class="t-head" id="th-event" aria-expanded="false" aria-controls="tb-event">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Where is this tag going?</span><span class="t-val" data-val="event"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-event" role="region" aria-labelledby="th-event">
+          <div class="t-inner">
+            <label class="sr-only" for="f-event">Event</label>
+            <input id="f-event" class="t-input" data-key="event" autocomplete="off" maxlength="24" placeholder="Event name">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="since" data-for="since">
+        <button type="button" class="t-head" id="th-since" aria-expanded="false" aria-controls="tb-since">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Member since when?</span><span class="t-val" data-val="since"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-since" role="region" aria-labelledby="th-since">
+          <div class="t-inner">
+            <label class="sr-only" for="f-since">Member since</label>
+            <input id="f-since" class="t-input" data-key="since" autocomplete="off" maxlength="12" placeholder="Oct 2026">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="greet" data-for="greet">
+        <button type="button" class="t-head" id="th-greet" aria-expanded="false" aria-controls="tb-greet">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">How do you say hi?</span><span class="t-val" data-val="greet"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-greet" role="region" aria-labelledby="th-greet">
+          <div class="t-inner">
+            <div class="greets" id="greets" role="radiogroup" aria-label="Greeting"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="q" data-for="q">
+        <button type="button" class="t-head" id="th-q" aria-expanded="false" aria-controls="tb-q">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Break the ice</span><span class="t-val" data-val="q"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-q" role="region" aria-labelledby="th-q">
+          <div class="t-inner">
+            <p class="q-text" id="questionText"></p>
+            <label class="sr-only" for="f-answer">Your answer</label>
+            <input id="f-answer" class="t-input" data-key="answer" maxlength="22" autocomplete="off" placeholder="Your answer">
+            <button type="button" class="link" id="shuffleQ">Ask me something else</button>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="photo" data-for="photo">
+        <button type="button" class="t-head" id="th-photo" aria-expanded="false" aria-controls="tb-photo">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Got a good photo?</span><span class="t-val" data-val="photo"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-photo" role="region" aria-labelledby="th-photo">
+          <div class="t-inner">
+            <div class="photo-row">
+              <label class="photo-tile" for="f-photo" id="photoTile"><span class="sr-only">Choose a photo</span></label>
+              <input id="f-photo" type="file" accept="image/*" class="sr-only">
+              <div class="photo-copy">
+                <label class="link" for="f-photo">Choose a photo</label>
+                <button type="button" class="link muted" id="clearPhoto" hidden>Remove it</button>
+                <span class="fine">It stays on your device.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="mood" data-for="mood">
+        <button type="button" class="t-head" id="th-mood" aria-expanded="false" aria-controls="tb-mood">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">How's your energy today?</span><span class="t-val" data-val="mood"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-mood" role="region" aria-labelledby="th-mood">
+          <div class="t-inner">
+            <label class="sr-only" for="f-mood">Energy</label>
+            <input id="f-mood" class="range" type="range" min="0" max="100" data-key="mood" data-num>
+            <div class="range-ends" aria-hidden="true"><span>sleepy</span><span>radiant</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="back" data-for="back">
+        <button type="button" class="t-head" id="th-back" aria-expanded="false" aria-controls="tb-back">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Anything for the back?</span><span class="t-val" data-val="back"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-back" role="region" aria-labelledby="th-back">
+          <div class="t-inner">
+            <label class="sr-only" for="f-back">Back of the tag</label>
+            <input id="f-back" class="t-input" data-key="back" autocomplete="off" maxlength="40" placeholder="how can i help?">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="color">
+        <button type="button" class="t-head" id="th-color" aria-expanded="false" aria-controls="tb-color">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">What's your color?</span><span class="t-val" data-val="color"></span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-color" role="region" aria-labelledby="th-color">
+          <div class="t-inner">
+            <div class="swatches" id="swatches" role="radiogroup" aria-label="Color"></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="f-row" data-for="answer">
-      <label for="f-answer">Answer</label>
-      <input id="f-answer" data-key="answer" maxlength="22" autocomplete="off">
-    </div>
-    <div class="f-row" data-for="photo">
-      <span class="label">Photo</span>
-      <div class="f-inline">
-        <label class="photo-tile" for="f-photo" id="photoTile"><span class="sr-only">Choose a photo</span></label>
-        <input id="f-photo" type="file" accept="image/*" class="sr-only">
-        <label class="txt small" for="f-photo">Choose</label>
-        <button type="button" class="txt small muted" id="clearPhoto" hidden>Remove</button>
-      </div>
-    </div>
-    <div class="f-row" data-for="mood">
-      <label for="f-mood">Energy</label>
-      <div class="f-inline">
-        <input id="f-mood" class="range" type="range" min="0" max="100" data-key="mood" data-num>
-        <output id="moodOut" for="f-mood"></output>
-      </div>
-    </div>
-    <div class="f-row" data-for="back">
-      <label for="f-back">Back</label>
-      <input id="f-back" data-key="back" maxlength="40" autocomplete="off">
-    </div>
-    <div class="f-row">
-      <span class="label" id="l-color">Color</span>
-      <div class="f-inline">
-        <div class="swatches" id="swatches" role="radiogroup" aria-labelledby="l-color"></div>
-        <span class="muted-txt" id="colorName"></span>
-      </div>
+
+    <div class="actions">
+      <button type="button" class="ghost" id="flipBtn" aria-pressed="false">Flip it</button>
+      <button type="button" class="solid" id="saveBtn"><span>Save PNG</span></button>
     </div>
   </aside>
-
-  <nav class="presets" id="styles" aria-label="Styles">
-    <button type="button" class="sty preset" data-tpl="classic"><span class="p-no">01</span><span class="thumb"></span><span class="p-name">Classic</span></button>
-    <button type="button" class="sty preset" data-tpl="chatty"><span class="p-no">02</span><span class="thumb"></span><span class="p-name">Chatty</span></button>
-    <button type="button" class="sty preset" data-tpl="member"><span class="p-no">03</span><span class="thumb"></span><span class="p-name">Member</span></button>
-    <button type="button" class="sty preset" data-tpl="volunteer"><span class="p-no">04</span><span class="thumb"></span><span class="p-name">Lanyard</span></button>
-    <button type="button" class="sty preset" data-tpl="glow"><span class="p-no">05</span><span class="thumb"></span><span class="p-name">Glow</span></button>
-  </nav>
 </main>
 
 <dialog class="dlg" id="saveDlg" aria-labelledby="dlgTitle">

@@ -1,4 +1,4 @@
-# hello, i'm
+# hello, i'm_
 
 A small name tag maker. Pick a style, type your name, swing the badge around, save it as a PNG.
 
@@ -18,10 +18,10 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Drag a sticker to fling it; it springs back. Tap to slap it down.
 - Typing and picking colors give the badge a little nudge.
 - Names get a capital first letter as you type. Change it back to lowercase and it stays that way.
-- The style picker shows live mini versions of every tag with your name on them.
+- The tag picker shows live mini versions of every tag with your name on them.
+- Each field is a small numbered ticket with a question ("What do we call you?"). Click one to open it; Enter moves to the next.
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
-- **surprise me** rolls a random style, color, question and greeting.
-- **save png** renders the current side at 3x with a transparent background.
+- **Save PNG** renders the current side at 3x with a transparent background.
 - Your tag is remembered in `localStorage`.
 
 ## Run it
