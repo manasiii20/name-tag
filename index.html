@@ -33,8 +33,10 @@
     </div>
 
     <div class="actions">
-      <button type="button" class="solid" id="saveBtn"><span>Save PNG</span></button>
-      <button type="button" class="ghost" id="flipBtn" aria-pressed="false">Flip it</button>
+      <div class="stack">
+        <button type="button" class="solid" id="saveBtn"><span>Save PNG</span></button>
+        <button type="button" class="outline" id="flipBtn" aria-pressed="false">Flip it</button>
+      </div>
       <p class="hint" id="hint"></p>
     </div>
   </section>
@@ -49,6 +51,11 @@
         <button type="button" class="sty seg" data-tpl="chatty"><i class="glyph landscape" aria-hidden="true"></i>Chatty</button>
         <button type="button" class="sty seg" data-tpl="glow"><i class="glyph portrait" aria-hidden="true"></i>Glow</button>
       </div>
+      <button type="button" class="random" id="randomBtn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle class="dot" cx="9" cy="9" r="1.3"/><circle class="dot" cx="15" cy="15" r="1.3"/><circle class="dot" cx="15" cy="9" r="1.3"/><circle class="dot" cx="9" cy="15" r="1.3"/></svg>
+        <span class="random-t">Make me a random one</span>
+        <span class="random-s">A new design every press</span>
+      </button>
     </section>
 
     <div class="tickets" id="tickets">

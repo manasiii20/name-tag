@@ -55,12 +55,165 @@
       swatch: (p) => hsl(p.h, 95, 58), strap: (p) => hsl(p.h, 70, 46),
     },
   };
+  // ---------- generated tags ----------
+  // "Random" builds a new tag from a seed: format, layout, palette, type pairing and a few details.
+  const GEN_PALETTES = [
+    { n: 'Paper and tomato', bg: '#F3EFE6', ink: '#1B1B1B', ac: '#E8442E', soft: '#E7DFCF' },
+    { n: 'Forest', bg: '#E9EFE6', ink: '#17301F', ac: '#2F7D4F', soft: '#D4E2D0' },
+    { n: 'Cobalt', bg: '#EEF1F8', ink: '#121A33', ac: '#2B4FD8', soft: '#DAE1F4' },
+    { n: 'Butter', bg: '#FFF6D6', ink: '#2A2410', ac: '#E8A800', soft: '#F3E5B0' },
+    { n: 'Lilac', bg: '#F1ECFA', ink: '#24183D', ac: '#7C4DEB', soft: '#E0D6F5' },
+    { n: 'Night', bg: '#17171A', ink: '#F3F1EA', ac: '#FF6A3D', soft: '#2B2B31' },
+    { n: 'Bubblegum', bg: '#FFE9F1', ink: '#3A1225', ac: '#E8407F', soft: '#F8D0DF' },
+    { n: 'Mint', bg: '#E4F5EF', ink: '#0F2E26', ac: '#14996F', soft: '#CBE9DC' },
+    { n: 'Clay', bg: '#F4E6DC', ink: '#3B1F12', ac: '#C4592E', soft: '#EAD2C0' },
+    { n: 'Ink', bg: '#FFFFFF', ink: '#111111', ac: '#111111', soft: '#ECECEC' },
+  ];
+  const GEN_LAYOUTS = ['band', 'block', 'frame', 'badge', 'stub', 'stripes'];
+  const GEN_NAME_FONTS = [
+    { f: "var(--f-hand)", w: 700, max: 76, tilt: true },
+    { f: "var(--f-display)", w: 800, max: 64, ls: '-.04em' },
+    { f: "var(--f-narrow)", w: 700, max: 78, up: true },
+    { f: "var(--f-ui)", w: 600, max: 60, ls: '-.04em' },
+  ];
+  const GEN_DISPLAY_FONTS = [
+    { f: "var(--f-display)", w: 800, ls: '-.03em' },
+    { f: "var(--f-narrow)", w: 700, up: true, ls: '0' },
+    { f: "var(--f-ui)", w: 600, ls: '-.03em' },
+  ];
+  function mulberry(a) {
+    return () => {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function genSpec(seed) {
+    const r = mulberry(seed);
+    const pick = (arr) => arr[Math.floor(r() * arr.length)];
+    return {
+      format: r() < 0.6 ? 'P' : 'L',
+      layout: pick(GEN_LAYOUTS),
+      nameFont: pick(GEN_NAME_FONTS),
+      dispFont: pick(GEN_DISPLAY_FONTS),
+      palette: Math.floor(r() * GEN_PALETTES.length),
+      smile: r() < 0.4,
+      tilt: (r() * 5 - 3).toFixed(1),
+      no: String(Math.floor(r() * 900) + 100),
+      radius: pick([14, 20, 26]),
+    };
+  }
+  function applyGen() {
+    const g = genSpec(state.seed);
+    Object.assign(TPLS.random, g.format === 'P'
+      ? { kind: 'lanyard', w: 300, h: 440, fields: ['greet', 'role', 'event', 'back'] }
+      : { kind: 'sticker', w: 440, h: 300, fields: ['greet', 'role', 'event'] });
+  }
+  TPLS.random = {
+    kind: 'lanyard', w: 300, h: 440, fields: [],
+    palettes: GEN_PALETTES,
+    swatch: (p) => `linear-gradient(135deg, ${p.bg} 50%, ${p.ac} 50%)`,
+    strap: (p) => (p.n === 'Night' ? '#2B2B31' : p.ink),
+  };
+
+  function genFront(p) {
+    const g = genSpec(state.seed);
+    const t = TPLS.random;
+    const name = esc(nameOr());
+    const pron = esc(state.pronouns.trim());
+    const role = esc(state.role.trim());
+    const event = esc(state.event.trim());
+    const greet = esc(GREETS[state.greet] || GREETS[0]);
+    const initial = esc((state.name.trim()[0] || '?').toUpperCase());
+    const nf = g.nameFont;
+    const df = g.dispFont;
+    const P = g.format === 'P';
+    const nameMax = Math.round(nf.max * (P ? 1 : 1.05));
+    const nameStyle = `font:${nf.w} ${nameMax}px/1.15 ${nf.f};letter-spacing:${nf.ls || '0'};${nf.up ? 'text-transform:uppercase;' : ''}${nf.tilt ? `transform:rotate(${g.tilt}deg);` : ''}`;
+    const dispStyle = `font-family:${df.f};font-weight:${df.w};letter-spacing:${df.ls};${df.up ? 'text-transform:uppercase;' : ''}`;
+    const nameEl = (max = nameMax, min = 24) => `<div class="g-name fit" data-max="${max}" data-min="${min}" style="${nameStyle}">${name}</div>`;
+    const smileEl = g.smile ? `<span class="g-smile">${smile(p.ac === p.ink ? p.ink : p.ac)}</span>` : '';
+    const slot = P ? '<span class="slot"></span>' : '';
+    const vars = `--bg:${p.bg};--ink:${p.ink};--ac:${p.ac};--soft:${p.soft};--r:${g.radius}px`;
+    const meta = [event, pron].filter(Boolean).join(' · ');
+    let inner = '';
+
+    switch (g.layout) {
+      case 'band':
+        inner = `<div class="g-top g-meta">${meta || '&nbsp;'}</div>
+          <div class="g-mid">
+            <div class="g-greet fit" data-max="${P ? 40 : 34}" data-min="18" style="${dispStyle}">${greet}</div>
+            <div class="g-row">${nameEl()}${smileEl}</div>
+          </div>
+          <div class="g-band"><div class="fit" data-max="26" data-min="14" style="${dispStyle}">${role || 'guest'}</div></div>`;
+        break;
+      case 'block':
+        inner = `<div class="g-block" style="${dispStyle}"><span>${initial}</span></div>
+          <div class="g-body">
+            <div class="g-small">${greet}</div>
+            <div class="g-row">${nameEl(P ? nameMax : 60)}${smileEl}</div>
+            <div class="g-meta">${[role, event].filter(Boolean).join(' · ') || '&nbsp;'}</div>
+          </div>`;
+        break;
+      case 'frame':
+        inner = `<div class="g-frame">
+            <div class="g-small g-caps">${greet}</div>
+            <div class="g-center">${nameEl()}${pron ? `<div class="g-meta">${pron}</div>` : ''}</div>
+            <div class="g-foot"><span style="${dispStyle}">${role || 'guest'}</span><span class="g-meta">${event ? `${event}` : ''}</span></div>
+          </div>`;
+        break;
+      case 'badge':
+        inner = `<div class="g-badge">
+            <div class="g-small g-caps">${event || greet}</div>
+            <div class="g-disc" style="${dispStyle}">${initial}</div>
+            <div class="g-text">
+              <div class="g-small">${greet}</div>
+              ${nameEl(P ? Math.min(nameMax, 60) : 56)}
+              <div class="g-pill">${role || 'guest'}</div>
+            </div>
+          </div>`;
+        break;
+      case 'stub':
+        inner = `<div class="g-stub" style="${dispStyle}"><span class="g-no">No. ${g.no}</span><span class="g-stub-t fit" data-max="${P ? 30 : 22}" data-min="12">${event || 'hello'}</span></div>
+          <div class="g-body">
+            <div class="g-small">${greet}</div>
+            <div class="g-row">${nameEl()}${smileEl}</div>
+            <div class="g-meta">${[role, pron].filter(Boolean).join(' · ') || '&nbsp;'}</div>
+          </div>`;
+        break;
+      case 'stripes':
+        inner = `<div class="g-stripes"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="g-body">
+            <div class="g-greet fit" data-max="${P ? 36 : 30}" data-min="16" style="${dispStyle}">${greet}</div>
+            <div class="g-row">${nameEl()}${smileEl}</div>
+            <div class="g-meta">${[role, event, pron].filter(Boolean).join(' · ') || '&nbsp;'}</div>
+          </div>`;
+        break;
+    }
+    const card = `<div class="gen ${P ? 'P' : 'L'} lay-${g.layout}" style="${vars}">${slot}${inner}</div>`;
+    return t.kind === 'sticker' ? `<div class="gen-wrap" style="--r:${g.radius}px">${card}</div>` : card;
+  }
+
+  function genBack(p) {
+    const g = genSpec(state.seed);
+    const df = g.dispFont;
+    const back = esc(state.back.trim() || 'hello!');
+    return `<div class="gen gen-back P" style="--bg:${p.bg};--ink:${p.ink};--ac:${p.ac};--soft:${p.soft}">
+      <span class="slot"></span>
+      <div class="g-meta g-top">${esc(state.event.trim()) || '&nbsp;'}</div>
+      <div class="g-backtext fitblock" data-max="56" data-min="24" style="font-family:${df.f};font-weight:${df.w};letter-spacing:${df.ls};${df.up ? 'text-transform:uppercase;' : ''}"><span>${back}</span></div>
+      <div class="g-backno">No. ${g.no}</div>
+    </div>`;
+  }
+
   const now = new Date();
   const DEFAULTS = {
     tpl: 'volunteer', name: 'Alex', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     q: 0, answer: 'durian ice cream', since: `${now.toLocaleString('en', { month: 'short' })} ${now.getFullYear()}`,
     back: 'how can i help?', mood: 64, flipped: false,
-    colors: { volunteer: 0, classic: 0, chatty: 0, glow: 0 },
+    colors: { volunteer: 0, classic: 0, chatty: 0, glow: 0, random: 0 },
+    seed: 20261022,
   };
 
   // ---------- state ----------
@@ -140,6 +293,7 @@
     const event = esc(state.event.trim());
     const greet = GREETS[state.greet] || GREETS[0];
 
+    if (key === 'random') return genFront(p);
     switch (key) {
       case 'classic':
         return `<div class="cl-wrap"><div class="cl" style="--c:${p.c}">
@@ -199,6 +353,7 @@
     const p = pal();
     const back = esc(state.back.trim() || 'hello!');
     const event = esc(state.event.trim());
+    if (state.tpl === 'random') return genBack(p);
     switch (state.tpl) {
       case 'volunteer':
         return `<div class="vol dark">
@@ -331,7 +486,8 @@
   function moveIndicator() {
     const on = $(`.seg[data-tpl="${state.tpl}"]`);
     const ind = $('#segInd');
-    if (!on || !ind) return;
+    ind.style.opacity = on ? '1' : '0';
+    if (!on) return;
     ind.style.width = `${on.offsetWidth}px`;
     ind.style.transform = `translateX(${on.offsetLeft}px)`;
   }
@@ -358,7 +514,8 @@
     const H = stage.clientHeight;
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
-    scale = clamp(Math.min((H - (lan ? 92 : 120)) / natH, (W - 32) / natW), 0.4, lan ? 1.08 : 1.1);
+    const room = stage.clientWidth < 600 ? 150 : (lan ? 92 : 120); // keep clear of the Save / Flip stack
+    scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 1.08 : 1.1);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 - 16);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
@@ -528,11 +685,12 @@
 
   // ---------- switching styles ----------
   let switching = false;
-  function setTemplate(next) {
-    if (next === state.tpl || switching) return;
+  function setTemplate(next, opts = {}) {
+    if ((next === state.tpl && !opts.force) || switching) return;
     const fromSticker = !isLanyard();
-    const toSticker = TPLS[next].kind === 'sticker';
+    const toSticker = opts.toSticker ?? TPLS[next].kind === 'sticker';
     const swap = () => {
+      if (opts.prep) opts.prep();
       state.tpl = next;
       state.flipped = false;
       render();
@@ -555,6 +713,20 @@
       switching = false;
     }, 240);
   }
+
+  // a brand-new generated tag on every press
+  function randomize() {
+    const seed = Math.floor(Math.random() * 2 ** 31);
+    const g = genSpec(seed);
+    const btn = $('#randomBtn');
+    btn.classList.remove('rolling'); void btn.offsetWidth; btn.classList.add('rolling');
+    setTemplate('random', {
+      force: true,
+      toSticker: g.format === 'L',
+      prep: () => { state.seed = seed; state.colors.random = g.palette; applyGen(); },
+    });
+  }
+  $('#randomBtn').addEventListener('click', randomize);
 
   // ---------- panel wiring ----------
   $('#styles').addEventListener('click', (e) => {
@@ -661,6 +833,7 @@
   }
 
   // ---------- go ----------
+  applyGen();
   syncInputs();
   render();
   layout();
