@@ -29,47 +29,47 @@
     classic: {
       kind: 'sticker', w: 440, h: 316, fields: ['greet'],
       palettes: [
-        { n: 'tomato', c: '#C8160F' }, { n: 'cobalt', c: '#1F4FD6' }, { n: 'grass', c: '#138A4E' },
-        { n: 'bubblegum', c: '#E2468E' }, { n: 'licorice', c: '#1C1C1E' },
+        { n: 'Tomato', c: '#C8160F' }, { n: 'Cobalt', c: '#1F4FD6' }, { n: 'Grass', c: '#138A4E' },
+        { n: 'Bubblegum', c: '#E2468E' }, { n: 'Licorice', c: '#1C1C1E' },
       ],
       swatch: (p) => p.c,
     },
     chatty: {
       kind: 'sticker', w: 440, h: 320, fields: ['q', 'answer'],
       palettes: [
-        { n: 'grape and lime', f: '#4B2C9C', h: '#C8DA2C', q: '#FFFFFF' },
-        { n: 'mint and grape', f: '#BFE4DF', h: '#3D2A8E', q: '#3D2A8E' },
-        { n: 'lime and tomato', f: '#D7E13B', h: '#E2401C', q: '#E2401C' },
-        { n: 'slate and lime', f: '#88888C', h: '#D7E13B', q: '#FFFFFF' },
+        { n: 'Grape and lime', f: '#4B2C9C', h: '#C8DA2C', q: '#FFFFFF' },
+        { n: 'Mint and grape', f: '#BFE4DF', h: '#3D2A8E', q: '#3D2A8E' },
+        { n: 'Lime and tomato', f: '#D7E13B', h: '#E2401C', q: '#E2401C' },
+        { n: 'Slate and lime', f: '#88888C', h: '#D7E13B', q: '#FFFFFF' },
       ],
       swatch: (p) => `linear-gradient(135deg, ${p.f} 50%, ${p.h} 50%)`,
     },
     member: {
       kind: 'lanyard', w: 300, h: 440, fields: ['role', 'event', 'since', 'photo', 'back'],
       palettes: [
-        { n: 'ink blue', i: '#1F4A8C', il: '#A9BCD8' }, { n: 'forest', i: '#1E6A49', il: '#A9CBB9' },
-        { n: 'oxblood', i: '#8C1F2C', il: '#D9AEB3' }, { n: 'graphite', i: '#2B2B2E', il: '#B4B4B8' },
+        { n: 'Graphite', i: '#2B2B2E', il: '#C4C4C6' }, { n: 'Forest', i: '#1E6A49', il: '#A9CBB9' },
+        { n: 'Oxblood', i: '#8C1F2C', il: '#D9AEB3' }, { n: 'Ink', i: '#1F4A8C', il: '#A9BCD8' },
       ],
       swatch: (p) => p.i, strap: (p) => p.i,
     },
     volunteer: {
       kind: 'lanyard', w: 300, h: 440, fields: ['greet', 'role', 'event', 'back'],
-      palettes: [{ n: 'tangerine', a: '#F27A1A' }, { n: 'electric blue', a: '#2F6BFF' }, { n: 'hot pink', a: '#EE4F9B' }, { n: 'leaf', a: '#1FA35B' }],
+      palettes: [{ n: 'Tangerine', a: '#F27A1A' }, { n: 'Electric blue', a: '#2F6BFF' }, { n: 'Hot pink', a: '#EE4F9B' }, { n: 'Leaf', a: '#1FA35B' }],
       swatch: (p) => p.a, strap: () => '#1E2329',
     },
     glow: {
       kind: 'lanyard', w: 300, h: 440, fields: ['role', 'event', 'mood', 'back'],
-      palettes: [{ n: 'amber', h: 28 }, { n: 'rose', h: 342 }, { n: 'lime', h: 72 }, { n: 'sky', h: 198 }, { n: 'violet', h: 262 }],
+      palettes: [{ n: 'Amber', h: 28 }, { n: 'Rose', h: 342 }, { n: 'Lime', h: 72 }, { n: 'Sky', h: 198 }, { n: 'Violet', h: 262 }],
       swatch: (p) => hsl(p.h, 95, 58), strap: (p) => hsl(p.h, 70, 46),
     },
   };
   const ORDER = Object.keys(TPLS);
   const SPECS = {
-    classic: ['Name badge label', 'Adhesive · 3⅜ × 2⅓ in'],
-    chatty: ['Conversation label', 'Adhesive · 3⅜ × 2⅓ in'],
-    member: ['Member card', 'CR80 · 54 × 86 mm · PVC'],
-    volunteer: ['Event badge', 'CR80 · 54 × 86 mm · slot punch'],
-    glow: ['Light card', 'CR80 · 54 × 86 mm · frosted'],
+    classic: ['Sticker label', '3⅜ × 2⅓ in'],
+    chatty: ['Conversation sticker', '3⅜ × 2⅓ in'],
+    member: ['Member card', '54 × 86 mm'],
+    volunteer: ['Lanyard badge', '54 × 86 mm'],
+    glow: ['Glow card', '54 × 86 mm'],
   };
 
   const now = new Date();
@@ -329,58 +329,27 @@
     renderSwatches();
     $('#flipBtn').disabled = !lan;
     $('#flipBtn').setAttribute('aria-pressed', String(lan && state.flipped));
-    $('#moodOut').textContent = `${state.mood}% ${moodWord(state.mood)}`;
+    $('#moodOut').textContent = `${state.mood}% · ${moodWord(state.mood)}`;
     if (t.fields.includes('mood')) {
-      $('#f-mood').style.setProperty('--track', `linear-gradient(90deg, ${hsl(p.h + 30, 80, 90)}, ${hsl(p.h + 12, 96, 68)} 55%, ${hsl(p.h - 4, 98, 52)})`);
+      $('#f-mood').style.setProperty('--track', `linear-gradient(90deg, ${hsl(p.h + 30, 80, 90)}, ${hsl(p.h + 12, 96, 68)} 55%, ${hsl(p.h - 4, 98, 56)})`);
     }
     $('#clearPhoto').hidden = !state.photo;
     const tile = $('#photoTile');
     tile.classList.toggle('has-photo', !!state.photo);
     tile.style.backgroundImage = state.photo ? `url('${state.photo}')` : '';
-    $('#echo').textContent = state.name.trim() || 'you';
-    $('#nameCount').textContent = `${state.name.length}/24`;
-    $('#hint').textContent = lan ? 'Drag to swing · tap to flip' : 'Drag it around · tap to slap it on';
-    $('#styleNote').textContent = SPECS[state.tpl][0].toLowerCase();
-    $('#specNo').textContent = `${String(ORDER.indexOf(state.tpl) + 1).padStart(2, '0')}/${String(ORDER.length).padStart(2, '0')}`;
+    $('#hint').textContent = lan ? 'Drag to swing, tap to flip' : 'Drag it around, tap to stick it';
+    stage.style.setProperty('--doodle', state.tpl === 'member' ? p.i : '#2B2B2E');
+    $('#greets').style.setProperty('--tint-bg', `var(--t-${state.tpl}-bg)`);
+    $('#greets').style.setProperty('--tint', `var(--t-${state.tpl})`);
     $('#specName').textContent = SPECS[state.tpl][0];
     $('#specSize').textContent = SPECS[state.tpl][1];
     $('#colorName').textContent = p.n;
     $$('#greets .chip').forEach((c) => c.setAttribute('aria-checked', String(+c.dataset.i === state.greet)));
     $('#questionText').textContent = QUESTIONS[state.q] || QUESTIONS[0];
-    renderThumbs();
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
   }
-
-  // live mini versions of every style in the picker
-  function renderThumbs() {
-    $$('.sty').forEach((b) => {
-      const key = b.dataset.tpl;
-      const t = TPLS[key];
-      const box = $('.thumb', b);
-      const bw = box.clientWidth || 64;
-      const bh = box.clientHeight || 70;
-      const k = Math.min((bw - 12) / t.w, (bh - 12) / t.h);
-      box.innerHTML = `<div class="thumb-in${t.kind === 'sticker' ? ' is-sticker' : ''}" style="transform:scale(${k.toFixed(4)}) translate(-50%, -50%)">
-        <div class="face-mini" style="width:${t.w}px;height:${t.h}px">${frontHTML(key)}</div></div>`;
-      fitAll(box);
-    });
-  }
-
-  // ruler numbers
-  function renderRulers() {
-    const step = 100;
-    const off = 26;
-    const x = $('#rulerX');
-    const y = $('#rulerY');
-    let hx = '';
-    for (let i = 1; off + i * step < innerWidth; i++) hx += `<i style="left:${off + i * step}px">${i}</i>`;
-    let hy = '';
-    for (let i = 1; off + i * step < Math.max(innerHeight, document.body.scrollHeight); i++) hy += `<i style="top:${off + i * step}px">${i}</i>`;
-    x.innerHTML = hx; y.innerHTML = hy;
-  }
-  addEventListener('resize', renderRulers);
 
   function renderSwatches() {
     const t = tpl();
@@ -409,7 +378,7 @@
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
-  new ResizeObserver(() => { layout(); renderThumbs(); }).observe(stage);
+  new ResizeObserver(layout).observe(stage);
 
   // ---------- physics ----------
   const K = 17;          // pendulum stiffness (g / L)
@@ -722,7 +691,7 @@
       toast("Couldn't make the picture. Try again in a moment.");
     } finally {
       btn.disabled = false;
-      label.textContent = 'Save PNG';
+      label.textContent = 'Save as PNG';
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());
@@ -741,7 +710,6 @@
   syncInputs();
   render();
   layout();
-  renderRulers();
-  if (document.fonts) document.fonts.ready.then(() => { render(); layout(); renderRulers(); });
+  if (document.fonts) document.fonts.ready.then(() => { render(); layout(); });
   requestAnimationFrame((time) => { last = time; frame(time); });
 })();
