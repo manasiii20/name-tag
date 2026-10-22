@@ -7,10 +7,9 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 | style   | what it is                                                        | extras                                  |
 | ------- | ----------------------------------------------------------------- | --------------------------------------- |
 | lanyard | "hi, i'm" badge with a highlighted name and a smiley              | dark flip side ("how can i help?")      |
-| classic | the red "HELLO, I'M" sticker, name handwritten                   | greetings incl. hindi + marathi        |
+| classic | the red "HELLO, I'M" sticker, rectangle or circle                | greetings incl. hindi + marathi        |
 | chatty  | speech-bubble sticker with an icebreaker question                 | shuffle questions, write your answer    |
 | glow    | soft gradient light with a face that watches your cursor          | energy slider changes the glow + eyes   |
-| random  | a generated tag: portrait card or sticker, one of six layouts     | new design on every press               |
 
 ## Interactions
 
@@ -20,7 +19,6 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Names get a capital first letter as you type. Change it back to lowercase and it stays that way.
 - Each field is a small numbered ticket with a question ("What do we call you?"). Click one to open it; Enter moves to the next.
 - Save PNG and Flip are stacked at the bottom left of the stage, so they're always in reach.
-- **Make me a random one** generates a new tag beyond the presets: format, layout, palette, type pairing and small details all come from a seed.
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
 - **Save PNG** renders the current side at 3x with a transparent background.
 - Your tag is remembered in `localStorage`.
