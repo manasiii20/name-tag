@@ -64,10 +64,17 @@
     },
   };
   const ORDER = Object.keys(TPLS);
+  const SPECS = {
+    classic: ['Name badge label', 'Adhesive · 3⅜ × 2⅓ in'],
+    chatty: ['Conversation label', 'Adhesive · 3⅜ × 2⅓ in'],
+    member: ['Member card', 'CR80 · 54 × 86 mm · PVC'],
+    volunteer: ['Event badge', 'CR80 · 54 × 86 mm · slot punch'],
+    glow: ['Light card', 'CR80 · 54 × 86 mm · frosted'],
+  };
 
   const now = new Date();
   const DEFAULTS = {
-    tpl: 'volunteer', name: 'alex', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
+    tpl: 'volunteer', name: 'Alex', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     q: 0, answer: 'durian ice cream', since: `${now.toLocaleString('en', { month: 'short' })} ${now.getFullYear()}`,
     back: 'how can i help?', mood: 64, photo: '', flipped: false,
     colors: { classic: 0, chatty: 0, member: 0, volunteer: 0, glow: 0 },
@@ -98,7 +105,7 @@
   }
 
   const tpl = () => TPLS[state.tpl];
-  const pal = () => { const t = tpl(); return t.palettes[(state.colors[state.tpl] || 0) % t.palettes.length]; };
+  const pal = (key = state.tpl) => { const t = TPLS[key]; return t.palettes[(state.colors[key] || 0) % t.palettes.length]; };
   const isLanyard = () => tpl().kind === 'lanyard';
 
   // ---------- helpers ----------
@@ -143,15 +150,15 @@
   }
 
   // ---------- templates ----------
-  function frontHTML() {
-    const p = pal();
+  function frontHTML(key = state.tpl) {
+    const p = pal(key);
     const name = esc(nameOr());
     const pron = esc(state.pronouns.trim());
     const role = esc(state.role.trim());
     const event = esc(state.event.trim());
     const greet = GREETS[state.greet] || GREETS[0];
 
-    switch (state.tpl) {
+    switch (key) {
       case 'classic':
         return `<div class="cl-wrap"><div class="cl" style="--c:${p.c}">
           <div class="cl-head fit" data-max="52" data-min="22">${esc(greet.toUpperCase())}</div>
@@ -275,19 +282,17 @@
   const front = $('#front');
   const back = $('#back');
 
-  const greetSel = $('#f-greet');
-  GREETS.forEach((g, i) => greetSel.add(new Option(g, i)));
-  const qSel = $('#f-q');
-  QUESTIONS.forEach((q, i) => qSel.add(new Option(q, i)));
+  $('#greets').innerHTML = GREETS.map((g, i) =>
+    `<button type="button" class="chip" role="radio" data-i="${i}" aria-checked="false">${esc(g)}</button>`).join('');
 
-  function fitAll() {
-    $$('.fit', rig).forEach((el) => {
+  function fitAll(root = rig) {
+    $$('.fit', root).forEach((el) => {
       let size = +el.dataset.max;
       const min = +el.dataset.min;
       el.style.fontSize = `${size}px`;
       while (el.scrollWidth > el.clientWidth + 1 && size > min) { size -= 2; el.style.fontSize = `${size}px`; }
     });
-    $$('.fitblock', rig).forEach((el) => {
+    $$('.fitblock', root).forEach((el) => {
       let size = +el.dataset.max;
       const min = +el.dataset.min;
       const inner = el.firstElementChild;
@@ -324,14 +329,58 @@
     renderSwatches();
     $('#flipBtn').disabled = !lan;
     $('#flipBtn').setAttribute('aria-pressed', String(lan && state.flipped));
-    $('#moodOut').textContent = `${state.mood}% · ${moodWord(state.mood)}`;
+    $('#moodOut').textContent = `${state.mood}% ${moodWord(state.mood)}`;
+    if (t.fields.includes('mood')) {
+      $('#f-mood').style.setProperty('--track', `linear-gradient(90deg, ${hsl(p.h + 30, 80, 90)}, ${hsl(p.h + 12, 96, 68)} 55%, ${hsl(p.h - 4, 98, 52)})`);
+    }
     $('#clearPhoto').hidden = !state.photo;
+    const tile = $('#photoTile');
+    tile.classList.toggle('has-photo', !!state.photo);
+    tile.style.backgroundImage = state.photo ? `url('${state.photo}')` : '';
     $('#echo').textContent = state.name.trim() || 'you';
-    $('#hint').textContent = lan ? 'drag to swing it · tap to flip it' : 'drag it around · tap to slap it on';
+    $('#nameCount').textContent = `${state.name.length}/24`;
+    $('#hint').textContent = lan ? 'Drag to swing · tap to flip' : 'Drag it around · tap to slap it on';
+    $('#styleNote').textContent = SPECS[state.tpl][0].toLowerCase();
+    $('#specNo').textContent = `${String(ORDER.indexOf(state.tpl) + 1).padStart(2, '0')}/${String(ORDER.length).padStart(2, '0')}`;
+    $('#specName').textContent = SPECS[state.tpl][0];
+    $('#specSize').textContent = SPECS[state.tpl][1];
+    $('#colorName').textContent = p.n;
+    $$('#greets .chip').forEach((c) => c.setAttribute('aria-checked', String(+c.dataset.i === state.greet)));
+    $('#questionText').textContent = QUESTIONS[state.q] || QUESTIONS[0];
+    renderThumbs();
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
   }
+
+  // live mini versions of every style in the picker
+  function renderThumbs() {
+    $$('.sty').forEach((b) => {
+      const key = b.dataset.tpl;
+      const t = TPLS[key];
+      const box = $('.thumb', b);
+      const bw = box.clientWidth || 64;
+      const bh = box.clientHeight || 70;
+      const k = Math.min((bw - 12) / t.w, (bh - 12) / t.h);
+      box.innerHTML = `<div class="thumb-in${t.kind === 'sticker' ? ' is-sticker' : ''}" style="transform:scale(${k.toFixed(4)}) translate(-50%, -50%)">
+        <div class="face-mini" style="width:${t.w}px;height:${t.h}px">${frontHTML(key)}</div></div>`;
+      fitAll(box);
+    });
+  }
+
+  // ruler numbers
+  function renderRulers() {
+    const step = 100;
+    const off = 26;
+    const x = $('#rulerX');
+    const y = $('#rulerY');
+    let hx = '';
+    for (let i = 1; off + i * step < innerWidth; i++) hx += `<i style="left:${off + i * step}px">${i}</i>`;
+    let hy = '';
+    for (let i = 1; off + i * step < Math.max(innerHeight, document.body.scrollHeight); i++) hy += `<i style="top:${off + i * step}px">${i}</i>`;
+    x.innerHTML = hx; y.innerHTML = hy;
+  }
+  addEventListener('resize', renderRulers);
 
   function renderSwatches() {
     const t = tpl();
@@ -360,7 +409,7 @@
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
-  new ResizeObserver(layout).observe(stage);
+  new ResizeObserver(() => { layout(); renderThumbs(); }).observe(stage);
 
   // ---------- physics ----------
   const K = 17;          // pendulum stiffness (g / L)
@@ -564,6 +613,30 @@
     $(`.swatch[data-i="${i}"]`).focus();
   });
 
+  // Names get a capital first letter as you start typing. Lowercase it yourself afterwards and it stays small.
+  const nameInput = $('#f-name');
+  let freshName = false;
+  nameInput.addEventListener('beforeinput', (e) => {
+    const all = nameInput.selectionStart === 0 && nameInput.selectionEnd === nameInput.value.length;
+    freshName = all && /^insert/.test(e.inputType || '');
+  });
+  nameInput.addEventListener('input', () => {
+    const v = nameInput.value;
+    if (freshName && v && v[0] !== v[0].toUpperCase()) {
+      const pos = nameInput.selectionStart;
+      nameInput.value = v[0].toUpperCase() + v.slice(1);
+      nameInput.setSelectionRange(pos, pos);
+    }
+    freshName = false;
+  });
+
+  $('#greets').addEventListener('click', (e) => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    state.greet = +c.dataset.i;
+    render(); save(); kick(1.2);
+  });
+
   $$('[data-key]').forEach((el) => {
     el.addEventListener('input', () => {
       const k = el.dataset.key;
@@ -573,10 +646,12 @@
     });
   });
 
-  $('#shuffleQ').addEventListener('click', () => {
+  $('#question').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    btn.classList.remove('rolling'); void btn.offsetWidth; btn.classList.add('rolling');
     let q;
     do { q = Math.floor(Math.random() * QUESTIONS.length); } while (q === state.q);
-    state.q = q; qSel.value = q;
+    state.q = q;
     render(); save(); kick(1.5);
   });
 
@@ -626,7 +701,8 @@
       return;
     }
     btn.disabled = true;
-    btn.textContent = 'printing…';
+    const label = $('span', btn);
+    label.textContent = 'Printing…';
     try {
       if (document.fonts) await document.fonts.ready;
       const canvas = await window.html2canvas(card, {
@@ -646,7 +722,7 @@
       toast("Couldn't make the picture. Try again in a moment.");
     } finally {
       btn.disabled = false;
-      btn.textContent = 'save png';
+      label.textContent = 'Save PNG';
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());
@@ -665,6 +741,7 @@
   syncInputs();
   render();
   layout();
-  if (document.fonts) document.fonts.ready.then(() => { render(); layout(); });
+  renderRulers();
+  if (document.fonts) document.fonts.ready.then(() => { render(); layout(); renderRulers(); });
   requestAnimationFrame((time) => { last = time; frame(time); });
 })();
