@@ -11,7 +11,7 @@
   // ---------- content ----------
   const GREETS = [
     "hello, i'm", "hi, i'm", 'hello, my name is', "hey, i'm", 'hello, who am i again?',
-    'namaste, main hoon', 'arre, main hoon', 'namaskar, maajha naav', 'hola, soy', 'bonjour, je suis',
+    'arree, mai hoon', 'hola, soy', 'bonjour, je suis',
   ];
   const QUESTIONS = [
     "what's the weirdest thing you've ever eaten?",
@@ -77,6 +77,7 @@
         const s = JSON.parse(raw);
         const merged = { ...DEFAULTS, ...s, colors: { ...DEFAULTS.colors, ...(s.colors || {}) } };
         if (!TPLS[merged.tpl]) merged.tpl = DEFAULTS.tpl;
+        if (!(merged.greet >= 0 && merged.greet < GREETS.length)) merged.greet = DEFAULTS.greet;
         return merged;
       }
     } catch { /* storage unavailable: start fresh */ }
@@ -359,11 +360,13 @@
     const H = stage.clientHeight;
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
-    const room = stage.clientWidth < 600 ? 150 : (lan ? 92 : 120); // keep clear of the Save / Flip stack
+    const room = stage.clientWidth < 600 ? 190 : (lan ? 120 : 150); // keep clear of the Save / Flip stack
     scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 1.08 : 1.1);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 - 16);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
+    // the hint sits centred just under the card's resting spot
+    $('#hint').style.top = `${Math.round(ty + natH * scale + (lan ? 22 : 30))}px`;
   }
   new ResizeObserver(layout).observe(stage);
   new ResizeObserver(moveIndicator).observe($('#styles'));
@@ -383,6 +386,7 @@
   let x = 0, y = 0, vx = 0, vy = 0;
   let t = 0, last = performance.now();
   let drag = null;
+  let restRot = -2, lastRot = -2;
 
   function kick(strength = 1) {
     if (reduceMotion.matches) return;
@@ -408,17 +412,14 @@
       card.style.setProperty('--twist', `${twist.toFixed(2)}deg`);
       card.style.setProperty('--sh', (th * 1.3 + twist / 70).toFixed(3));
     } else {
-      // stickers stay wherever you drop them; a throw glides to a stop and bumps off the edges
+      // stickers lift while you drag and stick flat wherever you let go
       if (held) { vx *= Math.pow(0.03, dt); vy *= Math.pow(0.03, dt); }
-      else {
-        const f = Math.pow(0.02, dt);
-        vx *= f; vy *= f;
-        x += vx * dt; y += vy * dt;
-      }
+      else { vx = 0; vy = 0; }
       const lim = stickerLimits();
-      if (Math.abs(x) > lim.x) { x = Math.sign(x) * lim.x; vx *= -0.35; }
-      if (Math.abs(y) > lim.y) { y = Math.sign(y) * lim.y; vy *= -0.35; }
-      const rot = clamp(vx * 0.02, -16, 16) - 2;
+      x = clamp(x, -lim.x, lim.x);
+      y = clamp(y, -lim.y, lim.y);
+      const rot = held ? restRot + clamp(vx * 0.02, -14, 14) : restRot;
+      lastRot = rot;
       rig.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;
       card.style.setProperty('--twist', '0deg');
       card.style.setProperty('--sh', (x / 260).toFixed(3));
@@ -474,7 +475,10 @@
     if (!drag || e.pointerId !== drag.id) return;
     const dx = e.clientX - drag.sx;
     const dy = e.clientY - drag.sy;
-    if (!drag.moved && Math.hypot(dx, dy) > 6) drag.moved = true;
+    if (!drag.moved && Math.hypot(dx, dy) > 6) {
+      drag.moved = true;
+      if (!isLanyard()) { rig.classList.add('lifted'); flipEl.classList.remove('stick', 'slap'); }
+    }
     if (!drag.moved) return;
     const tnow = performance.now();
     const dt = Math.max(8, tnow - drag.lastT) / 1000;
@@ -494,7 +498,9 @@
   const endDrag = (e) => {
     if (!drag || e.pointerId !== drag.id) return;
     const wasTap = !drag.moved && e.type === 'pointerup';
+    const placed = drag.moved && !isLanyard();
     drag = null;
+    if (placed) stickDown();
     rig.classList.remove('grabbing');
     w = clamp(w, -9, 9); vx = clamp(vx, -2500, 2500); vy = clamp(vy, -2500, 2500);
     if (wasTap) tap();
@@ -511,6 +517,16 @@
     }
   });
 
+  // the sticker presses onto the paper: a quick squash, the shadow tightens, the tilt settles
+  function stickDown() {
+    restRot = clamp(lastRot, -7, 7);
+    vx = vy = 0;
+    rig.classList.remove('lifted');
+    flipEl.classList.remove('stick', 'slap');
+    void flipEl.offsetWidth;
+    flipEl.classList.add('stick');
+  }
+
   function tap() { if (isLanyard()) flip(); else slap(); }
   function flip() {
     if (!isLanyard()) return;
@@ -526,7 +542,7 @@
     flipEl.classList.add('slap');
     vy += 120;
   }
-  flipEl.addEventListener('animationend', () => flipEl.classList.remove('slap'));
+  flipEl.addEventListener('animationend', () => flipEl.classList.remove('slap', 'stick'));
 
   // ---------- switching styles ----------
   let switching = false;
@@ -540,7 +556,7 @@
       render();
       layout();
       th = toSticker ? 0 : (Math.random() < 0.5 ? -1 : 1) * 0.4;
-      w = 0; x = y = vx = vy = 0;
+      w = 0; x = y = vx = vy = 0; restRot = lastRot = -2;
       save();
     };
     if (reduceMotion.matches) { swap(); return; }
