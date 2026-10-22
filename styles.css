@@ -104,7 +104,7 @@ button, input, select { font: inherit; color: inherit; }
 
 .strap {
   width: 26px;
-  height: 550px;
+  height: 610px;
   background:
     repeating-linear-gradient(0deg, rgba(255,255,255,.06) 0 1px, transparent 1px 3px),
     linear-gradient(90deg, rgba(0,0,0,.22), rgba(0,0,0,0) 22%, rgba(0,0,0,0) 78%, rgba(0,0,0,.22)),

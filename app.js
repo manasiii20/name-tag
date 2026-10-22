@@ -60,7 +60,7 @@
   };
   const now = new Date();
   const DEFAULTS = {
-    tpl: 'volunteer', name: 'Alex', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
+    tpl: 'volunteer', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     q: 0, answer: 'durian ice cream', since: `${now.toLocaleString('en', { month: 'short' })} ${now.getFullYear()}`,
     back: 'how can i help?', mood: 64, flipped: false,
     colors: { volunteer: 0, classic: 0, chatty: 0, glow: 0 },
@@ -77,6 +77,7 @@
         const s = JSON.parse(raw);
         const merged = { ...DEFAULTS, ...s, colors: { ...DEFAULTS.colors, ...(s.colors || {}) } };
         if (!TPLS[merged.tpl]) merged.tpl = DEFAULTS.tpl;
+        if (merged.name === 'Alex') merged.name = ''; // the old sample name, not something a visitor typed
         if (!(merged.greet >= 0 && merged.greet < GREETS.length)) merged.greet = DEFAULTS.greet;
         return merged;
       }
@@ -120,7 +121,7 @@
   const moodClass = (e) => (e < 22 ? 'sleepy' : e > 86 ? 'happy' : '');
   const smile = (color) => `<span class="smile" style="--sc:${color}"><i></i><i></i><b></b></span>`;
   const eyes = (cls = '') => `<div class="eye-pair ${cls}"><i class="eye"></i><i class="eye"></i></div>`;
-  const nameOr = () => state.name.trim() || 'your name';
+  const nameOr = () => state.name.trim() || '(visitor)';
 
   // ---------- templates ----------
   function frontHTML(key = state.tpl) {
@@ -362,7 +363,7 @@
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
     const room = stage.clientWidth < 600 ? 190 : (lan ? 120 : 150); // keep clear of the Save / Flip stack
     scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 0.92 : 0.95);
-    const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 - 16);
+    const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
@@ -595,24 +596,6 @@
     render(); save(); kick();
     $(`.swatch[data-i="${i}"]`).focus();
   });
-
-  // Names get a capital first letter as you start typing. Lowercase it yourself afterwards and it stays small.
-  const nameInput = $('#f-name');
-  let freshName = false;
-  nameInput.addEventListener('beforeinput', (e) => {
-    const all = nameInput.selectionStart === 0 && nameInput.selectionEnd === nameInput.value.length;
-    freshName = all && /^insert/.test(e.inputType || '');
-  });
-  nameInput.addEventListener('input', () => {
-    const v = nameInput.value;
-    if (freshName && v && v[0] !== v[0].toUpperCase()) {
-      const pos = nameInput.selectionStart;
-      nameInput.value = v[0].toUpperCase() + v.slice(1);
-      nameInput.setSelectionRange(pos, pos);
-    }
-    freshName = false;
-  });
-
 
   $$('[data-key]').forEach((el) => {
     el.addEventListener('input', () => {

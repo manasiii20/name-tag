@@ -16,7 +16,7 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Drag a lanyard badge to swing it (real pendulum physics). Tap or press Enter to flip it.
 - Drag a sticker anywhere on the page; it stays where you drop it. Tap to slap it down.
 - Typing and picking colors give the badge a little nudge.
-- Names get a capital first letter as you type. Change it back to lowercase and it stays that way.
+- Your name stays exactly as you type it. Until you type one, the tag says "(visitor)".
 - Each field is a small numbered ticket with a question ("What do we call you?"). Click one to open it; Enter moves to the next.
 - Save PNG and Flip are stacked at the bottom left of the stage, so they're always in reach.
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
