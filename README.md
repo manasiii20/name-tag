@@ -7,7 +7,7 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 | style   | what it is                                                        | extras                                  |
 | ------- | ----------------------------------------------------------------- | --------------------------------------- |
 | lanyard | "hi, i'm" badge with a highlighted name and a smiley              | dark flip side ("how can i help?")      |
-| classic | the red "HELLO, I'M" sticker, name handwritten                   | greeting picker (hola, bonjour, ciao…)  |
+| classic | the red "HELLO, I'M" sticker, name handwritten                   | greetings incl. hindi + marathi        |
 | chatty  | speech-bubble sticker with an icebreaker question                 | shuffle questions, write your answer    |
 | glow    | soft gradient light with a face that watches your cursor          | energy slider changes the glow + eyes   |
 | random  | a generated tag: portrait card or sticker, one of six layouts     | new design on every press               |

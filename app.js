@@ -9,7 +9,10 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   // ---------- content ----------
-  const GREETS = ["hello, i'm", "hi, i'm", 'hello, my name is', "hey, i'm", 'hola, soy', 'bonjour, je suis', 'ciao, sono'];
+  const GREETS = [
+    "hello, i'm", "hi, i'm", 'hello, my name is', "hey, i'm", 'hello, who am i again?',
+    'namaste, main hoon', 'arre, main hoon', 'namaskar, maajha naav', 'hola, soy', 'bonjour, je suis',
+  ];
   const QUESTIONS = [
     "what's the weirdest thing you've ever eaten?",
     'what word best describes you?',
@@ -32,7 +35,7 @@
       swatch: (p) => p.a, strap: () => '#1E2329',
     },
     classic: {
-      kind: 'sticker', w: 440, h: 316, fields: ['greet'],
+      kind: 'sticker', w: 440, h: 316, fields: ['greet', 'shape'],
       palettes: [
         { n: 'Tomato', c: '#C8160F' }, { n: 'Cobalt', c: '#1F4FD6' }, { n: 'Grass', c: '#138A4E' },
         { n: 'Bubblegum', c: '#E2468E' }, { n: 'Licorice', c: '#1C1C1E' },
@@ -213,7 +216,7 @@
     q: 0, answer: 'durian ice cream', since: `${now.toLocaleString('en', { month: 'short' })} ${now.getFullYear()}`,
     back: 'how can i help?', mood: 64, flipped: false,
     colors: { volunteer: 0, classic: 0, chatty: 0, glow: 0, random: 0 },
-    seed: 20261022,
+    seed: 20261022, shape: 'rect',
   };
 
   // ---------- state ----------
@@ -296,8 +299,17 @@
     if (key === 'random') return genFront(p);
     switch (key) {
       case 'classic':
+        if (state.shape === 'circle') {
+          return `<div class="cl-wrap circle"><div class="cl circle" style="--c:${p.c}">
+          <div class="cl-head fit" data-max="40" data-min="14">${esc(greet.toUpperCase())}</div>
+          <div class="cl-box">
+            <div class="cl-name fit" data-max="70" data-min="26">${name}</div>
+            ${pron ? `<div class="cl-pron">${pron}</div>` : ''}
+          </div>
+        </div></div>`;
+        }
         return `<div class="cl-wrap"><div class="cl" style="--c:${p.c}">
-          <div class="cl-head fit" data-max="52" data-min="22">${esc(greet.toUpperCase())}</div>
+          <div class="cl-head fit" data-max="52" data-min="16">${esc(greet.toUpperCase())}</div>
           <div class="cl-box">
             <div class="cl-name fit" data-max="86" data-min="30">${name}</div>
             ${pron ? `<div class="cl-pron">${pron}</div>` : ''}
@@ -324,7 +336,7 @@
           <span class="slot"></span>
           <div class="vol-org">${event ? `<b>${event}</b>` : '&nbsp;'}</div>
           <div class="vol-main">
-            <div class="vol-hi fit" data-max="46" data-min="26">${esc(greet)}</div>
+            <div class="vol-hi fit" data-max="46" data-min="18">${esc(greet)}</div>
             <div class="vol-pill"><span class="vol-name fit" data-max="64" data-min="28">${name}</span>${smile('#1C2127')}</div>
             ${pron ? `<div class="vol-pron">${pron}</div>` : ''}
           </div>
@@ -415,6 +427,8 @@
     front.innerHTML = frontHTML() + '<div class="sheen"></div>';
     back.innerHTML = lan ? backHTML() + '<div class="sheen"></div>' : '';
     card.classList.toggle('is-flipped', lan && state.flipped);
+    card.classList.toggle('is-circle', state.tpl === 'classic' && state.shape === 'circle');
+    $$('#shapes .opt').forEach((o) => o.setAttribute('aria-checked', String(o.dataset.shape === state.shape)));
 
     if (lan) {
       $('#strap').style.setProperty('--strap', t.strap(p));
@@ -833,6 +847,20 @@
   }
 
   // ---------- go ----------
+  // the classic sticker comes as a rectangle or a circle
+  function applyShape() {
+    Object.assign(TPLS.classic, state.shape === 'circle' ? { w: 360, h: 360 } : { w: 440, h: 316 });
+  }
+  $('#shapes').addEventListener('click', (e) => {
+    const o = e.target.closest('.opt');
+    if (!o || o.dataset.shape === state.shape) return;
+    state.shape = o.dataset.shape;
+    applyShape();
+    render(); layout(); save();
+    slap();
+  });
+
+  applyShape();
   applyGen();
   syncInputs();
   render();
