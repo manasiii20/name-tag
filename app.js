@@ -26,6 +26,11 @@
   ];
 
   const TPLS = {
+    volunteer: {
+      kind: 'lanyard', w: 300, h: 440, fields: ['greet', 'role', 'event', 'back'],
+      palettes: [{ n: 'Tangerine', a: '#F27A1A' }, { n: 'Electric blue', a: '#2F6BFF' }, { n: 'Hot pink', a: '#EE4F9B' }, { n: 'Leaf', a: '#1FA35B' }],
+      swatch: (p) => p.a, strap: () => '#1E2329',
+    },
     classic: {
       kind: 'sticker', w: 440, h: 316, fields: ['greet'],
       palettes: [
@@ -44,19 +49,6 @@
       ],
       swatch: (p) => `linear-gradient(135deg, ${p.f} 50%, ${p.h} 50%)`,
     },
-    member: {
-      kind: 'lanyard', w: 300, h: 440, fields: ['role', 'event', 'since', 'photo', 'back'],
-      palettes: [
-        { n: 'Graphite', i: '#2B2B2E', il: '#C4C4C6' }, { n: 'Forest', i: '#1E6A49', il: '#A9CBB9' },
-        { n: 'Oxblood', i: '#8C1F2C', il: '#D9AEB3' }, { n: 'Ink', i: '#1F4A8C', il: '#A9BCD8' },
-      ],
-      swatch: (p) => p.i, strap: (p) => p.i,
-    },
-    volunteer: {
-      kind: 'lanyard', w: 300, h: 440, fields: ['greet', 'role', 'event', 'back'],
-      palettes: [{ n: 'Tangerine', a: '#F27A1A' }, { n: 'Electric blue', a: '#2F6BFF' }, { n: 'Hot pink', a: '#EE4F9B' }, { n: 'Leaf', a: '#1FA35B' }],
-      swatch: (p) => p.a, strap: () => '#1E2329',
-    },
     glow: {
       kind: 'lanyard', w: 300, h: 440, fields: ['role', 'event', 'mood', 'back'],
       palettes: [{ n: 'Amber', h: 28 }, { n: 'Rose', h: 342 }, { n: 'Lime', h: 72 }, { n: 'Sky', h: 198 }, { n: 'Violet', h: 262 }],
@@ -67,8 +59,8 @@
   const DEFAULTS = {
     tpl: 'volunteer', name: 'Alex', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     q: 0, answer: 'durian ice cream', since: `${now.toLocaleString('en', { month: 'short' })} ${now.getFullYear()}`,
-    back: 'how can i help?', mood: 64, photo: '', flipped: false,
-    colors: { classic: 0, chatty: 0, member: 0, volunteer: 0, glow: 0 },
+    back: 'how can i help?', mood: 64, flipped: false,
+    colors: { volunteer: 0, classic: 0, chatty: 0, glow: 0 },
   };
 
   // ---------- state ----------
@@ -90,8 +82,7 @@
   function save() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      try { localStorage.setItem(KEY, JSON.stringify(state)); }
-      catch { try { localStorage.setItem(KEY, JSON.stringify({ ...state, photo: '' })); } catch { /* ignore */ } }
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* storage full or blocked */ }
     }, 250);
   }
 
@@ -174,32 +165,6 @@
           </div>
         </div></div>`;
 
-      case 'member': {
-        const h = hash(state.name + state.event);
-        const no = String(h % 1000).padStart(3, '0');
-        const initial = esc((state.name.trim()[0] || '?').toUpperCase());
-        const photo = state.photo
-          ? `<div class="mem-photo-in" style="background-image:url('${state.photo}')"></div>`
-          : `<div class="mem-photo-in">${initial}</div>`;
-        const field = (label, val) => `<div><div class="mem-label">${label}</div><div class="mem-val fit" data-max="26" data-min="14">${val || '&nbsp;'}</div></div>`;
-        return `<div class="mem" style="--i:${p.i};--il:${p.il}">
-          <span class="slot"></span>
-          <div class="mem-no">MEMBER ${no}</div>
-          <div class="mem-title">Member<br>Card</div>
-          <div class="mem-org fit" data-max="10" data-min="8">${event || 'the club'}</div>
-          <div class="mem-body">
-            <div class="mem-fields">
-              ${field('name', name)}${field('team', role)}${field('pronouns', pron)}${field('since', esc(state.since.trim()))}
-            </div>
-            <div class="mem-photo">${photo}</div>
-          </div>
-          <div class="mem-foot">
-            <div class="mem-fine">The holder of this card is an official member of ${event || 'the club'}</div>
-            <div class="mem-stamp-wrap"><div class="mem-stamp">${initial}</div><div class="mem-code">NT-${String(now.getFullYear()).slice(2)}-${no}</div></div>
-          </div>
-        </div>`;
-      }
-
       case 'volunteer':
         return `<div class="vol" style="--a:${p.a}">
           <span class="slot"></span>
@@ -235,16 +200,6 @@
     const back = esc(state.back.trim() || 'hello!');
     const event = esc(state.event.trim());
     switch (state.tpl) {
-      case 'member': {
-        const no = String(hash(state.name + state.event) % 1000).padStart(3, '0');
-        return `<div class="mem mem-back" style="--i:${p.i};--il:${p.il}">
-          <span class="slot"></span>
-          <div class="mem-no">MEMBER ${no}</div>
-          <div class="mem-big fitblock" data-max="52" data-min="24"><span>${back}</span></div>
-          ${barcode(state.name + no, p.i)}
-          <div class="mem-fine">If found, please return to ${esc(nameOr())}${event ? ` at ${event}` : ''}</div>
-        </div>`;
-      }
       case 'volunteer':
         return `<div class="vol dark">
           <span class="slot"></span>
@@ -320,47 +275,21 @@
     renderSwatches();
     $('#flipBtn').disabled = !lan;
     $('#flipBtn').setAttribute('aria-pressed', String(lan && state.flipped));
-    $('#clearPhoto').hidden = !state.photo;
-    const tile = $('#photoTile');
-    tile.style.backgroundImage = state.photo ? `url('${state.photo}')` : '';
-    $('#hint').textContent = lan ? 'Drag to swing it, tap to flip it.' : 'Drag it around, tap to stick it down.';
-    stage.style.setProperty('--doodle', state.tpl === 'member' ? p.i : '#2B2B2E');
+    $('#hint').textContent = lan ? 'Drag to swing it, tap to flip it.' : 'Drag it anywhere, tap to stick it down.';
     $$('#greets .greet').forEach((g) => g.setAttribute('aria-checked', String(+g.dataset.i === state.greet)));
-    renderTickets(p);
+    renderTickets();
     $('#questionText').textContent = QUESTIONS[state.q] || QUESTIONS[0];
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
-    renderThumbs();
+    moveIndicator();
   }
 
-  // ticket stubs: number the visible ones and show what's filled in
-  function renderTickets(p) {
-    const vals = {
-      name: state.name.trim(),
-      pronouns: state.pronouns.trim(),
-      role: state.role.trim(),
-      event: state.event.trim(),
-      since: state.since.trim(),
-      greet: GREETS[state.greet],
-      q: state.answer.trim(),
-      photo: state.photo ? 'Added' : '',
-      mood: `${state.mood}%, ${moodWord(state.mood)}`,
-      back: state.back.trim(),
-    };
+  // number the tickets that apply to this tag
+  function renderTickets() {
     let n = 0;
     $$('.ticket').forEach((tk) => {
-      if (tk.hidden) return;
-      $('.t-no', tk).textContent = String(++n).padStart(2, '0');
-      const key = tk.dataset.ticket;
-      const el = $('.t-val', tk);
-      if (key === 'color') {
-        el.innerHTML = `<i class="dot" style="background:${tpl().swatch(p)}"></i>${esc(p.n)}`;
-        el.classList.remove('empty');
-        return;
-      }
-      el.textContent = vals[key] || 'Not filled in';
-      el.classList.toggle('empty', !vals[key]);
+      if (!tk.hidden) $('.t-no', tk).textContent = String(++n).padStart(2, '0');
     });
     const open = $('.ticket.is-open');
     if (open && open.hidden) setOpen(null);
@@ -398,20 +327,13 @@
     render(); save(); kick(1.2);
   });
 
-  // live mini versions of each preset, with your name on them
-  function renderThumbs() {
-    $$('.preset').forEach((b) => {
-      const key = b.dataset.tpl;
-      const t = TPLS[key];
-      const box = $('.thumb', b);
-      const bw = box.clientWidth;
-      const bh = box.clientHeight;
-      if (!bw || !bh) return;
-      const k = Math.min((bw - 4) / t.w, (bh - 4) / t.h);
-      box.innerHTML = `<div class="thumb-in${t.kind === 'sticker' ? ' is-sticker' : ''}" style="transform:scale(${k.toFixed(4)}) translate(-50%, -50%)">
-        <div class="face-mini" style="width:${t.w}px;height:${t.h}px">${frontHTML(key)}</div></div>`;
-      fitAll(box);
-    });
+  // slide the tag picker's highlight under the chosen option
+  function moveIndicator() {
+    const on = $(`.seg[data-tpl="${state.tpl}"]`);
+    const ind = $('#segInd');
+    if (!on || !ind) return;
+    ind.style.width = `${on.offsetWidth}px`;
+    ind.style.transform = `translateX(${on.offsetLeft}px)`;
   }
 
   function renderSwatches() {
@@ -436,18 +358,25 @@
     const H = stage.clientHeight;
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
-    scale = clamp(Math.min((H - (lan ? 54 : 100)) / natH, (W - 32) / natW), 0.4, lan ? 1.08 : 1.1);
+    scale = clamp(Math.min((H - (lan ? 92 : 120)) / natH, (W - 32) / natW), 0.4, lan ? 1.08 : 1.1);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 - 16);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
-  new ResizeObserver(() => { layout(); renderThumbs(); }).observe(stage);
+  new ResizeObserver(layout).observe(stage);
+  new ResizeObserver(moveIndicator).observe($('#styles'));
+
+  function stickerLimits() {
+    const t = tpl();
+    return {
+      x: Math.max(0, (stage.clientWidth / scale - t.w) / 2 - 8),
+      y: Math.max(0, (stage.clientHeight / scale - t.h) / 2 - 8),
+    };
+  }
 
   // ---------- physics ----------
   const K = 17;          // pendulum stiffness (g / L)
   const D = 1.15;        // swing damping
-  const KS = 170;        // sticker spring
-  const DS = 15;
   let th = 0.32, w = 0;  // lanyard angle + angular velocity
   let x = 0, y = 0, vx = 0, vy = 0;
   let t = 0, last = performance.now();
@@ -477,11 +406,16 @@
       card.style.setProperty('--twist', `${twist.toFixed(2)}deg`);
       card.style.setProperty('--sh', (th * 1.3 + twist / 70).toFixed(3));
     } else {
+      // stickers stay wherever you drop them; a throw glides to a stop and bumps off the edges
       if (held) { vx *= Math.pow(0.03, dt); vy *= Math.pow(0.03, dt); }
       else {
-        vx += (-KS * x - DS * vx) * dt; vy += (-KS * y - DS * vy) * dt;
+        const f = Math.pow(0.02, dt);
+        vx *= f; vy *= f;
         x += vx * dt; y += vy * dt;
       }
+      const lim = stickerLimits();
+      if (Math.abs(x) > lim.x) { x = Math.sign(x) * lim.x; vx *= -0.35; }
+      if (Math.abs(y) > lim.y) { y = Math.sign(y) * lim.y; vy *= -0.35; }
       const rot = clamp(vx * 0.02, -16, 16) - 2;
       rig.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;
       card.style.setProperty('--twist', '0deg');
@@ -680,28 +614,6 @@
   });
 
   $('#flipBtn').addEventListener('click', flip);
-
-  // photo for the member card: downscale so it stays light
-  $('#f-photo').addEventListener('change', (e) => {
-    const file = e.target.files && e.target.files[0];
-    e.target.value = '';
-    if (!file) return;
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const max = 360;
-      const k = Math.min(1, max / Math.max(img.width, img.height));
-      const c = document.createElement('canvas');
-      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      state.photo = c.toDataURL('image/jpeg', 0.86);
-      URL.revokeObjectURL(url);
-      render(); save(); kick(1.5);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); toast("That file didn't open as an image. Try a JPG or PNG."); };
-    img.src = url;
-  });
-  $('#clearPhoto').addEventListener('click', () => { state.photo = ''; render(); save(); });
 
   // ---------- save as png ----------
   const dlg = $('#saveDlg');

@@ -16,8 +16,6 @@
   <section class="stage" id="stage" aria-label="Your name tag">
     <h1 class="site">hello, i'm<span class="cursor" aria-hidden="true">_</span></h1>
 
-    <svg class="doodle d1" viewBox="0 0 160 200" aria-hidden="true"><path pathLength="1" d="M80 178 C 40 140, 6 104, 14 62 C 22 22, 70 20, 80 64 C 90 20, 140 22, 146 62 C 152 104, 118 140, 80 178 C 60 196, 34 192, 22 176"/></svg>
-    <svg class="doodle d2" viewBox="0 0 160 200" aria-hidden="true"><path pathLength="1" d="M80 178 C 40 140, 6 104, 14 62 C 22 22, 70 20, 80 64 C 90 20, 140 22, 146 62 C 152 104, 118 140, 80 178 C 60 196, 34 192, 22 176"/></svg>
 
     <div class="mount" id="mount">
       <div class="drop" id="drop">
@@ -34,18 +32,22 @@
       </div>
     </div>
 
-    <p class="hint" id="hint"></p>
+    <div class="actions">
+      <button type="button" class="solid" id="saveBtn"><span>Save PNG</span></button>
+      <button type="button" class="ghost" id="flipBtn" aria-pressed="false">Flip it</button>
+      <p class="hint" id="hint"></p>
+    </div>
   </section>
 
   <aside class="panel" aria-label="Edit your tag">
     <section class="pick" aria-labelledby="h-pick">
       <h2 class="pick-h" id="h-pick">Which tag are you?</h2>
-      <div class="presets" id="styles">
-        <button type="button" class="sty preset" data-tpl="classic"><span class="thumb"></span><span class="p-name">Classic</span></button>
-        <button type="button" class="sty preset" data-tpl="chatty"><span class="thumb"></span><span class="p-name">Chatty</span></button>
-        <button type="button" class="sty preset" data-tpl="member"><span class="thumb"></span><span class="p-name">Member</span></button>
-        <button type="button" class="sty preset" data-tpl="volunteer"><span class="thumb"></span><span class="p-name">Lanyard</span></button>
-        <button type="button" class="sty preset" data-tpl="glow"><span class="thumb"></span><span class="p-name">Glow</span></button>
+      <div class="seg-track" id="styles" role="group" aria-labelledby="h-pick">
+        <span class="seg-ind" id="segInd" aria-hidden="true"></span>
+        <button type="button" class="sty seg" data-tpl="volunteer"><i class="glyph portrait" aria-hidden="true"></i>Lanyard</button>
+        <button type="button" class="sty seg" data-tpl="classic"><i class="glyph landscape" aria-hidden="true"></i>Classic</button>
+        <button type="button" class="sty seg" data-tpl="chatty"><i class="glyph landscape" aria-hidden="true"></i>Chatty</button>
+        <button type="button" class="sty seg" data-tpl="glow"><i class="glyph portrait" aria-hidden="true"></i>Glow</button>
       </div>
     </section>
 
@@ -53,7 +55,7 @@
       <div class="ticket is-open" data-ticket="name">
         <button type="button" class="t-head" id="th-name" aria-expanded="true" aria-controls="tb-name">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">What do we call you?</span><span class="t-val" data-val="name"></span></span>
+          <span class="t-main"><span class="t-q">What do we call you?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-name" role="region" aria-labelledby="th-name">
@@ -66,7 +68,7 @@
       <div class="ticket" data-ticket="pronouns">
         <button type="button" class="t-head" id="th-pronouns" aria-expanded="false" aria-controls="tb-pronouns">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">How should people refer to you?</span><span class="t-val" data-val="pronouns"></span></span>
+          <span class="t-main"><span class="t-q">How should people refer to you?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-pronouns" role="region" aria-labelledby="th-pronouns">
@@ -79,7 +81,7 @@
       <div class="ticket" data-ticket="role" data-for="role">
         <button type="button" class="t-head" id="th-role" aria-expanded="false" aria-controls="tb-role">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">What are you here as?</span><span class="t-val" data-val="role"></span></span>
+          <span class="t-main"><span class="t-q">What are you here as?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-role" role="region" aria-labelledby="th-role">
@@ -92,7 +94,7 @@
       <div class="ticket" data-ticket="event" data-for="event">
         <button type="button" class="t-head" id="th-event" aria-expanded="false" aria-controls="tb-event">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Where is this tag going?</span><span class="t-val" data-val="event"></span></span>
+          <span class="t-main"><span class="t-q">Where is this tag going?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-event" role="region" aria-labelledby="th-event">
@@ -102,23 +104,10 @@
           </div>
         </div>
       </div>
-      <div class="ticket" data-ticket="since" data-for="since">
-        <button type="button" class="t-head" id="th-since" aria-expanded="false" aria-controls="tb-since">
-          <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Member since when?</span><span class="t-val" data-val="since"></span></span>
-          <span class="t-plus" aria-hidden="true"></span>
-        </button>
-        <div class="t-body" id="tb-since" role="region" aria-labelledby="th-since">
-          <div class="t-inner">
-            <label class="sr-only" for="f-since">Member since</label>
-            <input id="f-since" class="t-input" data-key="since" autocomplete="off" maxlength="12" placeholder="Oct 2026">
-          </div>
-        </div>
-      </div>
       <div class="ticket" data-ticket="greet" data-for="greet">
         <button type="button" class="t-head" id="th-greet" aria-expanded="false" aria-controls="tb-greet">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">How do you say hi?</span><span class="t-val" data-val="greet"></span></span>
+          <span class="t-main"><span class="t-q">How do you say hi?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-greet" role="region" aria-labelledby="th-greet">
@@ -130,7 +119,7 @@
       <div class="ticket" data-ticket="q" data-for="q">
         <button type="button" class="t-head" id="th-q" aria-expanded="false" aria-controls="tb-q">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Break the ice</span><span class="t-val" data-val="q"></span></span>
+          <span class="t-main"><span class="t-q">Break the ice</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-q" role="region" aria-labelledby="th-q">
@@ -142,30 +131,10 @@
           </div>
         </div>
       </div>
-      <div class="ticket" data-ticket="photo" data-for="photo">
-        <button type="button" class="t-head" id="th-photo" aria-expanded="false" aria-controls="tb-photo">
-          <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Got a good photo?</span><span class="t-val" data-val="photo"></span></span>
-          <span class="t-plus" aria-hidden="true"></span>
-        </button>
-        <div class="t-body" id="tb-photo" role="region" aria-labelledby="th-photo">
-          <div class="t-inner">
-            <div class="photo-row">
-              <label class="photo-tile" for="f-photo" id="photoTile"><span class="sr-only">Choose a photo</span></label>
-              <input id="f-photo" type="file" accept="image/*" class="sr-only">
-              <div class="photo-copy">
-                <label class="link" for="f-photo">Choose a photo</label>
-                <button type="button" class="link muted" id="clearPhoto" hidden>Remove it</button>
-                <span class="fine">It stays on your device.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="ticket" data-ticket="mood" data-for="mood">
         <button type="button" class="t-head" id="th-mood" aria-expanded="false" aria-controls="tb-mood">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">How's your energy today?</span><span class="t-val" data-val="mood"></span></span>
+          <span class="t-main"><span class="t-q">How's your energy today?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-mood" role="region" aria-labelledby="th-mood">
@@ -179,7 +148,7 @@
       <div class="ticket" data-ticket="back" data-for="back">
         <button type="button" class="t-head" id="th-back" aria-expanded="false" aria-controls="tb-back">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Anything for the back?</span><span class="t-val" data-val="back"></span></span>
+          <span class="t-main"><span class="t-q">Anything for the back?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-back" role="region" aria-labelledby="th-back">
@@ -192,7 +161,7 @@
       <div class="ticket" data-ticket="color">
         <button type="button" class="t-head" id="th-color" aria-expanded="false" aria-controls="tb-color">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">What's your color?</span><span class="t-val" data-val="color"></span></span>
+          <span class="t-main"><span class="t-q">What's your color?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
         <div class="t-body" id="tb-color" role="region" aria-labelledby="th-color">
@@ -203,10 +172,6 @@
       </div>
     </div>
 
-    <div class="actions">
-      <button type="button" class="ghost" id="flipBtn" aria-pressed="false">Flip it</button>
-      <button type="button" class="solid" id="saveBtn"><span>Save PNG</span></button>
-    </div>
   </aside>
 </main>
 
