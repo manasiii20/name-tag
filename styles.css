@@ -703,16 +703,16 @@ button, input, select { font: inherit; color: inherit; }
   .site { left: max(22px, env(safe-area-inset-left, 0px)); top: calc(12px + env(safe-area-inset-top, 0px)); font-size: 19px; line-height: 42px; }
 
   /* flip, save and share become small icon buttons in the top right */
-  /* top row, left to right: details, flip, share, save */
-  .actions { left: auto; right: 16px; bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); }
-  #flipBtn { margin-right: 50px; }
+  /* top row, left to right: flip, save, share */
+  .actions { left: auto; right: 66px; bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); }
   .stack { flex-direction: row; width: auto; gap: 8px; }
-  .share { right: 66px; bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); }
-  .share-pop { right: -50px; }
+  .share { right: 16px; bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); }
   .act, .act.share-btn { width: 42px; min-height: 42px; height: 42px; padding: 0; border-radius: 12px; display: grid; grid-template-columns: 1fr; grid-template-rows: 1fr; place-items: center; }
   .act .act-t, .act .act-s { display: none; }
   .act .act-ic { grid-row: auto; width: 42px; height: 42px; background: transparent; border-radius: 12px; }
-  .act.primary .act-ic { background: var(--ink); }
+  .act.primary .act-ic { background: transparent; color: var(--ink); }
+  .act.share-btn { background: var(--ink); box-shadow: 0 8px 18px -10px rgba(20, 20, 10, .5); }
+  .act.share-btn .act-ic { background: transparent; color: var(--white); }
   .act:disabled .act-ic { opacity: .35; }
   .share-pop { bottom: auto; top: calc(100% + 8px); }
   .hint { left: 50%; right: auto; transform: translateX(-50%); bottom: calc(124px + env(safe-area-inset-bottom, 0px)); max-width: none; white-space: nowrap; text-align: center; }

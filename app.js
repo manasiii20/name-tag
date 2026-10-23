@@ -837,7 +837,7 @@
     const room = editingPhone ? 150 : phone.matches ? 230 : (lan ? 120 : 150); // keep clear of the action stack (desktop) or the tag bar (phones)
     const cap = phone.matches ? (lan ? 0.78 : 0.66) : (lan ? 0.92 : 0.95); // stickers sit smaller on a phone screen
     scale = clamp(Math.min((H - room) / natH, (W - (editingPhone ? 16 : 32)) / natW), 0.2, cap);
-    const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
+    const ty = lan ? (phone.matches ? 44 : 0) : Math.max(10, (H - natH * scale) / 2 + 8);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
