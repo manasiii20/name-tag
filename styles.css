@@ -465,7 +465,7 @@ button, input, select { font: inherit; color: inherit; }
   scrollbar-width: thin; scrollbar-color: var(--edge-strong) transparent;
 }
 
-.pick { display: flex; flex-direction: column; gap: 10px; padding-bottom: 14px; }
+.pick { display: flex; flex-direction: column; gap: 10px; padding-bottom: 6px; }
 /* tag picker: separate pills, like name-tag stickers on a sheet */
 .share {
   position: fixed; z-index: 30;
