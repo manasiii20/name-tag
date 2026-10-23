@@ -8,10 +8,10 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 | ------- | ----------------------------------------------------------------- | --------------------------------------- |
 | say hi  | "hi, i'm" badge with a highlighted name and a smiley              | dark flip side ("how can i help?")      |
 | classic | the red "HELLO, I'M" sticker, rectangle or circle                | greetings incl. "arree, mai hoon"      |
-| mood light | soft gradient light with a face that watches your cursor          | energy slider changes the glow + eyes   |
+| aura | soft gradient light with a face that watches your cursor          | energy slider changes the glow + eyes   |
 | postcard| stamp-edged sticker with a little sea buddy and your name on a line | fish, narwhal or puffer                 |
 | motto | lanyard card with your own one-liner                              | your line, stacked, with smileys, bold colours |
-| coffee run | starburst with your name over a doodled coffee drinker            | four colourways, each with its own shirt|
+| coffee | starburst with your name over a doodled coffee drinker            | four colourways, each with its own shirt|
 | licensed | "creative licence" ID on a pale blue lanyard, glitter stars on the desk | photo, least favourite font, pick stickers to stick on |
 | crayon  | folded place card: crayon stripes, a wavy crayon frame, your name in the middle | pronouns on the fold, five colourways |
 
