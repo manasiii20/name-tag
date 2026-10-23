@@ -467,37 +467,11 @@ button, input, select { font: inherit; color: inherit; }
 
 .pick { display: flex; flex-direction: column; gap: 10px; }
 /* tag picker: separate pills, like name-tag stickers on a sheet */
-.seg-track { display: flex; flex-wrap: wrap; gap: 7px; }
-.seg {
-  display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px 0 11px; border-radius: 999px; cursor: pointer;
-  border: 0; background: var(--white); color: var(--ink-2); font: 500 13.5px var(--f-ui); white-space: nowrap;
-  box-shadow: 0 0 0 1px var(--edge), 0 1px 2px rgba(20, 20, 10, .04);
-  transition: background .15s, color .15s, box-shadow .15s, transform .15s;
-}
-.seg::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot, #BBB); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08); }
-.seg:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--edge-strong), 0 4px 10px -6px rgba(20, 20, 10, .25); }
-.seg[aria-pressed="true"] { background: var(--ink); color: var(--white); box-shadow: none; }
-.seg[aria-pressed="true"]::before { box-shadow: 0 0 0 2px rgba(255, 255, 255, .25); }
-.seg[data-tpl="classic"] { --dot: #C8160F; }
-.seg[data-tpl="volunteer"] { --dot: #F27A1A; }
-.seg[data-tpl="glow"] { --dot: #FFB02E; }
-.seg[data-tpl="postcard"] { --dot: #6460C6; }
-.seg[data-tpl="coffee"] { --dot: #3D8BEB; }
-.seg[data-tpl="slogan"] { --dot: #2DB94C; }
-.seg[data-tpl="crayon"] { --dot: #F6C531; }
-.seg[data-tpl="licence"] { --dot: #E8457E; }
 .share {
   position: fixed; z-index: 30;
   right: max(24px, env(safe-area-inset-right, 0px)); bottom: max(24px, env(safe-area-inset-bottom, 0px));
 }
-.share-btn {
-  display: inline-flex; align-items: center; gap: 7px; height: 42px; padding: 0 18px 0 15px; border-radius: 999px; cursor: pointer;
-  border: 0; background: var(--ink); color: var(--white); font: 500 14px var(--f-ui);
-  box-shadow: 0 10px 22px -12px rgba(20, 20, 10, .55);
-  transition: border-color .15s;
-}
-.share-btn:hover, .share-btn[aria-expanded="true"] { background: #2C2C2A; }
-.share-btn svg, .share-item svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.share-item svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .share-pop {
   position: absolute; right: 0; bottom: calc(100% + 10px); z-index: 20; width: 248px; padding: 6px;
   background: var(--white); border-radius: 12px; box-shadow: 0 0 0 1px var(--edge), 0 18px 36px -16px rgba(20, 20, 10, .35);
@@ -515,7 +489,20 @@ button, input, select { font: inherit; color: inherit; }
 .share-item b { font: 500 13.5px var(--f-ui); }
 .share-item small { font-size: 12px; color: var(--muted); }
 .share-btn:focus-visible, .share-item:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.pick-h, .tickets-h { margin: 0; font: 500 13px var(--f-ui); color: var(--ink-2); }
+.pick-h, .tickets-h { margin: 0; font: 500 16px var(--f-ui); letter-spacing: -.01em; color: var(--ink); }
+/* tag picker: two rows of four, plain tiles in the same white as the tickets */
+.seg-track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.seg {
+  height: 38px; padding: 0 6px; border: 0; border-radius: 8px; cursor: pointer;
+  background: var(--white); color: var(--ink-2); font: 500 13.5px var(--f-ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 0 0 1px var(--edge), 0 1px 2px rgba(20, 20, 10, .04);
+  transition: background .15s, color .15s, box-shadow .15s;
+}
+.seg:hover { box-shadow: 0 0 0 1px var(--edge-strong), 0 1px 2px rgba(20, 20, 10, .04); color: var(--ink); }
+.seg[aria-pressed="true"] { background: var(--ink); color: var(--white); box-shadow: none; }
+.seg:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.act.share-btn { width: 214px; }
+.act.share-btn[aria-expanded="true"] { box-shadow: 0 0 0 1px var(--ink), 0 8px 18px -12px rgba(20, 20, 10, .25); }
 .glyph { display: block; flex: none; border: 1.5px solid currentColor; border-radius: 2.5px; }
 .glyph.portrait { width: 9px; height: 12px; }
 .glyph.landscape { width: 13px; height: 9px; border-radius: 3px; }
@@ -717,7 +704,11 @@ button, input, select { font: inherit; color: inherit; }
 
   .share { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); right: 16px; }
   .editing .share { opacity: 0; pointer-events: none; }
-  .seg { height: 30px; padding: 0 11px 0 9px; font-size: 12.5px; }
+  .seg-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .seg { height: 34px; font-size: 13px; }
+  .pick-h { font-size: 15px; }
+  .act.share-btn { width: auto; grid-template-columns: 34px auto; grid-template-rows: auto; }
+  .share-btn .act-s { display: none; }
   .edit-toggle {
     position: fixed; z-index: 8; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
     display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 16px 0 13px; border: 0; border-radius: 999px; cursor: pointer;

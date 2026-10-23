@@ -384,11 +384,14 @@
     let h = 12345;
     const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
     let out = '';
-    for (let i = 0; i < 24; i++) {
-      if (i % 3 === 2) { rnd(); rnd(); rnd(); rnd(); continue; } // a lighter scatter: every third spot stays empty
-      const x = (i % 6) * 17 + rnd() * 12 - 2;
-      const y = Math.floor(i / 6) * 22 + rnd() * 14 - 2;
-      if (x < 16 && y < 12) continue; // keep the corner with the site title clear
+    // an even scatter over the whole desk: one sticker per cell of a 5 x 3 grid, nudged
+    // around inside its cell so it doesn't look like a grid
+    const cols = 5, rows = 3;
+    for (let i = 0; i < cols * rows; i++) {
+      const cx = i % cols, cy = Math.floor(i / cols);
+      const x = (cx + 0.15 + rnd() * 0.7) * (100 / cols) - 3;
+      const y = (cy + 0.12 + rnd() * 0.7) * (100 / rows) - 4;
+      if (x < 16 && y < 14) continue; // keep the corner with the site title clear
       const size = Math.round(34 + rnd() * 30);
       const rot = Math.round(rnd() * 60 - 30);
       const pick = rnd();
