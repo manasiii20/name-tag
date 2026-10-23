@@ -158,20 +158,23 @@
     const name = esc(nameOr());
     const event = esc(state.event.trim());
     const words = sloganWords();
-    const foot = `<div class="sl-foot"><b>${name}</b>${event ? `<span>${event}</span>` : ''}</div>`;
-    return `<div class="sl soft" style="--bg:${p.bg};--ink:${p.ink}">
+    return `<div class="sl" style="--bg:${p.bg};--ink:${p.ink}">
       <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
+      ${event ? `<div class="sl-tag">${event}</div>` : ''}
       ${smileySvg(p.ink, 'sl-smile s1')}${smileySvg(p.ink, 'sl-smile s2')}
       <div class="sl-stack fitblock" data-max="58" data-min="26"><span>${words.join('<br>')}</span></div>
-      ${foot}
+      <div class="sl-foot"><b>${name}</b></div>
     </div>`;
   }
+  // the back flips the colours and trades the slogan for one big grin and your note
   function sloganBack(p) {
-    return `<div class="sl soft sl-back" style="--bg:${p.bg};--ink:${p.ink}">
+    const words = sloganWords().join(' ');
+    return `<div class="sl sl-back" style="--bg:${p.ink};--ink:${p.bg}">
       <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
-      ${smileySvg(p.ink, 'sl-smile s3', 96)}
-      <div class="sl-backtext fitblock" data-max="48" data-min="22"><span>${esc(state.back.trim() || 'hello!')}</span></div>
-      <div class="sl-foot"><b>${esc(nameOr())}</b></div>
+      <div class="sl-ring"><span>${Array(3).fill(words).join(' · ')} · </span></div>
+      ${smileySvg(p.bg, 'sl-smile s3', 150)}
+      <div class="sl-backtext fitblock" data-max="40" data-min="18"><span>${esc(state.back.trim() || 'hello!')}</span></div>
+      <div class="sl-foot sl-foot-back"><b>${esc(nameOr())}</b>${state.event.trim() ? `<span>${esc(state.event.trim())}</span>` : ''}</div>
     </div>`;
   }
 
@@ -386,10 +389,10 @@
     slogan: {
       kind: 'lanyard', w: 300, h: 440, fields: ['statement', 'event', 'back'],
       palettes: [
-        { n: 'Mint', bg: '#2DB94C', ink: '#F4FFF2', strap: '#14532A' },
-        { n: 'Cobalt', bg: '#2033E3', ink: '#FFFFFF', strap: '#0E1766' },
-        { n: 'Bubblegum', bg: '#FF8DB5', ink: '#5A0F2E', strap: '#5A0F2E' },
-        { n: 'Lemon', bg: '#FFE14D', ink: '#1A1A1A', strap: '#1A1A1A' },
+        { n: 'Mint', bg: '#DCE9DE', ink: '#23A143', strap: '#23A143' },
+        { n: 'Sky', bg: '#DDE8FB', ink: '#2033E3', strap: '#2033E3' },
+        { n: 'Blush', bg: '#F8DDE5', ink: '#D93A73', strap: '#D93A73' },
+        { n: 'Lemon', bg: '#FFF0A0', ink: '#1A1A1A', strap: '#1A1A1A' },
       ],
       swatch: (p) => `linear-gradient(135deg, ${p.bg} 50%, ${p.ink} 50%)`, strap: (p) => p.strap,
     },
@@ -417,7 +420,7 @@
     licence: {
       kind: 'lanyard', w: 440, h: 300, fields: ['role', 'font', 'photo', 'stickers', 'back'], noColor: true, noPronouns: true,
       palettes: [{ n: 'Sunny', acc: '#D1462F' }],
-      swatch: (p) => p.acc, strap: () => '#A9D3F2', strapInk: 'rgba(16, 44, 72, .75)',
+      swatch: (p) => p.acc, strap: () => '#DCEEFB', strapInk: 'rgba(30, 70, 110, .7)',
     },
   };
   // --- crayon: a folded place card, striped and outlined in wax crayon ---
@@ -1154,34 +1157,48 @@
     if (isLanyard()) kick(1.4); else slap();
   });
 
-  // licence photo: shrink it and turn it black and white, like a photo-booth strip
+  // licence photo: shrink it and turn it black and white, like a photo-booth strip.
+  // ctx.filter does the work where it exists; the pixel pass covers browsers without it
+  function photoBoothify(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const k = Math.min(1, 420 / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+        const ctx = c.getContext('2d');
+        if ('filter' in ctx) ctx.filter = 'grayscale(1) contrast(1.08) brightness(1.04)';
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        try {
+          const px = ctx.getImageData(0, 0, c.width, c.height);
+          const d = px.data;
+          for (let i = 0; i < d.length; i += 4) {
+            const g = Math.min(255, (0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]) * 1.04 + 4);
+            d[i] = g; d[i + 1] = g * 0.98; d[i + 2] = g * 0.95;
+          }
+          ctx.putImageData(px, 0, 0);
+        } catch { /* pixel access blocked: the filter above (and the CSS one on screen) still apply */ }
+        resolve(c.toDataURL('image/jpeg', 0.86));
+      };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
   $('#f-photo').addEventListener('change', (e) => {
     const file = e.target.files && e.target.files[0];
     e.target.value = '';
     if (!file) return;
-    const img = new Image();
     const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const k = Math.min(1, 320 / Math.max(img.width, img.height));
-      const c = document.createElement('canvas');
-      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-      const ctx = c.getContext('2d');
-      ctx.drawImage(img, 0, 0, c.width, c.height);
-      const px = ctx.getImageData(0, 0, c.width, c.height);
-      const d = px.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const g = Math.min(255, (0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]) * 1.06 + 6);
-        d[i] = g; d[i + 1] = g * 0.97; d[i + 2] = g * 0.92;
-      }
-      ctx.putImageData(px, 0, 0);
-      state.photo = c.toDataURL('image/jpeg', 0.85);
-      URL.revokeObjectURL(url);
-      render(); save(); kick(1.4);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); toast("That file didn't open as an image. Try a JPG or PNG."); };
-    img.src = url;
+    photoBoothify(url)
+      .then((bw) => { state.photo = bw; state.photoBW = true; render(); save(); kick(1.4); })
+      .catch(() => toast("That file didn't open as an image. Try a JPG or PNG."))
+      .finally(() => URL.revokeObjectURL(url));
   });
-  $('#clearPhoto').addEventListener('click', () => { state.photo = ''; render(); save(); });
+  // photos saved by an earlier version may still be in colour
+  if (state.photo && !state.photoBW) {
+    photoBoothify(state.photo).then((bw) => { state.photo = bw; state.photoBW = true; render(); save(); }).catch(() => {});
+  }
+  $('#clearPhoto').addEventListener('click', () => { state.photo = ''; state.photoBW = false; render(); save(); });
 
   applyShape();
   syncInputs();
