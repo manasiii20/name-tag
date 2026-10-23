@@ -387,6 +387,7 @@
     for (let i = 0; i < 26; i++) {
       const x = (i % 6) * 17 + rnd() * 12 - 2;
       const y = Math.floor(i / 6) * 22 + rnd() * 14 - 2;
+      if (x < 16 && y < 12) continue; // keep the corner with the site title clear
       const size = Math.round(34 + rnd() * 30);
       const rot = Math.round(rnd() * 60 - 30);
       const pick = rnd();
@@ -442,7 +443,7 @@
       swatch: (p) => `linear-gradient(135deg, ${p.stripe} 50%, ${p.wave} 50%)`,
     },
     licence: {
-      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'font', 'photo', 'stickers', 'back'], noColor: true, noPronouns: true,
+      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'font', 'photo', 'stickers', 'back'], noColor: true, noPronouns: true, drop: 60,
       palettes: [{ n: 'Sunny', acc: '#D1462F' }],
       swatch: (p) => p.acc, strap: () => '#DCEEFB', strapInk: 'rgba(30, 70, 110, .7)',
     },
@@ -512,6 +513,19 @@
   // ---------- state ----------
   const KEY = 'hellotag:v1';
   const state = load();
+  // a shared link carries a whole tag (minus the photo) in ?tag=; open it, then tidy the address bar
+  (() => {
+    try {
+      const raw = new URLSearchParams(location.search).get('tag');
+      if (!raw) return;
+      const json = decodeURIComponent(escape(atob(raw.replace(/-/g, '+').replace(/_/g, '/'))));
+      const shared = JSON.parse(json);
+      Object.keys(DEFAULTS).forEach((k) => { if (k in shared && k !== 'photo') state[k] = shared[k]; });
+      if (!TPLS[state.tpl]) state.tpl = DEFAULTS.tpl;
+      state.photo = ''; state.photoBW = false; state.flipped = false;
+      history.replaceState(null, '', location.pathname);
+    } catch { /* a mangled link just opens the normal page */ }
+  })();
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
@@ -701,6 +715,7 @@
     if (lan) {
       $('#strap').style.setProperty('--strap', t.strap(p));
       $('#strap').style.setProperty('--strap-ink', t.strapInk || 'rgba(255, 255, 255, .82)');
+      $('#strap').style.setProperty('--strap-h', `${610 + (t.drop || 0)}px`);
       const word = (state.event.trim() || 'hello').toUpperCase();
       $('#strapText').textContent = Array(12).fill(word).join('  •  ');
     }
@@ -1066,16 +1081,8 @@
 
   // ---------- save as png ----------
   const dlg = $('#saveDlg');
-  $('#saveBtn').addEventListener('click', async (e) => {
-    const btn = e.currentTarget;
-    if (typeof window.html2canvas !== 'function') {
-      toast("The image exporter didn't load. Check your connection and reload.");
-      return;
-    }
-    btn.disabled = true;
-    const label = $('.act-t', btn);
-    label.textContent = 'Printing…';
-    btn.classList.add('busy');
+  // draw the card as it looks right now into a canvas, three times the size for a sharp picture
+  async function snapshot() {
     try {
       if (document.fonts) await document.fonts.ready;
       // the exporter loses inline drawings when it copies the page, so for the moment of the
@@ -1096,14 +1103,32 @@
         svg.replaceWith(img);
         return img.decode().catch(() => {});
       }));
-      const canvas = await window.html2canvas(card, {
+      return await window.html2canvas(card, {
         backgroundColor: null,
         scale: 3,
         logging: false,
         onclone: (doc) => doc.documentElement.classList.add('exporting'),
       });
+    } finally {
+      render();
+    }
+  }
+  const pngName = () => `${(state.name.trim() || 'visitor').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'visitor'}-tag.png`;
+
+  $('#saveBtn').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    if (typeof window.html2canvas !== 'function') {
+      toast("The image exporter didn't load. Check your connection and reload.");
+      return;
+    }
+    btn.disabled = true;
+    const label = $('.act-t', btn);
+    label.textContent = 'Printing…';
+    btn.classList.add('busy');
+    try {
+      const canvas = await snapshot();
       const url = canvas.toDataURL('image/png');
-      const fileName = `${(state.name.trim() || 'visitor').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'visitor'}-tag.png`;
+      const fileName = pngName();
       $('#saveImg').src = url;
       const link = $('#dlgDownload');
       link.href = url;
@@ -1143,6 +1168,50 @@
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());
+
+  // ---------- share ----------
+  function shareLink() {
+    const keep = {};
+    Object.keys(DEFAULTS).forEach((k) => { if (k !== 'photo' && k !== 'photoBW' && k !== 'flipped') keep[k] = state[k]; });
+    const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(keep)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return `${location.origin}${location.pathname}?tag=${b64}`;
+  }
+  const sharePop = $('#sharePop');
+  const shareToggle = $('#shareBtn');
+  function setShare(open) {
+    sharePop.hidden = !open;
+    shareToggle.setAttribute('aria-expanded', String(open));
+  }
+  shareToggle.addEventListener('click', (e) => { e.stopPropagation(); setShare(sharePop.hidden); });
+  document.addEventListener('click', (e) => { if (!sharePop.hidden && !e.target.closest('#sharePop')) setShare(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setShare(false); });
+  $('#shareMail').addEventListener('click', () => {
+    const who = state.name.trim() || 'someone';
+    const subject = `${who} made a name tag`;
+    const body = `Hi!\n\nI made a name tag on hello, i'm_. Open it here and make your own:\n${shareLink()}\n`;
+    $('#shareMail').href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setTimeout(() => setShare(false), 50);
+  });
+  $('#shareCopy').addEventListener('click', async () => {
+    const link = shareLink();
+    try { await navigator.clipboard.writeText(link); toast('Link copied. Paste it anywhere.'); }
+    catch { window.prompt('Copy this link', link); }
+    setShare(false);
+  });
+  $('#sharePic').addEventListener('click', async () => {
+    setShare(false);
+    try {
+      const canvas = await snapshot();
+      const blob = await new Promise((done) => canvas.toBlob(done, 'image/png'));
+      const file = new File([blob], pngName(), { type: 'image/png' });
+      const data = { files: [file], title: 'My name tag', text: `Make yours: ${shareLink()}` };
+      if (navigator.canShare && navigator.canShare(data)) await navigator.share(data);
+      else if (navigator.share) await navigator.share({ title: 'My name tag', url: shareLink() });
+      else toast("This browser can't share pictures. Use Save PNG, or copy the link.");
+    } catch (err) {
+      if (err && err.name !== 'AbortError') toast("Couldn't share that. Try Save PNG or copy the link.");
+    }
+  });
   dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
 
   let toastTimer;

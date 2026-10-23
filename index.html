@@ -59,7 +59,28 @@
   <aside class="panel" id="panel" aria-label="Edit your tag">
     <div class="panel-top"><span>Edit your tag</span><button type="button" class="panel-close" id="panelClose" aria-label="Close the editor">Done</button></div>
     <section class="pick" aria-labelledby="h-pick">
-      <h2 class="pick-h" id="h-pick">Which tag are you?</h2>
+      <div class="pick-row">
+        <h2 class="pick-h" id="h-pick">Which tag are you?</h2>
+        <div class="share">
+          <button type="button" class="share-btn" id="shareBtn" aria-haspopup="true" aria-expanded="false" aria-controls="sharePop">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Share
+          </button>
+          <div class="share-pop" id="sharePop" hidden>
+            <a class="share-item" id="shareMail" href="#">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/></svg>
+              <span><b>Email it</b><small>Opens your mail app with a link</small></span>
+            </a>
+            <button type="button" class="share-item" id="shareCopy">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+              <span><b>Copy link</b><small>Friends open your exact tag</small></span>
+            </button>
+            <button type="button" class="share-item" id="sharePic">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg>
+              <span><b>Send the picture</b><small>WhatsApp, Messages, Mail…</small></span>
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="seg-track" id="styles" role="group" aria-labelledby="h-pick">
         <span class="seg-ind" id="segInd" aria-hidden="true"></span>
         <button type="button" class="sty seg" data-tpl="classic">Classic</button>

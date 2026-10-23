@@ -26,6 +26,7 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
 - **Save PNG** renders the current side as a sharp PNG with a transparent background. On phones the save dialog also offers **Save to phone**, which opens the share sheet (Photos, Files, apps).
 - On phones the stage works like desktop (swing, flip, drag). **Edit tag** opens the editor as a side column next to the tag; **Done** closes it.
+- **Share** (top right of the editor): email a link, copy a link, or send the picture through the share sheet. The link carries the whole tag (minus the photo), so friends open your exact tag. No backend involved.
 - Your tag is remembered in `localStorage`.
 
 ## Run it
