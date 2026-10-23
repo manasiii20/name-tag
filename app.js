@@ -825,7 +825,7 @@
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
     const editingPhone = phone.matches && document.documentElement.classList.contains('editing');
-    const room = editingPhone ? 120 : phone.matches ? 150 : (lan ? 120 : 150); // keep clear of the action stack (desktop) or the tag bar (phones)
+    const room = editingPhone ? 150 : phone.matches ? 200 : (lan ? 120 : 150); // keep clear of the action stack (desktop) or the tag bar (phones)
     const cap = phone.matches ? (lan ? 0.78 : 0.66) : (lan ? 0.92 : 0.95); // stickers sit smaller on a phone screen
     scale = clamp(Math.min((H - room) / natH, (W - (editingPhone ? 16 : 32)) / natW), 0.2, cap);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
@@ -1138,19 +1138,12 @@
       const link = $('#dlgDownload');
       link.href = url;
       link.download = fileName;
-      // on phones, offer the share sheet so the tag can go straight to Photos
+      // on phones the same button hands the picture to the share sheet, so it can go straight to Photos
       shareFile = null;
-      const shareBtn = $('#dlgShare');
-      shareBtn.hidden = true;
-      link.classList.remove('secondary');
       const blob = await new Promise((done) => canvas.toBlob(done, 'image/png'));
       if (blob && typeof File === 'function' && navigator.canShare) {
         const file = new File([blob], fileName, { type: 'image/png' });
-        if (navigator.canShare({ files: [file] })) {
-          shareFile = file;
-          shareBtn.hidden = false;
-          link.classList.add('secondary');
-        }
+        if (navigator.canShare({ files: [file] })) shareFile = file;
       }
       if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
     } catch (err) {
@@ -1164,12 +1157,13 @@
     }
   });
   let shareFile = null;
-  $('#dlgShare').addEventListener('click', async () => {
-    if (!shareFile) return;
+  $('#dlgDownload').addEventListener('click', async (e) => {
+    if (!shareFile || !phone.matches) return; // desktop: the link downloads the file
+    e.preventDefault();
     try {
       await navigator.share({ files: [shareFile], title: 'My name tag' });
     } catch (err) {
-      if (err && err.name !== 'AbortError') toast('Sharing isn\'t available here. Long-press the picture to save it.');
+      if (err && err.name !== 'AbortError') toast('Long-press the picture to save it.');
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());
