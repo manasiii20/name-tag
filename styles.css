@@ -376,6 +376,13 @@ button, input, select { font: inherit; color: inherit; }
 .lc-backfoot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
 .lc-backfoot .lc-barcode { margin-top: 0; }
 
+/* --- crayon: folded place card --- */
+.cr { position: relative; width: 440px; height: 300px; border-radius: 6px; overflow: hidden; }
+.cr-art { position: absolute; inset: 0; }
+.cr-name { position: absolute; left: 92px; right: 92px; top: 74px; height: 78px; display: flex; align-items: center; justify-content: center; text-align: center; font: 700 64px/1.1 var(--f-hand); transform: rotate(-2deg); padding: 0 4px; }
+.cr-wax { position: absolute; left: 70px; top: 52px; pointer-events: none; opacity: .9; }
+.card:has(.cr) .face { border-radius: 6px; }
+
 /* --- glow: soft light with a face --- */
 .gl { height: 100%; position: relative; background: #FFF6E6; }
 .gl-orb { position: absolute; inset: -6%; animation: breathe 5s ease-in-out infinite; }
@@ -447,7 +454,7 @@ button, input, select { font: inherit; color: inherit; }
   position: relative; z-index: 1;
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   height: 38px; padding: 0 6px; border: 0; background: none; cursor: pointer;
-  font: 500 13.5px var(--f-ui); color: var(--muted); transition: color .2s;
+  font: 500 13.5px var(--f-ui); color: var(--muted); white-space: nowrap; transition: color .2s;
 }
 .seg:hover { color: var(--ink-2); }
 .seg[aria-pressed="true"] { color: var(--ink); }
@@ -676,7 +683,7 @@ button, input, select { font: inherit; color: inherit; }
   }
   .panel-close { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--ink); color: var(--white); font: 500 13px var(--f-ui); cursor: pointer; touch-action: manipulation; }
   .seg-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .seg { font-size: 12.5px; height: 34px; }
+  .seg { font-size: 12px; height: 34px; }
   .ticket { --notch-y: 25px; }
   .t-head { grid-template-columns: 34px minmax(0, 1fr) 16px; min-height: 50px; padding-right: 12px; }
   .ticket::before { left: 34px; }

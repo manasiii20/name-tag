@@ -352,13 +352,70 @@
       ],
       swatch: (p) => p.burst, strap: () => '#2A2321',
     },
+    crayon: {
+      kind: 'sticker', w: 440, h: 300, fields: [],
+      palettes: [
+        { n: 'Sunshine', stripe: '#F6C531', wave: '#F07B1D', ink: '#2B2620' },
+        { n: 'Lagoon', stripe: '#45C9B4', wave: '#2D5BD9', ink: '#1F2B5C' },
+        { n: 'Bubblegum', stripe: '#E6577F', wave: '#2F66E0', ink: '#3A1626' },
+        { n: 'Sky', stripe: '#9CC0F2', wave: '#C9DB2E', ink: '#22314A' },
+        { n: 'Coral', stripe: '#F27868', wave: '#7A3FD1', ink: '#3A1A16' },
+      ],
+      swatch: (p) => `linear-gradient(135deg, ${p.stripe} 50%, ${p.wave} 50%)`,
+    },
     licence: {
       kind: 'lanyard', w: 440, h: 300, fields: ['role', 'place', 'photo', 'favs', 'back'],
       palettes: [{ n: 'Signal red', acc: '#D1462F' }, { n: 'Ink blue', acc: '#2B4BD6' }, { n: 'Forest', acc: '#2E7D4F' }, { n: 'Grape', acc: '#7A3FD1' }],
       swatch: (p) => p.acc, strap: () => '#D9DCE2',
     },
   };
-  const EXTRA_FRONTS = { postcard: postcardFront, slogan: sloganFront, coffee: coffeeFront, licence: licenceFront };
+  // --- crayon: a folded place card, striped and outlined in wax crayon ---
+  function crayonFilters(id, seed) {
+    return `<filter id="${id}" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="${seed}" result="wob"/>
+        <feDisplacementMap in="SourceGraphic" in2="wob" scale="6" xChannelSelector="R" yChannelSelector="G" result="moved"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="${seed + 7}" result="grain"/>
+        <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.4 1.95" result="wax"/>
+        <feComposite in="moved" in2="wax" operator="in"/>
+      </filter>`;
+  }
+  function crayonBlob(cx, cy, rx, ry, bumps) {
+    // a wobbly rounded rectangle with soft scallops, like a hand-drawn crayon frame
+    const pts = [];
+    const n = bumps * 8;
+    for (let i = 0; i <= n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const c = Math.cos(a), s = Math.sin(a);
+      const sq = (v) => Math.sign(v) * Math.pow(Math.abs(v), 0.55);
+      const wob = 1 + 0.06 * Math.sin(a * bumps);
+      pts.push(`${(cx + sq(c) * rx * wob).toFixed(1)},${(cy + sq(s) * ry * wob).toFixed(1)}`);
+    }
+    return `M${pts.join(' L')} Z`;
+  }
+  function crayonFront(p) {
+    const W = 440, H = 300, fold = 236;
+    const f1 = uid('cr'), f2 = uid('cr');
+    const seed = (hash(state.name + p.n) % 50) + 1;
+    let stripes = '';
+    for (let x = 6; x < W; x += 30) stripes += `<rect x="${x}" y="-10" width="15" height="${H + 20}" rx="4"/>`;
+    const blob = crayonBlob(W / 2, 112, 150, 62, 9);
+    return `<div class="cr">
+      <svg class="cr-art" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">
+        <defs>${crayonFilters(f1, seed)}${crayonFilters(f2, seed + 3)}
+        </defs>
+        <rect width="${W}" height="${H}" fill="#FFFFFF"/>
+        <g fill="${p.stripe}" filter="url(#${f1})">${stripes}</g>
+        <rect y="${fold}" width="${W}" height="${H - fold}" fill="#FFFFFF" opacity=".62"/>
+        <rect y="${fold - 1}" width="${W}" height="2" fill="#000" opacity=".07"/>
+        <path d="${blob}" fill="#FFFFFF"/>
+        <path d="${blob}" fill="none" stroke="${p.wave}" stroke-width="9" stroke-linejoin="round" filter="url(#${f2})"/>
+      </svg>
+      <div class="cr-name fit" data-max="64" data-min="24" style="color:${p.ink}">${esc(nameOr())}</div>
+      <svg class="cr-wax" viewBox="0 0 300 120" width="300" height="120" aria-hidden="true">${speckles(state.name + 'wax', 300, 120, '#FFFFFF', 520)}</svg>
+    </div>`;
+  }
+
+  const EXTRA_FRONTS = { postcard: postcardFront, slogan: sloganFront, coffee: coffeeFront, licence: licenceFront, crayon: crayonFront };
   const EXTRA_BACKS = { slogan: sloganBack, coffee: coffeeBack, licence: licenceBack };
 
   Object.assign(TPLS, EXTRA_TPLS);
@@ -367,7 +424,7 @@
   const DEFAULTS = {
     tpl: 'volunteer', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     back: 'how can i help?', mood: 64, flipped: false,
-    colors: { volunteer: 0, classic: 0, glow: 0, postcard: 0, slogan: 0, coffee: 0, licence: 0 },
+    colors: { volunteer: 0, classic: 0, glow: 0, postcard: 0, slogan: 0, coffee: 0, licence: 0, crayon: 0 },
     shape: 'rect', critter: 'fish', look: 'soft', statement: 'you belong here',
     place: 'somewhere sunny', favs: 'chai, music, doodles', photo: '',
   };
@@ -910,7 +967,6 @@
       const k = el.dataset.key;
       state[k] = 'num' in el.dataset ? +el.value : el.value;
       render(); save();
-      if (el.type !== 'range') kick();
     });
   });
 
