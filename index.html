@@ -7,7 +7,7 @@
 <meta name="description" content="Make a name tag, swing it around, save it as a PNG.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Courier+Prime&family=Archivo+Narrow:wght@600;700&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Courier+Prime&family=Comic+Neue:wght@700&family=Lobster&family=Pacifico&family=Fredericka+the+Great&family=Rubik+Wet+Paint&family=Archivo+Narrow:wght@600;700&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,6 +16,8 @@
   <section class="stage" id="stage" aria-label="Your name tag">
     <h1 class="site">hello, i'm<span class="cursor" aria-hidden="true">_</span></h1>
 
+
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
 
     <div class="mount" id="mount">
       <div class="drop" id="drop">
@@ -107,7 +109,7 @@
         <div class="t-body" id="tb-role" role="region" aria-labelledby="th-role">
           <div class="t-inner">
             <label class="sr-only" for="f-role">Role</label>
-            <input id="f-role" class="t-input" data-key="role" autocomplete="off" maxlength="20" placeholder="Speaker, volunteer, guest…">
+            <input id="f-role" class="t-input" data-key="role" autocomplete="off" maxlength="32" placeholder="Speaker, volunteer, guest…">
           </div>
         </div>
       </div>
@@ -151,21 +153,6 @@
           </div>
         </div>
       </div>
-      <div class="ticket" data-ticket="look" data-for="look">
-        <button type="button" class="t-head" id="th-look" aria-expanded="false" aria-controls="tb-look">
-          <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Soft or bold?</span></span>
-          <span class="t-plus" aria-hidden="true"></span>
-        </button>
-        <div class="t-body" id="tb-look" role="region" aria-labelledby="th-look">
-          <div class="t-inner">
-            <div class="greets" role="radiogroup" aria-label="Slogan look">
-              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="look" data-v="soft">Soft, with smileys</button>
-              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="look" data-v="bold">Bold, in pills</button>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="ticket" data-ticket="statement" data-for="statement">
         <button type="button" class="t-head" id="th-statement" aria-expanded="false" aria-controls="tb-statement">
           <span class="t-no"></span>
@@ -192,6 +179,20 @@
               <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="critter" data-v="narwhal">Narwhal</button>
               <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="critter" data-v="puffer">Puffer</button>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="sig" data-for="sig">
+        <button type="button" class="t-head" id="th-sig" aria-expanded="false" aria-controls="tb-sig">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Tell me your least favourite font</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-sig" role="region" aria-labelledby="th-sig">
+          <div class="t-inner">
+            <label class="sr-only" for="f-sig">Your signature</label>
+            <input id="f-sig" class="t-input" data-key="sig" autocomplete="off" maxlength="22" placeholder="Sign here (or we'll use your name)">
+            <div class="greets" id="sigFonts" role="radiogroup" aria-label="Signature font"></div>
           </div>
         </div>
       </div>
@@ -238,6 +239,18 @@
           <div class="t-inner">
             <label class="sr-only" for="f-favs">Favourite things, separated by commas</label>
             <input id="f-favs" class="t-input" data-key="favs" autocomplete="off" maxlength="40" placeholder="chai, music, doodles">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="stickers" data-for="stickers">
+        <button type="button" class="t-head" id="th-stickers" aria-expanded="false" aria-controls="tb-stickers">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Stick some stickers on it</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-stickers" role="region" aria-labelledby="th-stickers">
+          <div class="t-inner">
+            <div class="greets" id="stickerOpts" role="group" aria-label="Stickers"></div>
           </div>
         </div>
       </div>

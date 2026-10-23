@@ -118,7 +118,7 @@ button, input, select { font: inherit; color: inherit; }
   font: 700 10px/26px var(--f-display);
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: rgba(255,255,255,.82);
+  color: var(--strap-ink, rgba(255,255,255,.82));
   white-space: nowrap;
   padding-top: 380px;
 }
@@ -309,22 +309,18 @@ button, input, select { font: inherit; color: inherit; }
 .sl-smile.s3 { right: 22px; top: 60px; width: 96px; transform: rotate(-10deg); }
 .sl-stack { position: absolute; left: 26px; right: 26px; top: 128px; height: 200px; display: flex; align-items: center; justify-content: center; text-align: center; font: 500 58px/.92 var(--f-display); letter-spacing: -.05em; }
 .sl-stack span { display: block; width: 100%; }
-.sl-pills { position: absolute; left: -26px; right: -10px; top: 170px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 8px; transform: rotate(-8deg); }
-.sl-pill { padding: 2px 18px 6px; border-radius: 999px; font: italic 800 46px/1.05 var(--f-display); letter-spacing: -.04em; white-space: nowrap; }
-.sl-pill.fill { background: var(--ink); color: var(--bg); }
-.sl-pill.out { border: 2.5px solid var(--ink); color: var(--ink); }
 .sl-foot { position: absolute; left: 20px; right: 20px; bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; }
 .sl-foot b { font: 800 15px/1.2 var(--f-display); letter-spacing: -.01em; }
 .sl-foot span { font: 500 11px var(--f-ui); opacity: .75; }
 .sl-backtext { position: absolute; left: 26px; right: 26px; top: 170px; bottom: 70px; display: flex; align-items: flex-end; font: 600 48px/.95 var(--f-display); letter-spacing: -.04em; }
-.sl.bold .sl-backtext { font-style: italic; font-weight: 800; }
 .sl-backtext span { display: block; width: 100%; }
 
 /* --- coffee: starburst over a white card with a doodled coffee drinker --- */
 .cf { position: relative; width: 340px; height: 450px; }
 .cf-body { position: absolute; left: 34px; right: 34px; top: 96px; bottom: 0; background: #FFFFFF; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0, 0, 0, .05); }
 .cf-burst { position: absolute; left: 0; top: 0; width: 340px; height: 230px; }
-.cf-name { position: absolute; left: 70px; right: 70px; top: 82px; text-align: center; transform: rotate(-7deg); font: 700 56px/1.1 var(--f-hand); color: #111; padding: 0 4px; }
+.cf-name { position: absolute; left: 76px; right: 76px; top: 64px; height: 104px; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(-7deg); font: 700 56px/1 var(--f-hand); color: #111; padding: 0 4px; }
+.cf-name span { display: block; width: 100%; overflow-wrap: anywhere; }
 .cf-side { position: absolute; left: 14px; bottom: 16px; transform-origin: 0 100%; transform: rotate(-90deg) translateY(100%); white-space: nowrap; font: 400 11px var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #111; }
 .cf-side b { font-weight: 800; letter-spacing: .1em; }
 .cf-person { position: absolute; left: 22px; bottom: -6px; width: 240px; height: auto; }
@@ -335,51 +331,70 @@ button, input, select { font: inherit; color: inherit; }
 .cf-backtext span { display: block; width: 100%; }
 .cf-star-b { top: 22px; right: 20px; }
 
-/* --- creative licence: landscape ID in a clear holder --- */
-.lc { height: 100%; position: relative; border-radius: 18px; background: rgba(255, 255, 255, .62); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .09), inset 0 2px 0 rgba(255, 255, 255, .9); color: #111; }
+/* --- licensed: a creative licence covered in stickers --- */
+.lc { height: 100%; position: relative; border-radius: 18px; background: rgba(255, 255, 255, .64); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .09), inset 0 2px 0 rgba(255, 255, 255, .9); color: #111; }
 .lc .slot { top: 12px; background: rgba(20, 20, 28, .14); }
-.lc-card { position: absolute; left: 14px; right: 14px; top: 34px; bottom: 14px; background: #FFFFFF; border: 2px solid #111; border-radius: 6px; padding: 26px 14px 10px; }
-.lc-mono { font: 400 7.5px/1.2 "Courier Prime", "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
-.lc-stars { position: absolute; left: 30px; right: 140px; top: 7px; display: flex; justify-content: space-between; }
-.lc-stars svg { width: 12px; height: 12px; }
-.lc-grid { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; height: 100%; }
-.lc-left { position: relative; display: flex; flex-direction: column; gap: 4px; }
-.lc-photo { width: 104px; height: 124px; border: 4px solid #111; background: #8E8A84 center / cover no-repeat; }
-.lc-photo-empty { display: grid; place-items: center; font: 700 64px/1 var(--f-hand); color: #EDEAE4; background: #77736D; }
-.lc-sticker-a { position: absolute; left: -8px; top: 98px; padding: 4px 8px; border-radius: 50%; background: #E3F06B; border: 1.5px solid #111; font: 800 7px/1.05 var(--f-display); text-transform: uppercase; text-align: center; transform: rotate(-10deg); letter-spacing: .04em; }
-.lc-sticker-b { position: absolute; left: 76px; top: 92px; width: 36px; height: 28px; border-radius: 9px 9px 9px 2px; background: #F5A9CC; border: 1.5px solid #111; display: grid; place-items: center; transform: rotate(8deg); }
-.lc-sticker-b svg { width: 16px; height: 14px; }
-.lc-barcode { display: flex; height: 22px; margin-top: 10px; }
+.lc-card { position: absolute; left: 14px; right: 14px; top: 34px; bottom: 14px; background: #FFFFFF; border: 2.5px solid #111; border-radius: 5px; }
+.lc-mono { font: 400 7.5px/1.2 "Courier Prime", "Courier New", monospace; letter-spacing: .1em; text-transform: uppercase; }
+.lc-stars { position: absolute; left: 16px; right: 120px; top: 8px; display: flex; justify-content: space-between; }
+.lc-stars svg:nth-child(odd) { transform: translateY(3px); }
+.lc-issued { position: absolute; right: 12px; top: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.lc-issued b { font: 400 22px/1 var(--f-ui); color: #D1462F; letter-spacing: .03em; }
+.lc-photo-wrap { position: absolute; left: 14px; top: 34px; width: 104px; height: 128px; border: 5px solid #111; background: #111; }
+.lc-photo { width: 100%; height: 100%; background: #8E8A84 center / cover no-repeat; filter: sepia(.25) contrast(1.05); }
+.lc-photo-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #EDEAE4; background: linear-gradient(160deg, #9A948C, #625E58); }
+.lc-photo-empty span { font: 700 54px/1 var(--f-hand); }
+.lc-photo-empty small { font: 400 7px "Courier Prime", monospace; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.lc-barcode { position: absolute; left: 14px; bottom: 22px; display: flex; height: 28px; }
 .lc-barcode i { display: block; height: 100%; background: #111; }
 .lc-barcode b { display: block; height: 100%; }
-.lc-cap { font-size: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 108px; }
-.lc-right { display: flex; flex-direction: column; min-width: 0; }
-.lc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
-.lc-title { display: flex; flex-direction: column; line-height: .9; }
-.lc-title span:first-child { font: 900 33px/.9 var(--f-display); letter-spacing: -.02em; }
-.lc-title span:last-child { font: 700 27px/.95 var(--f-narrow); letter-spacing: -.01em; }
-.lc-issued { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-top: -14px; }
-.lc-issued b { font: 400 22px/1 var(--f-ui); color: var(--acc); letter-spacing: .02em; }
-.lc-fields { margin-top: 6px; border-left: 1.5px solid #111; display: flex; flex-direction: column; }
+.lc-cap { position: absolute; left: 14px; bottom: 9px; width: 132px; font-size: 5.6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-title { position: absolute; left: 130px; top: 30px; display: flex; flex-direction: column; }
+.lc-title span:first-child { font: 900 38px/.88 var(--f-display); letter-spacing: -.025em; }
+.lc-title span:last-child { font: 700 30px/.95 var(--f-narrow); letter-spacing: -.01em; }
+.lc-fields { position: absolute; left: 236px; right: 10px; top: 76px; border-left: 1.5px solid #111; display: flex; flex-direction: column; }
 .lc-f { border-top: 1.5px solid #111; padding: 3px 0 3px 6px; display: flex; flex-direction: column; min-width: 0; }
-.lc-f b { font: 800 15px/1.15 var(--f-display); letter-spacing: -.01em; white-space: nowrap; overflow: hidden; }
-.lc-sig em { font: 700 28px/1 var(--f-hand); font-style: normal; color: #111; white-space: nowrap; overflow: hidden; padding-right: 4px; }
-.lc-last { flex-direction: row; gap: 8px; padding: 0; }
-.lc-favs { padding: 3px 6px; display: flex; flex-direction: column; gap: 3px; }
-.lc-favs > div { display: flex; gap: 4px; }
-.lc-fav { width: 22px; height: 22px; border-radius: 5px; display: grid; place-items: center; font: 800 10px var(--f-display); text-transform: capitalize; }
-.lc-based { flex: 1; min-width: 0; border-left: 1.5px solid #111; padding: 3px 6px; display: flex; flex-direction: column; }
-.lc-based b { font-size: 13px; }
-.lc-card-back { display: flex; flex-direction: column; padding: 30px 18px 14px; }
+.lc-f b { font: 800 15px/1.15 var(--f-display); letter-spacing: -.01em; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
+.lc-sig { min-height: 50px; }
+.lc-sig em { font-style: normal; font-size: 30px; line-height: 1.25; color: #111; white-space: nowrap; overflow: hidden; padding-right: 4px; transform: rotate(-3deg); transform-origin: 0 50%; }
+.lc-occ b { height: 34px; display: flex; align-items: center; white-space: normal; line-height: 1.05; }
+.lc-occ b span { display: block; width: 100%; }
+.lc-based { border-bottom: 1.5px solid #111; }
+.lc-based b { font-size: 14px; }
+.lc-favs { position: absolute; left: 132px; top: 168px; display: flex; flex-direction: column; gap: 4px; }
+.lc-favs > div { display: flex; gap: 5px; }
+.lc-fav { width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; font: 800 11px var(--f-display); text-transform: capitalize; }
+
+/* stickers: each has a home on the card and a white die-cut edge */
+.lk { position: absolute; z-index: 3; filter: drop-shadow(0 0 0 #fff) drop-shadow(1px 1.5px 1px rgba(0, 0, 0, .18)); }
+.lk svg { display: block; }
+.lk-certified { left: 4px; top: 134px; transform: rotate(-10deg); display: flex; flex-direction: column; align-items: center; padding: 5px 10px 4px; border-radius: 50%; background: #E3F06B; border: 2px solid #111; font: 800 7.5px/1.05 var(--f-display); text-transform: uppercase; letter-spacing: .05em; box-shadow: 0 0 0 3px #FFFFFF; }
+.lk-certified b { margin-top: 2px; padding: 1px 6px; border-radius: 4px; background: #111; color: #FFFFFF; font-size: 8px; letter-spacing: .1em; }
+.lk-heart { left: 84px; top: 118px; transform: rotate(8deg); }
+.lk-pencil { left: -6px; top: 172px; transform: rotate(-32deg); }
+.lk-nib { right: 18px; top: 150px; transform: rotate(14deg); }
+.lk-gold { left: 88px; top: 16px; }
+.lk-holo { left: 178px; top: 200px; }
+.lk-smiley { left: 132px; top: 204px; transform: rotate(-8deg); }
+.lk-rainbow { left: -14px; top: -16px; transform: rotate(-24deg); }
+.lk-back { right: 18px; top: 18px; }
+.lc-card-back { display: flex; flex-direction: column; padding: 34px 18px 14px; }
 .lc-backtext { flex: 1; display: flex; align-items: center; font: 900 34px/.95 var(--f-display); letter-spacing: -.02em; }
 .lc-backtext span { display: block; width: 100%; }
 .lc-backfoot { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
-.lc-backfoot .lc-barcode { margin-top: 0; }
+.lc-backfoot .lc-barcode { position: static; }
+
+/* glitter stars scattered over the desk while the licence is out */
+.confetti { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; }
+.confetti span { position: absolute; transform: scale(.4); transition: transform .5s cubic-bezier(.3, 1.4, .5, 1); }
+.stage[data-tpl="licence"] .confetti { opacity: .9; }
+.stage[data-tpl="licence"] .confetti span { transform: scale(1); }
 
 /* --- crayon: folded place card --- */
 .cr { position: relative; width: 440px; height: 300px; border-radius: 6px; overflow: hidden; }
 .cr-art { position: absolute; inset: 0; }
 .cr-name { position: absolute; left: 92px; right: 92px; top: 74px; height: 78px; display: flex; align-items: center; justify-content: center; text-align: center; font: 700 64px/1.1 var(--f-hand); transform: rotate(-2deg); padding: 0 4px; }
+.cr-pron { position: absolute; right: 22px; bottom: 16px; font: 700 26px/1 var(--f-hand); transform: rotate(-2deg); }
 .cr-wax { position: absolute; left: 70px; top: 52px; pointer-events: none; opacity: .9; }
 .card:has(.cr) .face { border-radius: 6px; }
 
@@ -516,7 +531,7 @@ button, input, select { font: inherit; color: inherit; }
 .t-input::placeholder { color: var(--muted); opacity: .75; }
 #f-name { height: 50px; font: 700 28px var(--f-hand); padding-top: 3px; }
 
-.greets { display: flex; flex-wrap: wrap; gap: 6px; padding: 3px; margin: -3px; }
+.greets { display: flex; flex-wrap: wrap; gap: 6px; padding: 3px; }
 .greet {
   height: 32px; padding: 0 11px; border-radius: 7px; cursor: pointer;
   border: 1px solid var(--edge); background: #FBFBF9; font-size: 13.5px; color: var(--ink-2);
@@ -546,7 +561,7 @@ button, input, select { font: inherit; color: inherit; }
 .range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--white); border: 1.5px solid var(--ink); }
 .range-ends { display: flex; justify-content: space-between; margin-top: -6px; font-size: 12px; color: var(--muted); }
 
-.swatches { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px; margin: -4px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px; }
 .swatch {
   width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
   background: var(--sw); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
@@ -556,7 +571,7 @@ button, input, select { font: inherit; color: inherit; }
 /* actions sit on the stage, bottom left, so the tickets never push them away */
 .actions {
   position: absolute; z-index: 4;
-  left: max(28px, env(safe-area-inset-left, 0px)); bottom: 24px; right: 28px;
+  left: max(28px, env(safe-area-inset-left, 0px)); bottom: 24px;
   display: flex; align-items: flex-end; gap: 20px;
 }
 .stack { display: flex; flex-direction: column; gap: 8px; width: 214px; }

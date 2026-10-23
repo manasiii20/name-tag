@@ -159,13 +159,6 @@
     const event = esc(state.event.trim());
     const words = sloganWords();
     const foot = `<div class="sl-foot"><b>${name}</b>${event ? `<span>${event}</span>` : ''}</div>`;
-    if (state.look === 'bold') {
-      return `<div class="sl bold" style="--bg:${p.bg};--ink:${p.ink}">
-        <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
-        <div class="sl-pills">${words.map((w, i) => `<span class="sl-pill ${i % 3 === 1 ? 'out' : 'fill'}">${w}</span>`).join('')}</div>
-        ${foot}
-      </div>`;
-    }
     return `<div class="sl soft" style="--bg:${p.bg};--ink:${p.ink}">
       <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
       ${smileySvg(p.ink, 'sl-smile s1')}${smileySvg(p.ink, 'sl-smile s2')}
@@ -174,7 +167,7 @@
     </div>`;
   }
   function sloganBack(p) {
-    return `<div class="sl ${state.look === 'bold' ? 'bold' : 'soft'} sl-back" style="--bg:${p.bg};--ink:${p.ink}">
+    return `<div class="sl soft sl-back" style="--bg:${p.bg};--ink:${p.ink}">
       <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
       ${smileySvg(p.ink, 'sl-smile s3', 96)}
       <div class="sl-backtext fitblock" data-max="48" data-min="22"><span>${esc(state.back.trim() || 'hello!')}</span></div>
@@ -240,7 +233,7 @@
         <polygon points="${pts}" fill="${p.burst}" stroke="#111" stroke-width="3.2" stroke-linejoin="round"/>
         <circle cx="170" cy="30" r="9" fill="#EFEFEC" stroke="#111" stroke-width="2"/>
       </svg>
-      <div class="cf-name fit" data-max="56" data-min="22">${esc(nameOr())}</div>
+      <div class="cf-name fitblock" data-max="56" data-min="18"><span>${esc(nameOr())}</span></div>
     </div>`;
   }
   function coffeeBack(p) {
@@ -258,14 +251,61 @@
     </div>`;
   }
 
-  const starRow = (n, color) => Array.from({ length: n }, () =>
-    `<svg viewBox="0 0 20 20" width="12" height="12" aria-hidden="true"><path d="M10 1 L12.6 7.4 L19.5 7.6 L14 11.9 L16 18.6 L10 14.6 L4 18.6 L6 11.9 L0.5 7.6 L7.4 7.4 Z" fill="${color}"/></svg>`).join('');
+  // ---------- licensed: a whimsical creative licence covered in stickers ----------
+  const starPath = (cx, cy, r, ir = 0.45) => {
+    let d = '';
+    for (let i = 0; i < 10; i++) {
+      const a = -Math.PI / 2 + (i * Math.PI) / 5;
+      const rr = i % 2 ? r * ir : r;
+      d += `${i ? 'L' : 'M'}${(cx + Math.cos(a) * rr).toFixed(1)} ${(cy + Math.sin(a) * rr).toFixed(1)}`;
+    }
+    return `${d}Z`;
+  };
+  // glitter: a star in one colour, peppered with lighter and darker flecks
+  function glitterStar(size, fill, light, dark, seed, rot = 0) {
+    const id = uid('gs');
+    const s = size;
+    return `<svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" style="transform:rotate(${rot}deg)" aria-hidden="true">
+      <defs><clipPath id="${id}"><path d="${starPath(s / 2, s / 2 + s * 0.04, s * 0.48, 0.48)}"/></clipPath></defs>
+      <path d="${starPath(s / 2, s / 2 + s * 0.04, s * 0.48, 0.48)}" fill="${fill}" stroke="${dark}" stroke-width="${(s / 40).toFixed(1)}" stroke-linejoin="round"/>
+      <g clip-path="url(#${id})">${speckles(seed + 'l', s, s, light, Math.round(s * 1.4))}${speckles(seed + 'd', s, s, dark, Math.round(s * 0.9))}</g>
+    </svg>`;
+  }
+  function holoStar(size, rot = 0) {
+    const id = uid('hs');
+    const s = size;
+    return `<svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" style="transform:rotate(${rot}deg)" aria-hidden="true">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFD1F0"/><stop offset=".35" stop-color="#C9E7FF"/><stop offset=".65" stop-color="#E4FFD8"/><stop offset="1" stop-color="#E9D2FF"/></linearGradient></defs>
+      <path d="${starPath(s / 2, s / 2 + s * 0.04, s * 0.48, 0.5)}" fill="url(#${id})" stroke="#FFFFFF" stroke-width="${(s / 22).toFixed(1)}" stroke-linejoin="round"/>
+      <path d="${starPath(s / 2, s / 2 + s * 0.04, s * 0.48, 0.5)}" fill="none" stroke="#B9A6D9" stroke-width="${(s / 60).toFixed(1)}" stroke-linejoin="round"/>
+    </svg>`;
+  }
+
+  const LIC_STICKERS = {
+    certified: { label: 'Certified creative', art: (n) => `<div class="lk lk-certified"><span>★ certified ★</span><span>creative</span><b>${n}</b></div>` },
+    heart: { label: 'Heart bubble', art: () => `<div class="lk lk-heart"><svg viewBox="0 0 64 54" width="64" height="54" aria-hidden="true"><path d="M8 4h48a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H30l-12 10v-10H8a6 6 0 0 1-6-6V10a6 6 0 0 1 6-6z" fill="#F7B6D4" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/><path d="M32 33 C22 26 19 22 19 18 C19 14.5 21.8 12 25 12 C28 12 30.4 13.8 32 16.2 C33.6 13.8 36 12 39 12 C42.2 12 45 14.5 45 18 C45 22 42 26 32 33 Z" fill="#FFFFFF"/></svg></div>` },
+    pencil: { label: 'Pencil', art: () => `<div class="lk lk-pencil"><svg viewBox="0 0 90 34" width="90" height="34" aria-hidden="true"><rect x="16" y="6" width="54" height="22" rx="3" fill="#C9B6F2" stroke="#111" stroke-width="2.4"/><path d="M16 6 L2 17 L16 28 Z" fill="#F6D9B5" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/><path d="M2 17 l5 -4 v8 z" fill="#111"/><rect x="70" y="6" width="9" height="22" fill="#D9DCE2" stroke="#111" stroke-width="2.4"/><rect x="79" y="6" width="9" height="22" rx="3" fill="#F7A9C4" stroke="#111" stroke-width="2.4"/><path d="M20 13 h46" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".7"/></svg></div>` },
+    nib: { label: 'Pen nib', art: () => `<div class="lk lk-nib"><svg viewBox="0 0 54 54" width="54" height="54" aria-hidden="true"><path d="M27 4 L44 24 L33 46 H21 L10 24 Z" fill="#111"/><path d="M27 18 V34" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/><circle cx="27" cy="30" r="3.4" fill="#FFFFFF"/><path d="M48 6 l1.8 4.2 4.2 1.8 -4.2 1.8 -1.8 4.2 -1.8 -4.2 -4.2 -1.8 4.2 -1.8z" fill="#111"/><path d="M6 36 l1.2 2.8 2.8 1.2 -2.8 1.2 -1.2 2.8 -1.2 -2.8 -2.8 -1.2 2.8 -1.2z" fill="#111"/></svg></div>` },
+    gold: { label: 'Gold star', art: () => `<div class="lk lk-gold">${glitterStar(58, '#E8B730', '#FFF2B0', '#9C7212', 'gold', -12)}</div>` },
+    holo: { label: 'Holo star', art: () => `<div class="lk lk-holo">${holoStar(54, 14)}</div>` },
+    smiley: { label: 'Smiley', art: () => `<div class="lk lk-smiley"><svg viewBox="0 0 50 50" width="50" height="50" aria-hidden="true"><circle cx="25" cy="25" r="22" fill="#FFD84A" stroke="#111" stroke-width="2.4"/><ellipse cx="18" cy="21" rx="2.8" ry="4.6" fill="#111"/><ellipse cx="32" cy="21" rx="2.8" ry="4.6" fill="#111"/><path d="M14 30 Q25 41 36 30" stroke="#111" stroke-width="2.8" fill="none" stroke-linecap="round"/></svg></div>` },
+    rainbow: { label: 'Rainbow', art: () => `<div class="lk lk-rainbow"><svg viewBox="0 0 70 40" width="70" height="40" aria-hidden="true"><path d="M6 38 a29 29 0 0 1 58 0" fill="none" stroke="#111" stroke-width="13"/><path d="M6 38 a29 29 0 0 1 58 0" fill="none" stroke="#FF7A7A" stroke-width="9"/><path d="M14 38 a21 21 0 0 1 42 0" fill="none" stroke="#FFD84A" stroke-width="7"/><path d="M21 38 a14 14 0 0 1 28 0" fill="none" stroke="#7FD6A6" stroke-width="6"/><path d="M27 38 a8 8 0 0 1 16 0" fill="none" stroke="#8EC5FF" stroke-width="5"/></svg></div>` },
+  };
+  const SIG_FONTS = {
+    comic: { label: 'Comic Neue', css: "'Comic Neue', 'Comic Sans MS', cursive", w: 700 },
+    lobster: { label: 'Lobster', css: "'Lobster', cursive", w: 400 },
+    pacifico: { label: 'Pacifico', css: "'Pacifico', cursive", w: 400 },
+    fredericka: { label: 'Fredericka', css: "'Fredericka the Great', cursive", w: 400 },
+    wetpaint: { label: 'Wet Paint', css: "'Rubik Wet Paint', cursive", w: 400 },
+  };
+
   function licenceBarcode(seed) {
     let h = hash(seed) || 1;
     const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
     let out = '';
     let w = 0;
-    while (w < 104) {
+    while (w < 112) {
       const bar = 1 + Math.floor(rnd() * 3);
       const gap = 1 + Math.floor(rnd() * 2.4);
       out += `<i style="width:${bar}px"></i><b style="width:${gap}px"></b>`;
@@ -274,51 +314,71 @@
     return out;
   }
   const FAV_COLORS = [['#2B0F3A', '#FF7AC6'], ['#3A1C00', '#FF9A2E'], ['#001E3C', '#4CB7FF']];
-  function licenceFront(p) {
+  const blackStars = (n) => Array.from({ length: n }, () => `<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path d="${starPath(10, 10.6, 9.6, 0.45)}" fill="#111"/></svg>`).join('');
+  const initials = () => (state.name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2) || 'v').toUpperCase();
+
+  function licenceFront() {
     const name = esc(nameOr());
-    const initial = esc((state.name.trim()[0] || 'v').toUpperCase());
+    const sig = esc(state.sig.trim() || nameOr());
+    const font = SIG_FONTS[state.sigFont] || SIG_FONTS.comic;
     const favs = state.favs.split(',').map((f) => f.trim()).filter(Boolean).slice(0, 3);
     const tiles = favs.map((f, i) => `<span class="lc-fav" style="background:${FAV_COLORS[i][0]};color:${FAV_COLORS[i][1]}" title="${esc(f)}">${esc(f.slice(0, 2))}</span>`).join('');
     const photo = state.photo
       ? `<div class="lc-photo" style="background-image:url('${state.photo}')"></div>`
-      : `<div class="lc-photo lc-photo-empty">${initial}</div>`;
-    return `<div class="lc" style="--acc:${p.acc}">
+      : `<div class="lc-photo lc-photo-empty"><span>${esc(initials())}</span><small>photo booth</small></div>`;
+    const on = new Set(state.stickers.split(',').filter(Boolean));
+    const stickers = Object.keys(LIC_STICKERS).filter((k) => on.has(k)).map((k) => LIC_STICKERS[k].art(esc(initials()))).join('');
+    return `<div class="lc">
       <span class="slot"></span>
       <div class="lc-card">
-        <div class="lc-stars">${starRow(8, '#111')}</div>
-        <div class="lc-grid">
-          <div class="lc-left">
-            ${photo}
-            <span class="lc-sticker-a">★ certified ★<br>creative</span>
-            <span class="lc-sticker-b"><svg viewBox="0 0 20 18" width="16" height="14" aria-hidden="true"><path d="M10 16 C3 11 1 8 1 5.4 C1 3 3 1 5.4 1 C7.4 1 9 2.2 10 3.8 C11 2.2 12.6 1 14.6 1 C17 1 19 3 19 5.4 C19 8 17 11 10 16 Z" fill="#FFFFFF"/></svg></span>
-            <div class="lc-barcode">${licenceBarcode(state.name + 'licence')}</div>
-            <div class="lc-mono lc-cap">${name} · creative</div>
-          </div>
-          <div class="lc-right">
-            <div class="lc-head">
-              <div class="lc-title"><span>CREATIVE</span><span>LICENCE</span></div>
-              <div class="lc-issued"><span class="lc-mono">licence issued :</span><b>${now.getFullYear()}</b></div>
-            </div>
-            <div class="lc-fields">
-              <div class="lc-f"><span class="lc-mono">name :</span><b class="fit" data-max="16" data-min="9">${name}</b></div>
-              <div class="lc-f"><span class="lc-mono">occupation :</span><b class="fit" data-max="15" data-min="9">${esc(state.role.trim()) || '&nbsp;'}</b></div>
-              <div class="lc-f lc-sig"><span class="lc-mono">signature :</span><em class="fit" data-max="30" data-min="14">${name}</em></div>
-              <div class="lc-f lc-last"><div class="lc-favs"><span class="lc-mono">favourite things :</span><div>${tiles || '&nbsp;'}</div></div><div class="lc-based"><span class="lc-mono">based in :</span><b class="fit" data-max="13" data-min="8">${esc(state.place.trim()) || '&nbsp;'}</b></div></div>
-            </div>
-          </div>
+        <div class="lc-stars">${blackStars(7)}</div>
+        <div class="lc-issued"><span class="lc-mono">licence issued :</span><b>${now.getFullYear()}</b></div>
+        <div class="lc-photo-wrap">${photo}</div>
+        <div class="lc-barcode">${licenceBarcode(state.name + 'licence')}</div>
+        <div class="lc-mono lc-cap">${name} · ${esc(state.role.trim()) || 'creative'} · creative</div>
+        <div class="lc-title"><span>CREATIVE</span><span>LICENCE</span></div>
+        <div class="lc-fields">
+          <div class="lc-f"><span class="lc-mono">name :</span><b class="fit" data-max="17" data-min="9">${name}</b></div>
+          <div class="lc-f lc-occ"><span class="lc-mono">occupation :</span><b class="fitblock" data-max="15" data-min="9"><span>${esc(state.role.trim()) || '&nbsp;'}</span></b></div>
+          <div class="lc-f lc-sig"><span class="lc-mono">signature :</span><em class="fit" data-max="30" data-min="12" style="font-family:${font.css};font-weight:${font.w}">${sig}</em></div>
+          <div class="lc-f lc-based"><span class="lc-mono">based in :</span><b class="fit" data-max="14" data-min="8">${esc(state.place.trim()) || '&nbsp;'}</b></div>
         </div>
+        <div class="lc-favs"><span class="lc-mono">favourite things :</span><div>${tiles || '&nbsp;'}</div></div>
+        ${stickers}
       </div>
     </div>`;
   }
-  function licenceBack(p) {
-    return `<div class="lc" style="--acc:${p.acc}">
+  function licenceBack() {
+    return `<div class="lc">
       <span class="slot"></span>
       <div class="lc-card lc-card-back">
-        <div class="lc-stars">${starRow(8, '#111')}</div>
+        <div class="lc-stars">${blackStars(7)}</div>
         <div class="lc-backtext fitblock" data-max="40" data-min="18"><span>${esc(state.back.trim() || 'hello!')}</span></div>
         <div class="lc-backfoot"><div class="lc-barcode">${licenceBarcode(state.name + 'back')}</div><span class="lc-mono">if found, return to ${esc(nameOr())}</span></div>
+        <div class="lk lk-gold lk-back">${glitterStar(58, '#E8B730', '#FFF2B0', '#9C7212', 'goldb', 10)}</div>
       </div>
     </div>`;
+  }
+
+  // scattered glitter and holo stars behind the licence, like a sticker-covered desk
+  function confettiHTML() {
+    const kinds = [
+      ['#E8B730', '#FFF2B0', '#9C7212'], ['#E8457E', '#FFC2DA', '#9C1F4E'], ['#C7242E', '#FF9A9A', '#7E1018'],
+      ['#2E7FD6', '#B9DCFF', '#164E8C'], ['#F2852E', '#FFD1A6', '#A0480E'], ['#8E9AA6', '#EEF2F6', '#4E5862'],
+      ['#7AB648', '#D8F2B8', '#3E6C1E'], ['#5B8FD9', '#C9DEFF', '#2B4F8C'],
+    ];
+    let h = 12345;
+    const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
+    let out = '';
+    for (let i = 0; i < 26; i++) {
+      const x = (i % 6) * 17 + rnd() * 12 - 2;
+      const y = Math.floor(i / 6) * 22 + rnd() * 14 - 2;
+      const size = Math.round(34 + rnd() * 30);
+      const rot = Math.round(rnd() * 60 - 30);
+      const star = rnd() < 0.18 ? holoStar(size, rot) : (() => { const k = kinds[Math.floor(rnd() * kinds.length)]; return glitterStar(size, k[0], k[1], k[2], `c${i}`, rot); })();
+      out += `<span style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%">${star}</span>`;
+    }
+    return out;
   }
 
   const EXTRA_TPLS = {
@@ -333,7 +393,7 @@
       swatch: (p) => p.frame,
     },
     slogan: {
-      kind: 'lanyard', w: 300, h: 440, fields: ['look', 'statement', 'event', 'back'],
+      kind: 'lanyard', w: 300, h: 440, fields: ['statement', 'event', 'back'],
       palettes: [
         { n: 'Mint', bg: '#DCE9DE', ink: '#2DB94C', strap: '#C2D1C6' },
         { n: 'Cobalt', bg: '#2033E3', ink: '#FFFFFF', strap: '#2033E3' },
@@ -364,9 +424,9 @@
       swatch: (p) => `linear-gradient(135deg, ${p.stripe} 50%, ${p.wave} 50%)`,
     },
     licence: {
-      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'place', 'photo', 'favs', 'back'],
-      palettes: [{ n: 'Signal red', acc: '#D1462F' }, { n: 'Ink blue', acc: '#2B4BD6' }, { n: 'Forest', acc: '#2E7D4F' }, { n: 'Grape', acc: '#7A3FD1' }],
-      swatch: (p) => p.acc, strap: () => '#D9DCE2',
+      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'sig', 'place', 'photo', 'favs', 'stickers', 'back'], noColor: true,
+      palettes: [{ n: 'Sunny', acc: '#D1462F' }],
+      swatch: (p) => p.acc, strap: () => '#F4CF2E', strapInk: 'rgba(40, 30, 0, .72)',
     },
   };
   // --- crayon: a folded place card, striped and outlined in wax crayon ---
@@ -411,6 +471,7 @@
         <path d="${blob}" fill="none" stroke="${p.wave}" stroke-width="9" stroke-linejoin="round" filter="url(#${f2})"/>
       </svg>
       <div class="cr-name fit" data-max="64" data-min="24" style="color:${p.ink}">${esc(nameOr())}</div>
+      ${state.pronouns.trim() ? `<div class="cr-pron" style="color:${p.ink}">${esc(state.pronouns.trim())}</div>` : ''}
       <svg class="cr-wax" viewBox="0 0 300 120" width="300" height="120" aria-hidden="true">${speckles(state.name + 'wax', 300, 120, '#FFFFFF', 520)}</svg>
     </div>`;
   }
@@ -425,7 +486,8 @@
     tpl: 'volunteer', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     back: 'how can i help?', mood: 64, flipped: false,
     colors: { volunteer: 0, classic: 0, glow: 0, postcard: 0, slogan: 0, coffee: 0, licence: 0, crayon: 0 },
-    shape: 'rect', critter: 'fish', look: 'soft', statement: 'you belong here',
+    shape: 'rect', critter: 'fish', statement: 'you belong here', sig: '', sigFont: 'comic',
+    stickers: 'certified,heart,pencil,nib,gold',
     place: 'somewhere sunny', favs: 'chai, music, doodles', photo: '',
   };
 
@@ -620,6 +682,7 @@
 
     if (lan) {
       $('#strap').style.setProperty('--strap', t.strap(p));
+      $('#strap').style.setProperty('--strap-ink', t.strapInk || 'rgba(255, 255, 255, .82)');
       const word = (state.event.trim() || 'hello').toUpperCase();
       $('#strapText').textContent = Array(12).fill(word).join('  •  ');
     }
@@ -628,6 +691,9 @@
     // panel
     $$('.sty').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tpl === state.tpl)));
     $$('[data-for]').forEach((el) => { el.hidden = !t.fields.includes(el.dataset.for); });
+    $('[data-ticket="color"]').hidden = !!t.noColor;
+    $$('#stickerOpts .opt').forEach((o) => o.setAttribute('aria-checked', String(state.stickers.split(',').includes(o.dataset.s))));
+    $$('#sigFonts .opt').forEach((o) => o.setAttribute('aria-checked', String(o.dataset.v === state.sigFont)));
     $$('.row').forEach((row) => { row.hidden = [...row.children].every((c) => c.hidden); });
     renderSwatches();
     syncFlip(lan);
@@ -660,6 +726,8 @@
       const field = $('input:not([type="file"]), .greet[aria-checked="true"], .swatch[aria-checked="true"], button.link', $('.t-body', tk));
       if (field) setTimeout(() => field.focus({ preventScroll: true }), 120);
     }
+    // the panel scrolls; bring a newly opened ticket fully into view once it has expanded
+    if (tk) setTimeout(() => tk.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' }), 300);
   }
   $('#tickets').addEventListener('click', (e) => {
     const head = e.target.closest('.t-head');
@@ -1073,6 +1141,20 @@
   function applyShape() {
     Object.assign(TPLS.classic, state.shape === 'circle' ? { w: 360, h: 360 } : { w: 440, h: 316 });
   }
+  $('#stickerOpts').innerHTML = Object.entries(LIC_STICKERS).map(([k, v]) =>
+    `<button type="button" class="greet opt" role="checkbox" aria-checked="false" data-s="${k}">${v.label}</button>`).join('');
+  $('#stickerOpts').addEventListener('click', (e) => {
+    const o = e.target.closest('.opt[data-s]');
+    if (!o) return;
+    const set = new Set(state.stickers.split(',').filter(Boolean));
+    if (set.has(o.dataset.s)) set.delete(o.dataset.s); else set.add(o.dataset.s);
+    state.stickers = [...set].join(',');
+    render(); save(); kick(1.2);
+  });
+  $('#sigFonts').innerHTML = Object.entries(SIG_FONTS).map(([k, v]) =>
+    `<button type="button" class="greet opt" role="radio" aria-checked="false" data-k="sigFont" data-v="${k}" style="font-family:${v.css};font-weight:${v.w}">${v.label}</button>`).join('');
+  $('#confetti').innerHTML = confettiHTML();
+
   // option buttons inside tickets (sticker shape, postcard buddy, slogan look)
   $('#tickets').addEventListener('click', (e) => {
     const o = e.target.closest('.opt[data-k]');
