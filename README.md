@@ -7,9 +7,12 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 | style   | what it is                                                        | extras                                  |
 | ------- | ----------------------------------------------------------------- | --------------------------------------- |
 | lanyard | "hi, i'm" badge with a highlighted name and a smiley              | dark flip side ("how can i help?")      |
-| classic | the red "HELLO, I'M" sticker, rectangle or circle                | greetings incl. hindi + marathi        |
-| chatty  | speech-bubble sticker with an icebreaker question                 | shuffle questions, write your answer    |
+| classic | the red "HELLO, I'M" sticker, rectangle or circle                | greetings incl. "arree, mai hoon"      |
 | glow    | soft gradient light with a face that watches your cursor          | energy slider changes the glow + eyes   |
+| postcard| stamp-edged sticker with a little sea buddy and your name on a line | fish, narwhal or puffer                 |
+| slogan  | lanyard card with your own one-liner                              | soft (smileys) or bold (pills) look     |
+| coffee  | starburst with your name over a doodled coffee drinker            | four colourways, each with its own shirt|
+| licence | landscape "creative licence" ID in a clear holder                 | b&w photo, occupation, place, favourites|
 
 ## Interactions
 
@@ -21,7 +24,7 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Save PNG and Flip are stacked at the bottom left of the stage, so they're always in reach.
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
 - **Save PNG** renders the current side as a sharp PNG with a transparent background. On phones the save dialog also offers **Save to phone**, which opens the share sheet (Photos, Files, apps).
-- On phones the tag stays pinned at the top while you edit, shrinks while the keyboard is up, and Flip / Save sit in a bar along the bottom.
+- On phones the stage works like desktop (swing, flip, drag). **Edit tag** opens the editor as a side column next to the tag; **Done** closes it.
 - Your tag is remembered in `localStorage`.
 
 ## Run it

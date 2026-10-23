@@ -14,20 +14,6 @@
     "hello, i'm", "hi, i'm", 'hello, my name is', "hey, i'm", 'hello, who am i again?',
     'arree, mai hoon', 'hola, soy', 'bonjour, je suis',
   ];
-  const QUESTIONS = [
-    "what's the weirdest thing you've ever eaten?",
-    'what word best describes you?',
-    "what's your most unusual skill?",
-    "what's your go-to karaoke song?",
-    "what's a hill you'd happily die on?",
-    'what are you nerding out about lately?',
-    "what's your comfort food?",
-    'what made you laugh this week?',
-    "what's playing in your headphones?",
-    "what's your hidden talent?",
-    'cats, dogs, or neither?',
-    'what would your superpower be?',
-  ];
 
   const TPLS = {
     volunteer: {
@@ -43,29 +29,347 @@
       ],
       swatch: (p) => p.c,
     },
-    chatty: {
-      kind: 'sticker', w: 440, h: 320, fields: ['q', 'answer'],
-      palettes: [
-        { n: 'Grape and lime', f: '#4B2C9C', h: '#C8DA2C', q: '#FFFFFF' },
-        { n: 'Mint and grape', f: '#BFE4DF', h: '#3D2A8E', q: '#3D2A8E' },
-        { n: 'Lime and tomato', f: '#D7E13B', h: '#E2401C', q: '#E2401C' },
-        { n: 'Slate and lime', f: '#88888C', h: '#D7E13B', q: '#FFFFFF' },
-      ],
-      swatch: (p) => `linear-gradient(135deg, ${p.f} 50%, ${p.h} 50%)`,
-    },
     glow: {
       kind: 'lanyard', w: 300, h: 440, fields: ['role', 'event', 'mood', 'back'],
       palettes: [{ n: 'Amber', h: 28 }, { n: 'Rose', h: 342 }, { n: 'Lime', h: 72 }, { n: 'Sky', h: 198 }, { n: 'Violet', h: 262 }],
       swatch: (p) => hsl(p.h, 95, 58), strap: (p) => hsl(p.h, 70, 46),
     },
   };
+  // ---------- illustrated tags: postcard, slogan, coffee, licence ----------
+  let svgUid = 0;
+  const uid = (p) => `${p}${++svgUid}`;
+
+  // closed path whose edges wobble like a hand-cut border
+  function wavyPath(x, y, w, h, amp, step) {
+    const edge = (len) => Math.max(2, Math.round(len / step));
+    let d = `M${x} ${y}`;
+    let n = edge(w);
+    for (let i = 0; i < n; i++) d += ` Q${(x + (i + 0.5) * w / n).toFixed(1)} ${(y + (i % 2 ? amp : -amp)).toFixed(1)} ${(x + (i + 1) * w / n).toFixed(1)} ${y}`;
+    n = edge(h);
+    for (let i = 0; i < n; i++) d += ` Q${(x + w + (i % 2 ? -amp : amp)).toFixed(1)} ${(y + (i + 0.5) * h / n).toFixed(1)} ${x + w} ${(y + (i + 1) * h / n).toFixed(1)}`;
+    n = edge(w);
+    for (let i = 0; i < n; i++) d += ` Q${(x + w - (i + 0.5) * w / n).toFixed(1)} ${(y + h + (i % 2 ? -amp : amp)).toFixed(1)} ${(x + w - (i + 1) * w / n).toFixed(1)} ${y + h}`;
+    n = edge(h);
+    for (let i = 0; i < n; i++) d += ` Q${(x + (i % 2 ? amp : -amp)).toFixed(1)} ${(y + h - (i + 0.5) * h / n).toFixed(1)} ${x} ${(y + h - (i + 1) * h / n).toFixed(1)}`;
+    return `${d} Z`;
+  }
+
+  // a postage-stamp frame: a rectangle with round bumps all the way around
+  function scallopFrame(W, H, r, fill) {
+    let out = `<rect x="${r}" y="${r}" width="${W - 2 * r}" height="${H - 2 * r}" fill="${fill}"/>`;
+    const nx = Math.round((W - 2 * r) / (2.1 * r));
+    const ny = Math.round((H - 2 * r) / (2.1 * r));
+    for (let i = 0; i <= nx; i++) {
+      const cx = (r + i * (W - 2 * r) / nx).toFixed(1);
+      out += `<circle cx="${cx}" cy="${r}" r="${r}" fill="${fill}"/><circle cx="${cx}" cy="${H - r}" r="${r}" fill="${fill}"/>`;
+    }
+    for (let i = 1; i < ny; i++) {
+      const cy = (r + i * (H - 2 * r) / ny).toFixed(1);
+      out += `<circle cx="${r}" cy="${cy}" r="${r}" fill="${fill}"/><circle cx="${W - r}" cy="${cy}" r="${r}" fill="${fill}"/>`;
+    }
+    return out;
+  }
+
+  function speckles(seed, W, H, color, count) {
+    let h = hash(seed) || 7;
+    const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
+    let out = '';
+    for (let i = 0; i < count; i++) {
+      out += `<circle cx="${(rnd() * W).toFixed(1)}" cy="${(rnd() * H).toFixed(1)}" r="${(0.6 + rnd() * 1.6).toFixed(2)}" fill="${color}" opacity="${(0.35 + rnd() * 0.5).toFixed(2)}"/>`;
+    }
+    return out;
+  }
+
+  const CRITTERS = {
+    fish: `<svg class="pc-critter" viewBox="0 0 150 100" width="172" height="115" aria-hidden="true">
+      <path d="M38 50 L8 26 Q16 50 8 74 Z" fill="#E8432E"/>
+      <path d="M58 24 Q60 6 72 14 Q76 4 86 12 Q94 6 96 22 Z" fill="#E8432E"/>
+      <ellipse cx="78" cy="54" rx="46" ry="34" fill="#E8432E"/>
+      <path d="M104 23 Q128 34 128 56 Q128 78 104 87 Q114 56 104 23 Z" fill="#F27B3C"/>
+      <path d="M60 86 q6 8 12 0 q6 8 12 0 q6 8 12 0" fill="#E8432E"/>
+      <path d="M110 46 q5 -6 10 0" stroke="#3B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <circle cx="131" cy="58" r="4.6" fill="#E8432E"/><circle cx="131" cy="67" r="4.6" fill="#E8432E"/>
+      <circle cx="113" cy="60" r="4" fill="#F7A07A" opacity=".8"/>
+      <path d="M66 42 c-3 -4 -8 0 -4 4 l4 4 l4 -4 c4 -4 -1 -8 -4 -4z" fill="#F9B36B"/>
+      <circle cx="80" cy="36" r="1.8" fill="#F9B36B"/><circle cx="88" cy="44" r="1.8" fill="#F9B36B"/><circle cx="74" cy="56" r="1.8" fill="#F9B36B"/>
+    </svg>`,
+    narwhal: `<svg class="pc-critter" viewBox="0 0 150 100" width="172" height="115" aria-hidden="true">
+      <path d="M104 40 L124 2 L114 42 Z" fill="#F4E7C4"/>
+      <path d="M111 30 l7 -4 M108 22 l8 -4 M114 14 l6 -3" stroke="#E2CC96" stroke-width="2" stroke-linecap="round"/>
+      <path d="M22 72 L4 60 L8 80 Z" fill="#E8693A"/>
+      <path d="M20 74 Q32 62 46 64 Q60 32 98 36 Q134 40 134 66 Q134 92 98 92 L52 90 Q34 88 20 74 Z" fill="#E8693A"/>
+      <path d="M54 84 Q96 98 132 74 Q130 92 98 92 L54 90 Z" fill="#FFF7EE"/>
+      <path d="M80 70 q-6 12 6 14" stroke="#C9512A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M106 58 q5 -6 10 0" stroke="#3B1A12" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <circle cx="120" cy="70" r="4" fill="#F9A88A" opacity=".85"/>
+      <path d="M70 52 c-3 -4 -8 0 -4 4 l4 4 l4 -4 c4 -4 -1 -8 -4 -4z" fill="#FFF7EE"/>
+      <circle cx="62" cy="62" r="1.8" fill="#FFF7EE"/><circle cx="84" cy="48" r="1.8" fill="#FFF7EE"/>
+    </svg>`,
+    puffer: `<svg class="pc-critter" viewBox="0 0 150 100" width="172" height="115" aria-hidden="true">
+      <path d="M34 52 L10 36 Q16 52 10 68 Z" fill="#F2B530"/>
+      ${Array.from({ length: 16 }, (_, i) => {
+        const a = (i / 16) * Math.PI * 2;
+        const c = (r) => `${(80 + Math.cos(a) * r).toFixed(1)} ${(52 + Math.sin(a) * r).toFixed(1)}`;
+        const b1 = (r) => `${(80 + Math.cos(a - 0.12) * r).toFixed(1)} ${(52 + Math.sin(a - 0.12) * r).toFixed(1)}`;
+        const b2 = (r) => `${(80 + Math.cos(a + 0.12) * r).toFixed(1)} ${(52 + Math.sin(a + 0.12) * r).toFixed(1)}`;
+        return `<path d="M${b1(34)} L${c(44)} L${b2(34)} Z" fill="#E59A1E"/>`;
+      }).join('')}
+      <circle cx="80" cy="52" r="36" fill="#F7C84A"/>
+      <path d="M50 66 Q80 92 110 66 Q104 86 80 88 Q56 86 50 66 Z" fill="#FFF3CF"/>
+      <path d="M86 40 q5 -6 10 0" stroke="#3B2A0E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <circle cx="108" cy="56" r="5" fill="none" stroke="#3B2A0E" stroke-width="2.4"/>
+      <circle cx="94" cy="54" r="4" fill="#F59C7A" opacity=".8"/>
+      <path d="M62 40 q8 4 4 12" stroke="#E59A1E" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </svg>`,
+  };
+
+  function postcardFront(p) {
+    const W = 460, H = 240;
+    const inner = wavyPath(26, 26, W - 52, H - 52, 3.2, 22);
+    const greet = esc(GREETS[state.greet] || GREETS[0]);
+    return `<div class="pc" style="--frame:${p.frame};--ink:${p.ink}">
+      <svg class="pc-bg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">
+        ${scallopFrame(W, H, 7, p.frame)}
+        <path d="${inner}" fill="${p.inner}"/>
+        ${p.speck ? `<g>${speckles(state.name + p.n, W, H, p.speck, 140)}</g><path d="${wavyPath(0, 0, W, H, 0, 400)} ${inner}" fill="${p.frame}" fill-rule="evenodd"/>` : ''}
+      </svg>
+      ${CRITTERS[state.critter] || CRITTERS.fish}
+      <div class="pc-write">
+        <div class="pc-greet">${greet}</div>
+        <div class="pc-name fit" data-max="48" data-min="20">${esc(nameOr())}</div>
+        <div class="pc-line"></div>
+      </div>
+    </div>`;
+  }
+
+  function smileySvg(color, cls, w = 130) {
+    return `<svg class="${cls}" viewBox="0 0 120 100" width="${w}" height="${Math.round(w * 100 / 120)}" aria-hidden="true">
+      <ellipse cx="44" cy="30" rx="9" ry="20" transform="rotate(-14 44 30)" fill="${color}"/>
+      <ellipse cx="74" cy="26" rx="9" ry="20" transform="rotate(-14 74 26)" fill="${color}"/>
+      <path d="M14 60 Q58 104 112 58" stroke="${color}" stroke-width="7" fill="none" stroke-linecap="round"/>
+    </svg>`;
+  }
+  const leather = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='l'%3E%3CfeTurbulence type='turbulence' baseFrequency='.055' numOctaves='3' seed='4'/%3E%3CfeDiffuseLighting surfaceScale='1.6' lighting-color='%23fff'%3E%3CfeDistantLight azimuth='225' elevation='55'/%3E%3C/feDiffuseLighting%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1 0 0 0 .9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E")`;
+
+  function sloganWords() {
+    return (state.statement.trim() || 'you belong here').split(/\s+/).slice(0, 6).map(esc);
+  }
+  function sloganFront(p) {
+    const name = esc(nameOr());
+    const event = esc(state.event.trim());
+    const words = sloganWords();
+    const foot = `<div class="sl-foot"><b>${name}</b>${event ? `<span>${event}</span>` : ''}</div>`;
+    if (state.look === 'bold') {
+      return `<div class="sl bold" style="--bg:${p.bg};--ink:${p.ink}">
+        <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
+        <div class="sl-pills">${words.map((w, i) => `<span class="sl-pill ${i % 3 === 1 ? 'out' : 'fill'}">${w}</span>`).join('')}</div>
+        ${foot}
+      </div>`;
+    }
+    return `<div class="sl soft" style="--bg:${p.bg};--ink:${p.ink}">
+      <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
+      ${smileySvg(p.ink, 'sl-smile s1')}${smileySvg(p.ink, 'sl-smile s2')}
+      <div class="sl-stack fitblock" data-max="58" data-min="26"><span>${words.join('<br>')}</span></div>
+      ${foot}
+    </div>`;
+  }
+  function sloganBack(p) {
+    return `<div class="sl ${state.look === 'bold' ? 'bold' : 'soft'} sl-back" style="--bg:${p.bg};--ink:${p.ink}">
+      <span class="slot"></span><i class="sl-tex" style="background-image:${leather}"></i>
+      ${smileySvg(p.ink, 'sl-smile s3', 96)}
+      <div class="sl-backtext fitblock" data-max="48" data-min="22"><span>${esc(state.back.trim() || 'hello!')}</span></div>
+      <div class="sl-foot"><b>${esc(nameOr())}</b></div>
+    </div>`;
+  }
+
+  function burstPoints(cx, cy, rx, ry, n, seed) {
+    let h = hash(seed) || 3;
+    const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
+    const pts = [];
+    for (let i = 0; i < n * 2; i++) {
+      const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2;
+      const k = i % 2 === 0 ? 0.86 + rnd() * 0.16 : 0.5 + rnd() * 0.1;
+      pts.push(`${(cx + Math.cos(a) * rx * k).toFixed(1)},${(cy + Math.sin(a) * ry * k).toFixed(1)}`);
+    }
+    return pts.join(' ');
+  }
+  function shirtPattern(id, p) {
+    switch (p.shirt) {
+      case 'gingham':
+        return `<pattern id="${id}" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#FFFFFF"/><rect width="9" height="18" fill="${p.shirtC}" opacity=".55"/><rect width="18" height="9" fill="${p.shirtC}" opacity=".55"/></pattern>`;
+      case 'sprinkles':
+        return `<pattern id="${id}" width="26" height="22" patternUnits="userSpaceOnUse"><rect width="26" height="22" fill="${p.shirtC}"/><rect x="4" y="4" width="8" height="2.4" rx="1.2" fill="#FFFFFF" transform="rotate(35 8 5)"/><rect x="15" y="13" width="8" height="2.4" rx="1.2" fill="#FFFFFF" transform="rotate(-25 19 14)"/></pattern>`;
+      case 'stripes':
+        return `<pattern id="${id}" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#FFFFFF"/><rect width="14" height="6" fill="${p.shirtC}"/></pattern>`;
+      default:
+        return `<pattern id="${id}" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#FFFFFF"/><circle cx="9" cy="9" r="3.4" fill="${p.shirtC}"/></pattern>`;
+    }
+  }
+  function coffeeCharacter(p) {
+    const id = uid('shirt');
+    return `<svg class="cf-person" viewBox="0 0 250 200" width="240" height="192" aria-hidden="true">
+      <defs>${shirtPattern(id, p)}</defs>
+      <path d="M18 204 Q20 124 72 104 Q112 92 152 104 Q206 122 212 204 Z" fill="url(#${id})" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="112" cy="64" r="30" fill="#F6C6B4" stroke="#111" stroke-width="3"/>
+      <path d="M82 66 Q78 26 114 28 Q146 30 144 58 Q130 42 110 44 Q92 48 86 70 Z" fill="#111"/>
+      ${p.shirt === 'sprinkles' ? '<path d="M86 70 Q72 74 76 88 Q86 92 92 82" fill="#111"/>' : ''}
+      <path d="M116 60 v9" stroke="#111" stroke-width="2.6" stroke-linecap="round"/>
+      <circle cx="128" cy="65" r="3.4" fill="none" stroke="#111" stroke-width="2.4"/>
+      <path d="M36 130 Q12 168 40 186 Q92 192 150 182 Q166 176 160 160 Q150 150 132 152 L74 156 Q68 142 62 130 Z" fill="#F6C6B4" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="146" y="136" width="48" height="50" rx="5" fill="#FFFFFF" stroke="#111" stroke-width="3"/>
+      <path d="M194 148 q16 2 14 16 q-2 12 -14 10" fill="none" stroke="#111" stroke-width="3"/>
+      <ellipse cx="170" cy="141" rx="19" ry="3.6" fill="#3A2416"/>
+      <path d="M170 172 c-6 -8 -16 -2 -10 6 l10 8 l10 -8 c6 -8 -4 -14 -10 -6z" fill="#2E9E4A" stroke="#111" stroke-width="2"/>
+      <path d="M140 156 q10 -4 12 8 q-2 8 -12 6" fill="#F6C6B4" stroke="#111" stroke-width="3"/>
+    </svg>`;
+  }
+  const doodleStar = (cls) => `<svg class="${cls}" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true"><path d="M20 3 L24 15 L37 16 L27 24 L31 37 L20 29 L9 37 L13 24 L3 16 L16 15 Z" fill="#FFFFFF" stroke="#111" stroke-width="2.4" stroke-linejoin="round"/></svg>`;
+
+  function coffeeFront(p) {
+    const pts = burstPoints(170, 112, 168, 108, 11, 'coffee' + p.n);
+    const event = esc(state.event.trim());
+    const role = esc(state.role.trim());
+    return `<div class="cf no-box-shadow">
+      <div class="cf-body">
+        <div class="cf-side"><b>${event || 'hello'}</b>${role ? ` ${role}` : ''}</div>
+        ${coffeeCharacter(p)}
+        ${doodleStar('cf-star')}
+      </div>
+      <svg class="cf-burst" viewBox="0 0 340 230" width="340" height="230" aria-hidden="true">
+        <polygon points="${pts}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="18" stroke-linejoin="round"/>
+        <polygon points="${pts}" fill="${p.burst}" stroke="#111" stroke-width="3.2" stroke-linejoin="round"/>
+        <circle cx="170" cy="30" r="9" fill="#EFEFEC" stroke="#111" stroke-width="2"/>
+      </svg>
+      <div class="cf-name fit" data-max="56" data-min="22">${esc(nameOr())}</div>
+    </div>`;
+  }
+  function coffeeBack(p) {
+    const pts = burstPoints(170, 70, 120, 62, 10, 'coffee-back' + p.n);
+    return `<div class="cf">
+      <div class="cf-body cf-body-back">
+        <div class="cf-backtext fitblock" data-max="48" data-min="22"><span>${esc(state.back.trim() || 'hello!')}</span></div>
+        ${doodleStar('cf-star cf-star-b')}
+      </div>
+      <svg class="cf-burst cf-burst-back" viewBox="0 0 340 150" width="340" height="150" aria-hidden="true">
+        <polygon points="${pts}" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="16" stroke-linejoin="round"/>
+        <polygon points="${pts}" fill="${p.burst}" stroke="#111" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="170" cy="30" r="9" fill="#EFEFEC" stroke="#111" stroke-width="2"/>
+      </svg>
+    </div>`;
+  }
+
+  const starRow = (n, color) => Array.from({ length: n }, () =>
+    `<svg viewBox="0 0 20 20" width="12" height="12" aria-hidden="true"><path d="M10 1 L12.6 7.4 L19.5 7.6 L14 11.9 L16 18.6 L10 14.6 L4 18.6 L6 11.9 L0.5 7.6 L7.4 7.4 Z" fill="${color}"/></svg>`).join('');
+  function licenceBarcode(seed) {
+    let h = hash(seed) || 1;
+    const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
+    let out = '';
+    let w = 0;
+    while (w < 104) {
+      const bar = 1 + Math.floor(rnd() * 3);
+      const gap = 1 + Math.floor(rnd() * 2.4);
+      out += `<i style="width:${bar}px"></i><b style="width:${gap}px"></b>`;
+      w += bar + gap;
+    }
+    return out;
+  }
+  const FAV_COLORS = [['#2B0F3A', '#FF7AC6'], ['#3A1C00', '#FF9A2E'], ['#001E3C', '#4CB7FF']];
+  function licenceFront(p) {
+    const name = esc(nameOr());
+    const initial = esc((state.name.trim()[0] || 'v').toUpperCase());
+    const favs = state.favs.split(',').map((f) => f.trim()).filter(Boolean).slice(0, 3);
+    const tiles = favs.map((f, i) => `<span class="lc-fav" style="background:${FAV_COLORS[i][0]};color:${FAV_COLORS[i][1]}" title="${esc(f)}">${esc(f.slice(0, 2))}</span>`).join('');
+    const photo = state.photo
+      ? `<div class="lc-photo" style="background-image:url('${state.photo}')"></div>`
+      : `<div class="lc-photo lc-photo-empty">${initial}</div>`;
+    return `<div class="lc" style="--acc:${p.acc}">
+      <span class="slot"></span>
+      <div class="lc-card">
+        <div class="lc-stars">${starRow(8, '#111')}</div>
+        <div class="lc-grid">
+          <div class="lc-left">
+            ${photo}
+            <span class="lc-sticker-a">★ certified ★<br>creative</span>
+            <span class="lc-sticker-b"><svg viewBox="0 0 20 18" width="16" height="14" aria-hidden="true"><path d="M10 16 C3 11 1 8 1 5.4 C1 3 3 1 5.4 1 C7.4 1 9 2.2 10 3.8 C11 2.2 12.6 1 14.6 1 C17 1 19 3 19 5.4 C19 8 17 11 10 16 Z" fill="#FFFFFF"/></svg></span>
+            <div class="lc-barcode">${licenceBarcode(state.name + 'licence')}</div>
+            <div class="lc-mono lc-cap">${name} · creative</div>
+          </div>
+          <div class="lc-right">
+            <div class="lc-head">
+              <div class="lc-title"><span>CREATIVE</span><span>LICENCE</span></div>
+              <div class="lc-issued"><span class="lc-mono">licence issued :</span><b>${now.getFullYear()}</b></div>
+            </div>
+            <div class="lc-fields">
+              <div class="lc-f"><span class="lc-mono">name :</span><b class="fit" data-max="16" data-min="9">${name}</b></div>
+              <div class="lc-f"><span class="lc-mono">occupation :</span><b class="fit" data-max="15" data-min="9">${esc(state.role.trim()) || '&nbsp;'}</b></div>
+              <div class="lc-f lc-sig"><span class="lc-mono">signature :</span><em class="fit" data-max="30" data-min="14">${name}</em></div>
+              <div class="lc-f lc-last"><div class="lc-favs"><span class="lc-mono">favourite things :</span><div>${tiles || '&nbsp;'}</div></div><div class="lc-based"><span class="lc-mono">based in :</span><b class="fit" data-max="13" data-min="8">${esc(state.place.trim()) || '&nbsp;'}</b></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  function licenceBack(p) {
+    return `<div class="lc" style="--acc:${p.acc}">
+      <span class="slot"></span>
+      <div class="lc-card lc-card-back">
+        <div class="lc-stars">${starRow(8, '#111')}</div>
+        <div class="lc-backtext fitblock" data-max="40" data-min="18"><span>${esc(state.back.trim() || 'hello!')}</span></div>
+        <div class="lc-backfoot"><div class="lc-barcode">${licenceBarcode(state.name + 'back')}</div><span class="lc-mono">if found, return to ${esc(nameOr())}</span></div>
+      </div>
+    </div>`;
+  }
+
+  const EXTRA_TPLS = {
+    postcard: {
+      kind: 'sticker', w: 460, h: 240, fields: ['greet', 'critter'], noBox: true,
+      palettes: [
+        { n: 'Periwinkle', frame: '#6460C6', inner: '#FDFBF3', ink: '#2C2A57', speck: null },
+        { n: 'Sunflower', frame: '#F5D63C', inner: '#E5ECEE', ink: '#2C3A4F', speck: '#9DB0AD' },
+        { n: 'Cherry', frame: '#8D1120', inner: '#E7EDF0', ink: '#2C3A4F', speck: '#FFFFFF' },
+        { n: 'Sea glass', frame: '#3DA88A', inner: '#FFF8EC', ink: '#22423A', speck: '#E8C6A2' },
+      ],
+      swatch: (p) => p.frame,
+    },
+    slogan: {
+      kind: 'lanyard', w: 300, h: 440, fields: ['look', 'statement', 'event', 'back'],
+      palettes: [
+        { n: 'Mint', bg: '#DCE9DE', ink: '#2DB94C', strap: '#C2D1C6' },
+        { n: 'Cobalt', bg: '#2033E3', ink: '#FFFFFF', strap: '#2033E3' },
+        { n: 'Blush', bg: '#F8DDE5', ink: '#E0447B', strap: '#E8C2CE' },
+        { n: 'Lemon', bg: '#FFF0A0', ink: '#1A1A1A', strap: '#1A1A1A' },
+      ],
+      swatch: (p) => `linear-gradient(135deg, ${p.bg} 50%, ${p.ink} 50%)`, strap: (p) => p.strap,
+    },
+    coffee: {
+      kind: 'lanyard', w: 340, h: 450, fields: ['event', 'role', 'back'], noBox: true,
+      palettes: [
+        { n: 'Sky', burst: '#3D8BEB', shirt: 'gingham', shirtC: '#9CC3EE' },
+        { n: 'Pink', burst: '#F06BC3', shirt: 'sprinkles', shirtC: '#E2302E' },
+        { n: 'Lime', burst: '#B5DD43', shirt: 'stripes', shirtC: '#F3B23A' },
+        { n: 'Tangerine', burst: '#FF8A3D', shirt: 'dots', shirtC: '#2F6B4F' },
+      ],
+      swatch: (p) => p.burst, strap: () => '#2A2321',
+    },
+    licence: {
+      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'place', 'photo', 'favs', 'back'],
+      palettes: [{ n: 'Signal red', acc: '#D1462F' }, { n: 'Ink blue', acc: '#2B4BD6' }, { n: 'Forest', acc: '#2E7D4F' }, { n: 'Grape', acc: '#7A3FD1' }],
+      swatch: (p) => p.acc, strap: () => '#D9DCE2',
+    },
+  };
+  const EXTRA_FRONTS = { postcard: postcardFront, slogan: sloganFront, coffee: coffeeFront, licence: licenceFront };
+  const EXTRA_BACKS = { slogan: sloganBack, coffee: coffeeBack, licence: licenceBack };
+
+  Object.assign(TPLS, EXTRA_TPLS);
+
   const now = new Date();
   const DEFAULTS = {
     tpl: 'volunteer', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
-    q: 0, answer: 'durian ice cream', since: `${now.toLocaleString('en', { month: 'short' })} ${now.getFullYear()}`,
     back: 'how can i help?', mood: 64, flipped: false,
-    colors: { volunteer: 0, classic: 0, chatty: 0, glow: 0 },
-    shape: 'rect',
+    colors: { volunteer: 0, classic: 0, glow: 0, postcard: 0, slogan: 0, coffee: 0, licence: 0 },
+    shape: 'rect', critter: 'fish', look: 'soft', statement: 'you belong here',
+    place: 'somewhere sunny', favs: 'chai, music, doodles', photo: '',
   };
 
   // ---------- state ----------
@@ -133,6 +437,7 @@
     const event = esc(state.event.trim());
     const greet = GREETS[state.greet] || GREETS[0];
 
+    if (EXTRA_FRONTS[key]) return EXTRA_FRONTS[key](p);
     switch (key) {
       case 'classic':
         if (state.shape === 'circle') {
@@ -149,21 +454,6 @@
           <div class="cl-box">
             <div class="cl-name fit" data-max="86" data-min="30">${name}</div>
             ${pron ? `<div class="cl-pron">${pron}</div>` : ''}
-          </div>
-        </div></div>`;
-
-      case 'chatty':
-        return `<div class="ch-wrap"><div class="ch" style="--f:${p.f};--h:${p.h};--q:${p.q}">
-          <div class="ch-top">
-            ${pron ? `<div class="ch-pron">${pron}</div>` : ''}
-            <div class="ch-name fit" data-max="70" data-min="30">${name}</div>
-          </div>
-          <div class="ch-bottom">
-            <div class="ch-hello">hello</div>
-            <div class="ch-right">
-              <div class="ch-q">${esc(QUESTIONS[state.q] || QUESTIONS[0])}</div>
-              <div class="ch-a"><div class="ch-ans fit" data-max="30" data-min="16">${esc(state.answer.trim())}</div></div>
-            </div>
           </div>
         </div></div>`;
 
@@ -201,6 +491,7 @@
     const p = pal();
     const back = esc(state.back.trim() || 'hello!');
     const event = esc(state.event.trim());
+    if (EXTRA_BACKS[state.tpl]) return EXTRA_BACKS[state.tpl](p);
     switch (state.tpl) {
       case 'volunteer':
         return `<div class="vol dark">
@@ -263,7 +554,12 @@
     back.innerHTML = lan ? backHTML() + '<div class="sheen"></div>' : '';
     card.classList.toggle('is-flipped', lan && state.flipped);
     card.classList.toggle('is-circle', state.tpl === 'classic' && state.shape === 'circle');
-    $$('#shapes .opt').forEach((o) => o.setAttribute('aria-checked', String(o.dataset.shape === state.shape)));
+    card.classList.toggle('no-box', !!t.noBox);
+    $$('.opt[data-k]').forEach((o) => o.setAttribute('aria-checked', String(o.dataset.v === String(state[o.dataset.k]))));
+    const tile = $('#photoTile');
+    tile.style.backgroundImage = state.photo ? `url('${state.photo}')` : '';
+    tile.classList.toggle('has-photo', !!state.photo);
+    $('#clearPhoto').hidden = !state.photo;
 
     if (lan) {
       $('#strap').style.setProperty('--strap', t.strap(p));
@@ -281,7 +577,6 @@
     $('#hint').textContent = lan ? 'Drag to swing it, tap to flip it.' : 'Drag it anywhere, tap to stick it down.';
     $$('#greets .greet').forEach((g) => g.setAttribute('aria-checked', String(+g.dataset.i === state.greet)));
     renderTickets();
-    $('#questionText').textContent = QUESTIONS[state.q] || QUESTIONS[0];
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
@@ -307,7 +602,6 @@
     if (tk && focus) {
       const field = $('input:not([type="file"]), .greet[aria-checked="true"], .swatch[aria-checked="true"], button.link', $('.t-body', tk));
       if (field) setTimeout(() => field.focus({ preventScroll: true }), 120);
-      if (phone.matches) setTimeout(() => tk.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' }), 320);
     }
   }
   $('#tickets').addEventListener('click', (e) => {
@@ -324,16 +618,15 @@
     const i = list.indexOf(e.target.closest('.ticket'));
     setOpen(list[i + 1] || null, true);
   });
-  const panelEl = $('.panel');
-  panelEl.addEventListener('focusin', (e) => {
-    if (e.target.matches('input:not([type="range"]):not([type="file"])')) document.documentElement.classList.add('typing');
-  });
-  panelEl.addEventListener('focusout', () => {
-    setTimeout(() => {
-      const a = document.activeElement;
-      if (!a || !a.matches || !a.matches('.panel input:not([type="range"]):not([type="file"])')) document.documentElement.classList.remove('typing');
-    }, 60);
-  });
+  // phones: the editor is a side column you open and close; the tag shrinks into the space beside it
+  function setEditing(on) {
+    document.documentElement.classList.toggle('editing', on);
+    $('#editToggle').setAttribute('aria-expanded', String(on));
+    if (!on && document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
+  $('#editToggle').addEventListener('click', () => setEditing(true));
+  $('#panelClose').addEventListener('click', () => setEditing(false));
+  phone.addEventListener('change', () => { if (!phone.matches) setEditing(false); });
 
   $('#greets').addEventListener('click', (e) => {
     const g = e.target.closest('.greet');
@@ -349,7 +642,8 @@
     ind.style.opacity = on ? '1' : '0';
     if (!on) return;
     ind.style.width = `${on.offsetWidth}px`;
-    ind.style.transform = `translateX(${on.offsetLeft}px)`;
+    ind.style.height = `${on.offsetHeight}px`;
+    ind.style.transform = `translate(${on.offsetLeft}px, ${on.offsetTop}px)`;
   }
 
   function renderSwatches() {
@@ -374,8 +668,9 @@
     const H = stage.clientHeight;
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
-    const room = phone.matches ? 40 : (lan ? 120 : 150); // keep clear of the Save / Flip stack (on phones they sit in a bottom bar)
-    scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 0.92 : 0.95);
+    const editingPhone = phone.matches && document.documentElement.classList.contains('editing');
+    const room = editingPhone ? 60 : phone.matches ? 170 : (lan ? 120 : 150); // keep clear of the Save / Flip stack
+    scale = clamp(Math.min((H - room) / natH, (W - (editingPhone ? 16 : 32)) / natW), 0.2, lan ? 0.92 : 0.95);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
@@ -619,13 +914,6 @@
     });
   });
 
-  $('#shuffleQ').addEventListener('click', () => {
-    let q;
-    do { q = Math.floor(Math.random() * QUESTIONS.length); } while (q === state.q);
-    state.q = q;
-    render(); save(); kick(1.5);
-  });
-
   function syncFlip(lan) {
     const btn = $('#flipBtn');
     btn.disabled = !lan;
@@ -648,6 +936,24 @@
     btn.classList.add('busy');
     try {
       if (document.fonts) await document.fonts.ready;
+      // the exporter loses inline drawings when it copies the page, so for the moment of the
+      // snapshot each drawing on the card becomes an identical image; render() puts them back
+      await Promise.all($$('svg', card).map((svg) => {
+        const box = svg.getBoundingClientRect();
+        if (!box.width || !box.height) return null;
+        const w = svg.clientWidth || box.width;
+        const h = svg.clientHeight || box.height;
+        const copy = svg.cloneNode(true);
+        copy.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        copy.setAttribute('width', w);
+        copy.setAttribute('height', h);
+        const img = new Image();
+        img.className = svg.getAttribute('class') || '';
+        img.setAttribute('style', `${svg.getAttribute('style') || ''};width:${w}px;height:${h}px;max-width:none`);
+        img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}`;
+        svg.replaceWith(img);
+        return img.decode().catch(() => {});
+      }));
       const canvas = await window.html2canvas(card, {
         backgroundColor: null,
         scale: 3,
@@ -679,6 +985,7 @@
       console.error(err);
       toast("Couldn't make the picture. Try again in a moment.");
     } finally {
+      render();
       btn.disabled = false;
       label.textContent = 'Save PNG';
       btn.classList.remove('busy');
@@ -710,14 +1017,44 @@
   function applyShape() {
     Object.assign(TPLS.classic, state.shape === 'circle' ? { w: 360, h: 360 } : { w: 440, h: 316 });
   }
-  $('#shapes').addEventListener('click', (e) => {
-    const o = e.target.closest('.opt');
-    if (!o || o.dataset.shape === state.shape) return;
-    state.shape = o.dataset.shape;
-    applyShape();
+  // option buttons inside tickets (sticker shape, postcard buddy, slogan look)
+  $('#tickets').addEventListener('click', (e) => {
+    const o = e.target.closest('.opt[data-k]');
+    if (!o || o.dataset.v === String(state[o.dataset.k])) return;
+    state[o.dataset.k] = o.dataset.v;
+    if (o.dataset.k === 'shape') applyShape();
     render(); layout(); save();
-    slap();
+    if (isLanyard()) kick(1.4); else slap();
   });
+
+  // licence photo: shrink it and turn it black and white, like a photo-booth strip
+  $('#f-photo').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 320 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      const px = ctx.getImageData(0, 0, c.width, c.height);
+      const d = px.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const g = Math.min(255, (0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]) * 1.06 + 6);
+        d[i] = g; d[i + 1] = g * 0.97; d[i + 2] = g * 0.92;
+      }
+      ctx.putImageData(px, 0, 0);
+      state.photo = c.toDataURL('image/jpeg', 0.85);
+      URL.revokeObjectURL(url);
+      render(); save(); kick(1.4);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); toast("That file didn't open as an image. Try a JPG or PNG."); };
+    img.src = url;
+  });
+  $('#clearPhoto').addEventListener('click', () => { state.photo = ''; render(); save(); });
 
   applyShape();
   syncInputs();

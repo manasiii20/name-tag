@@ -7,7 +7,7 @@
 <meta name="description" content="Make a name tag, swing it around, save it as a PNG.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..900&family=Archivo+Narrow:wght@600;700&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Courier+Prime&family=Archivo+Narrow:wght@600;700&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -45,19 +45,28 @@
       <button type="button" class="act primary" id="saveBtn">
         <span class="act-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>
         <span class="act-t">Save PNG</span>
+        <span class="act-s">Transparent background</span>
       </button>
     </div>
   </div>
 
-  <aside class="panel" aria-label="Edit your tag">
+  <button type="button" class="edit-toggle" id="editToggle" aria-controls="panel" aria-expanded="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg>Edit tag
+  </button>
+
+  <aside class="panel" id="panel" aria-label="Edit your tag">
+    <div class="panel-top"><span>Edit your tag</span><button type="button" class="panel-close" id="panelClose" aria-label="Close the editor">Done</button></div>
     <section class="pick" aria-labelledby="h-pick">
       <h2 class="pick-h" id="h-pick">Which tag are you?</h2>
       <div class="seg-track" id="styles" role="group" aria-labelledby="h-pick">
         <span class="seg-ind" id="segInd" aria-hidden="true"></span>
         <button type="button" class="sty seg" data-tpl="volunteer"><i class="glyph portrait" aria-hidden="true"></i>Lanyard</button>
         <button type="button" class="sty seg" data-tpl="classic"><i class="glyph landscape" aria-hidden="true"></i>Classic</button>
-        <button type="button" class="sty seg" data-tpl="chatty"><i class="glyph landscape" aria-hidden="true"></i>Chatty</button>
         <button type="button" class="sty seg" data-tpl="glow"><i class="glyph portrait" aria-hidden="true"></i>Glow</button>
+        <button type="button" class="sty seg" data-tpl="postcard"><i class="glyph landscape" aria-hidden="true"></i>Postcard</button>
+        <button type="button" class="sty seg" data-tpl="slogan"><i class="glyph portrait" aria-hidden="true"></i>Slogan</button>
+        <button type="button" class="sty seg" data-tpl="coffee"><i class="glyph portrait" aria-hidden="true"></i>Coffee</button>
+        <button type="button" class="sty seg" data-tpl="licence"><i class="glyph landscape" aria-hidden="true"></i>Licence</button>
       </div>
     </section>
 
@@ -135,24 +144,99 @@
         <div class="t-body" id="tb-shape" role="region" aria-labelledby="th-shape">
           <div class="t-inner">
             <div class="greets" id="shapes" role="radiogroup" aria-label="Sticker shape">
-              <button type="button" class="greet opt" role="radio" aria-checked="true" data-shape="rect"><i class="shape-ic rect" aria-hidden="true"></i>Rectangle</button>
-              <button type="button" class="greet opt" role="radio" aria-checked="false" data-shape="circle"><i class="shape-ic circle" aria-hidden="true"></i>Circle</button>
+              <button type="button" class="greet opt" role="radio" aria-checked="true" data-k="shape" data-v="rect"><i class="shape-ic rect" aria-hidden="true"></i>Rectangle</button>
+              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="shape" data-v="circle"><i class="shape-ic circle" aria-hidden="true"></i>Circle</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="ticket" data-ticket="q" data-for="q">
-        <button type="button" class="t-head" id="th-q" aria-expanded="false" aria-controls="tb-q">
+      <div class="ticket" data-ticket="look" data-for="look">
+        <button type="button" class="t-head" id="th-look" aria-expanded="false" aria-controls="tb-look">
           <span class="t-no"></span>
-          <span class="t-main"><span class="t-q">Break the ice</span></span>
+          <span class="t-main"><span class="t-q">Soft or bold?</span></span>
           <span class="t-plus" aria-hidden="true"></span>
         </button>
-        <div class="t-body" id="tb-q" role="region" aria-labelledby="th-q">
+        <div class="t-body" id="tb-look" role="region" aria-labelledby="th-look">
           <div class="t-inner">
-            <p class="q-text" id="questionText"></p>
-            <label class="sr-only" for="f-answer">Your answer</label>
-            <input id="f-answer" class="t-input" data-key="answer" maxlength="22" autocomplete="off" placeholder="Your answer">
-            <button type="button" class="link" id="shuffleQ">Ask me something else</button>
+            <div class="greets" role="radiogroup" aria-label="Slogan look">
+              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="look" data-v="soft">Soft, with smileys</button>
+              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="look" data-v="bold">Bold, in pills</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="statement" data-for="statement">
+        <button type="button" class="t-head" id="th-statement" aria-expanded="false" aria-controls="tb-statement">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">What's your one-liner?</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-statement" role="region" aria-labelledby="th-statement">
+          <div class="t-inner">
+            <label class="sr-only" for="f-statement">Your one-liner</label>
+            <input id="f-statement" class="t-input" data-key="statement" autocomplete="off" maxlength="40" placeholder="you belong here">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="critter" data-for="critter">
+        <button type="button" class="t-head" id="th-critter" aria-expanded="false" aria-controls="tb-critter">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Who's your little buddy?</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-critter" role="region" aria-labelledby="th-critter">
+          <div class="t-inner">
+            <div class="greets" role="radiogroup" aria-label="Buddy">
+              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="critter" data-v="fish">Fish</button>
+              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="critter" data-v="narwhal">Narwhal</button>
+              <button type="button" class="greet opt" role="radio" aria-checked="false" data-k="critter" data-v="puffer">Puffer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="place" data-for="place">
+        <button type="button" class="t-head" id="th-place" aria-expanded="false" aria-controls="tb-place">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Where are you based?</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-place" role="region" aria-labelledby="th-place">
+          <div class="t-inner">
+            <label class="sr-only" for="f-place">Based in</label>
+            <input id="f-place" class="t-input" data-key="place" autocomplete="off" maxlength="24" placeholder="City, country">
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="photo" data-for="photo">
+        <button type="button" class="t-head" id="th-photo" aria-expanded="false" aria-controls="tb-photo">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Got a good photo?</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-photo" role="region" aria-labelledby="th-photo">
+          <div class="t-inner">
+            <div class="photo-row">
+              <label class="photo-tile" for="f-photo" id="photoTile"><span class="sr-only">Choose a photo</span></label>
+              <input id="f-photo" type="file" accept="image/*" class="sr-only">
+              <div class="photo-copy">
+                <label class="link" for="f-photo">Choose a photo</label>
+                <button type="button" class="link muted" id="clearPhoto" hidden>Remove it</button>
+                <span class="fine">Turned black and white. It stays on your device.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ticket" data-ticket="favs" data-for="favs">
+        <button type="button" class="t-head" id="th-favs" aria-expanded="false" aria-controls="tb-favs">
+          <span class="t-no"></span>
+          <span class="t-main"><span class="t-q">Three favourite things?</span></span>
+          <span class="t-plus" aria-hidden="true"></span>
+        </button>
+        <div class="t-body" id="tb-favs" role="region" aria-labelledby="th-favs">
+          <div class="t-inner">
+            <label class="sr-only" for="f-favs">Favourite things, separated by commas</label>
+            <input id="f-favs" class="t-input" data-key="favs" autocomplete="off" maxlength="40" placeholder="chai, music, doodles">
           </div>
         </div>
       </div>
