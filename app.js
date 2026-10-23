@@ -384,7 +384,8 @@
     let h = 12345;
     const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; };
     let out = '';
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 24; i++) {
+      if (i % 3 === 2) { rnd(); rnd(); rnd(); rnd(); continue; } // a lighter scatter: every third spot stays empty
       const x = (i % 6) * 17 + rnd() * 12 - 2;
       const y = Math.floor(i / 6) * 22 + rnd() * 14 - 2;
       if (x < 16 && y < 12) continue; // keep the corner with the site title clear
@@ -794,15 +795,8 @@
   });
 
   // slide the tag picker's highlight under the chosen option
-  function moveIndicator() {
-    const on = $(`.seg[data-tpl="${state.tpl}"]`);
-    const ind = $('#segInd');
-    ind.style.opacity = on ? '1' : '0';
-    if (!on) return;
-    ind.style.width = `${on.offsetWidth}px`;
-    ind.style.height = `${on.offsetHeight}px`;
-    ind.style.transform = `translate(${on.offsetLeft}px, ${on.offsetTop}px)`;
-  }
+  function moveIndicator() {}
+
 
   function renderSwatches() {
     const t = tpl();
