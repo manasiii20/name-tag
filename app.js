@@ -785,8 +785,9 @@
     document.documentElement.classList.toggle('editing', on);
     $('#editToggle').setAttribute('aria-expanded', String(on));
     if (!on && document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    setTimeout(layout, 380);
   }
-  $('#editToggle').addEventListener('click', () => setEditing(true));
+  $('#editToggle').addEventListener('click', () => setEditing(!document.documentElement.classList.contains('editing')));
   $('#panelClose').addEventListener('click', () => setEditing(false));
   phone.addEventListener('change', () => { if (!phone.matches) setEditing(false); });
 
@@ -824,8 +825,9 @@
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
     const editingPhone = phone.matches && document.documentElement.classList.contains('editing');
-    const room = editingPhone ? 60 : phone.matches ? 170 : (lan ? 120 : 150); // keep clear of the Save / Flip stack
-    scale = clamp(Math.min((H - room) / natH, (W - (editingPhone ? 16 : 32)) / natW), 0.2, lan ? 0.92 : 0.95);
+    const room = editingPhone ? 120 : phone.matches ? 150 : (lan ? 120 : 150); // keep clear of the action stack (desktop) or the tag bar (phones)
+    const cap = phone.matches ? (lan ? 0.78 : 0.66) : (lan ? 0.92 : 0.95); // stickers sit smaller on a phone screen
+    scale = clamp(Math.min((H - room) / natH, (W - (editingPhone ? 16 : 32)) / natW), 0.2, cap);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
@@ -1038,6 +1040,12 @@
   }
 
   // ---------- panel wiring ----------
+  $('.tagbar').addEventListener('click', (e) => {
+    const b = e.target.closest('.sty');
+    if (!b) return;
+    setTemplate(b.dataset.tpl);
+    b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+  });
   $('#styles').addEventListener('click', (e) => {
     const b = e.target.closest('.sty');
     if (b) setTemplate(b.dataset.tpl);

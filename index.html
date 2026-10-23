@@ -52,9 +52,20 @@
     </div>
   </div>
 
-  <button type="button" class="edit-toggle" id="editToggle" aria-controls="panel" aria-expanded="false">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg>Edit tag
-  </button>
+  <nav class="tagbar" aria-label="Tag types">
+    <button type="button" class="tagpill edit-toggle" id="editToggle" aria-controls="panel" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg>Details
+    </button>
+    <span class="tagbar-sep" aria-hidden="true"></span>
+    <button type="button" class="sty tagpill" data-tpl="classic">Classic</button>
+    <button type="button" class="sty tagpill" data-tpl="volunteer">Say Hi</button>
+    <button type="button" class="sty tagpill" data-tpl="glow">Aura</button>
+    <button type="button" class="sty tagpill" data-tpl="postcard">Postcard</button>
+    <button type="button" class="sty tagpill" data-tpl="coffee">Coffee</button>
+    <button type="button" class="sty tagpill" data-tpl="slogan">Motto</button>
+    <button type="button" class="sty tagpill" data-tpl="crayon">Crayon</button>
+    <button type="button" class="sty tagpill" data-tpl="licence">Licensed</button>
+  </nav>
 
   <aside class="panel" id="panel" aria-label="Edit your tag">
     <div class="panel-top"><span>Edit your tag</span><button type="button" class="panel-close" id="panelClose" aria-label="Close the editor">Done</button></div>
