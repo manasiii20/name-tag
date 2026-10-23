@@ -12,7 +12,7 @@
   // ---------- content ----------
   const GREETS = [
     "hello, i'm", "hi, i'm", 'hello, my name is', "hey, i'm", 'hello, who am i again?',
-    'arree, mai hoon', 'hola, soy', 'bonjour, je suis',
+    'arree, mai hoon', 'hola, soy',
   ];
 
   const TPLS = {
