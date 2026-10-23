@@ -292,13 +292,6 @@
     smiley: { label: 'Smiley', art: () => `<div class="lk lk-smiley"><svg viewBox="0 0 50 50" width="50" height="50" aria-hidden="true"><circle cx="25" cy="25" r="22" fill="#FFD84A" stroke="#111" stroke-width="2.4"/><ellipse cx="18" cy="21" rx="2.8" ry="4.6" fill="#111"/><ellipse cx="32" cy="21" rx="2.8" ry="4.6" fill="#111"/><path d="M14 30 Q25 41 36 30" stroke="#111" stroke-width="2.8" fill="none" stroke-linecap="round"/></svg></div>` },
     rainbow: { label: 'Rainbow', art: () => `<div class="lk lk-rainbow"><svg viewBox="0 0 70 40" width="70" height="40" aria-hidden="true"><path d="M6 38 a29 29 0 0 1 58 0" fill="none" stroke="#111" stroke-width="13"/><path d="M6 38 a29 29 0 0 1 58 0" fill="none" stroke="#FF7A7A" stroke-width="9"/><path d="M14 38 a21 21 0 0 1 42 0" fill="none" stroke="#FFD84A" stroke-width="7"/><path d="M21 38 a14 14 0 0 1 28 0" fill="none" stroke="#7FD6A6" stroke-width="6"/><path d="M27 38 a8 8 0 0 1 16 0" fill="none" stroke="#8EC5FF" stroke-width="5"/></svg></div>` },
   };
-  const SIG_FONTS = {
-    comic: { label: 'Comic Neue', css: "'Comic Neue', 'Comic Sans MS', cursive", w: 700 },
-    lobster: { label: 'Lobster', css: "'Lobster', cursive", w: 400 },
-    pacifico: { label: 'Pacifico', css: "'Pacifico', cursive", w: 400 },
-    fredericka: { label: 'Fredericka', css: "'Fredericka the Great', cursive", w: 400 },
-    wetpaint: { label: 'Wet Paint', css: "'Rubik Wet Paint', cursive", w: 400 },
-  };
 
   function licenceBarcode(seed) {
     let h = hash(seed) || 1;
@@ -313,16 +306,11 @@
     }
     return out;
   }
-  const FAV_COLORS = [['#2B0F3A', '#FF7AC6'], ['#3A1C00', '#FF9A2E'], ['#001E3C', '#4CB7FF']];
   const blackStars = (n) => Array.from({ length: n }, () => `<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path d="${starPath(10, 10.6, 9.6, 0.45)}" fill="#111"/></svg>`).join('');
   const initials = () => (state.name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2) || 'v').toUpperCase();
 
   function licenceFront() {
     const name = esc(nameOr());
-    const sig = esc(state.sig.trim() || nameOr());
-    const font = SIG_FONTS[state.sigFont] || SIG_FONTS.comic;
-    const favs = state.favs.split(',').map((f) => f.trim()).filter(Boolean).slice(0, 3);
-    const tiles = favs.map((f, i) => `<span class="lc-fav" style="background:${FAV_COLORS[i][0]};color:${FAV_COLORS[i][1]}" title="${esc(f)}">${esc(f.slice(0, 2))}</span>`).join('');
     const photo = state.photo
       ? `<div class="lc-photo" style="background-image:url('${state.photo}')"></div>`
       : `<div class="lc-photo lc-photo-empty"><span>${esc(initials())}</span><small>photo booth</small></div>`;
@@ -331,19 +319,22 @@
     return `<div class="lc">
       <span class="slot"></span>
       <div class="lc-card">
-        <div class="lc-stars">${blackStars(7)}</div>
-        <div class="lc-issued"><span class="lc-mono">licence issued :</span><b>${now.getFullYear()}</b></div>
-        <div class="lc-photo-wrap">${photo}</div>
-        <div class="lc-barcode">${licenceBarcode(state.name + 'licence')}</div>
-        <div class="lc-mono lc-cap">${name} · ${esc(state.role.trim()) || 'creative'} · creative</div>
-        <div class="lc-title"><span>CREATIVE</span><span>LICENCE</span></div>
-        <div class="lc-fields">
-          <div class="lc-f"><span class="lc-mono">name :</span><b class="fit" data-max="17" data-min="9">${name}</b></div>
-          <div class="lc-f lc-occ"><span class="lc-mono">occupation :</span><b class="fitblock" data-max="15" data-min="9"><span>${esc(state.role.trim()) || '&nbsp;'}</span></b></div>
-          <div class="lc-f lc-sig"><span class="lc-mono">signature :</span><em class="fit" data-max="30" data-min="12" style="font-family:${font.css};font-weight:${font.w}">${sig}</em></div>
-          <div class="lc-f lc-based"><span class="lc-mono">based in :</span><b class="fit" data-max="14" data-min="8">${esc(state.place.trim()) || '&nbsp;'}</b></div>
+        <div class="lc-stars">${blackStars(8)}</div>
+        <div class="lc-grid">
+          <div class="lc-left">
+            ${photo}
+            <div class="lc-barcode">${licenceBarcode(state.name + 'licence')}</div>
+            <div class="lc-mono lc-cap">${name} · creative</div>
+          </div>
+          <div class="lc-right">
+            <div class="lc-title"><span>CREATIVE</span><span>LICENCE</span></div>
+            <div class="lc-fields">
+              <div class="lc-f"><span class="lc-mono">name :</span><b class="fit" data-max="17" data-min="9">${name}</b></div>
+              <div class="lc-f lc-occ"><span class="lc-mono">here as :</span><b class="fitblock" data-max="15" data-min="9"><span>${esc(state.role.trim()) || '&nbsp;'}</span></b></div>
+              <div class="lc-f lc-font"><span class="lc-mono">least favourite font :</span><em class="fit" data-max="26" data-min="12">${esc(state.font.trim()) || '&nbsp;'}</em></div>
+            </div>
+          </div>
         </div>
-        <div class="lc-favs"><span class="lc-mono">favourite things :</span><div>${tiles || '&nbsp;'}</div></div>
         ${stickers}
       </div>
     </div>`;
@@ -395,10 +386,10 @@
     slogan: {
       kind: 'lanyard', w: 300, h: 440, fields: ['statement', 'event', 'back'],
       palettes: [
-        { n: 'Mint', bg: '#DCE9DE', ink: '#2DB94C', strap: '#C2D1C6' },
-        { n: 'Cobalt', bg: '#2033E3', ink: '#FFFFFF', strap: '#2033E3' },
-        { n: 'Blush', bg: '#F8DDE5', ink: '#E0447B', strap: '#E8C2CE' },
-        { n: 'Lemon', bg: '#FFF0A0', ink: '#1A1A1A', strap: '#1A1A1A' },
+        { n: 'Mint', bg: '#2DB94C', ink: '#F4FFF2', strap: '#14532A' },
+        { n: 'Cobalt', bg: '#2033E3', ink: '#FFFFFF', strap: '#0E1766' },
+        { n: 'Bubblegum', bg: '#FF8DB5', ink: '#5A0F2E', strap: '#5A0F2E' },
+        { n: 'Lemon', bg: '#FFE14D', ink: '#1A1A1A', strap: '#1A1A1A' },
       ],
       swatch: (p) => `linear-gradient(135deg, ${p.bg} 50%, ${p.ink} 50%)`, strap: (p) => p.strap,
     },
@@ -424,9 +415,9 @@
       swatch: (p) => `linear-gradient(135deg, ${p.stripe} 50%, ${p.wave} 50%)`,
     },
     licence: {
-      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'sig', 'place', 'photo', 'favs', 'stickers', 'back'], noColor: true,
+      kind: 'lanyard', w: 440, h: 300, fields: ['role', 'font', 'photo', 'stickers', 'back'], noColor: true, noPronouns: true,
       palettes: [{ n: 'Sunny', acc: '#D1462F' }],
-      swatch: (p) => p.acc, strap: () => '#F4CF2E', strapInk: 'rgba(40, 30, 0, .72)',
+      swatch: (p) => p.acc, strap: () => '#A9D3F2', strapInk: 'rgba(16, 44, 72, .75)',
     },
   };
   // --- crayon: a folded place card, striped and outlined in wax crayon ---
@@ -486,9 +477,9 @@
     tpl: 'volunteer', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     back: 'how can i help?', mood: 64, flipped: false,
     colors: { volunteer: 0, classic: 0, glow: 0, postcard: 0, slogan: 0, coffee: 0, licence: 0, crayon: 0 },
-    shape: 'rect', critter: 'fish', statement: 'you belong here', sig: '', sigFont: 'comic',
+    shape: 'rect', critter: 'fish', statement: 'you belong here', font: 'comic sans, obviously',
     stickers: 'certified,heart,pencil,nib,gold',
-    place: 'somewhere sunny', favs: 'chai, music, doodles', photo: '',
+    photo: '',
   };
 
   // ---------- state ----------
@@ -692,8 +683,8 @@
     $$('.sty').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tpl === state.tpl)));
     $$('[data-for]').forEach((el) => { el.hidden = !t.fields.includes(el.dataset.for); });
     $('[data-ticket="color"]').hidden = !!t.noColor;
+    $('[data-ticket="pronouns"]').hidden = !!t.noPronouns;
     $$('#stickerOpts .opt').forEach((o) => o.setAttribute('aria-checked', String(state.stickers.split(',').includes(o.dataset.s))));
-    $$('#sigFonts .opt').forEach((o) => o.setAttribute('aria-checked', String(o.dataset.v === state.sigFont)));
     $$('.row').forEach((row) => { row.hidden = [...row.children].every((c) => c.hidden); });
     renderSwatches();
     syncFlip(lan);
@@ -1142,7 +1133,7 @@
     Object.assign(TPLS.classic, state.shape === 'circle' ? { w: 360, h: 360 } : { w: 440, h: 316 });
   }
   $('#stickerOpts').innerHTML = Object.entries(LIC_STICKERS).map(([k, v]) =>
-    `<button type="button" class="greet opt" role="checkbox" aria-checked="false" data-s="${k}">${v.label}</button>`).join('');
+    `<button type="button" class="stk-opt opt" role="checkbox" aria-checked="false" data-s="${k}" aria-label="${v.label}" title="${v.label}"><span class="stk-prev">${v.art('MV')}</span></button>`).join('');
   $('#stickerOpts').addEventListener('click', (e) => {
     const o = e.target.closest('.opt[data-s]');
     if (!o) return;
@@ -1151,8 +1142,6 @@
     state.stickers = [...set].join(',');
     render(); save(); kick(1.2);
   });
-  $('#sigFonts').innerHTML = Object.entries(SIG_FONTS).map(([k, v]) =>
-    `<button type="button" class="greet opt" role="radio" aria-checked="false" data-k="sigFont" data-v="${k}" style="font-family:${v.css};font-weight:${v.w}">${v.label}</button>`).join('');
   $('#confetti').innerHTML = confettiHTML();
 
   // option buttons inside tickets (sticker shape, postcard buddy, slogan look)
