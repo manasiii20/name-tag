@@ -7,6 +7,7 @@
   const lerp = (a, b, t) => a + (b - a) * t;
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const phone = matchMedia('(max-width: 900px)');
 
   // ---------- content ----------
   const GREETS = [
@@ -306,6 +307,7 @@
     if (tk && focus) {
       const field = $('input:not([type="file"]), .greet[aria-checked="true"], .swatch[aria-checked="true"], button.link', $('.t-body', tk));
       if (field) setTimeout(() => field.focus({ preventScroll: true }), 120);
+      if (phone.matches) setTimeout(() => tk.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' }), 320);
     }
   }
   $('#tickets').addEventListener('click', (e) => {
@@ -322,6 +324,17 @@
     const i = list.indexOf(e.target.closest('.ticket'));
     setOpen(list[i + 1] || null, true);
   });
+  const panelEl = $('.panel');
+  panelEl.addEventListener('focusin', (e) => {
+    if (e.target.matches('input:not([type="range"]):not([type="file"])')) document.documentElement.classList.add('typing');
+  });
+  panelEl.addEventListener('focusout', () => {
+    setTimeout(() => {
+      const a = document.activeElement;
+      if (!a || !a.matches || !a.matches('.panel input:not([type="range"]):not([type="file"])')) document.documentElement.classList.remove('typing');
+    }, 60);
+  });
+
   $('#greets').addEventListener('click', (e) => {
     const g = e.target.closest('.greet');
     if (!g) return;
@@ -361,7 +374,7 @@
     const H = stage.clientHeight;
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
-    const room = stage.clientWidth < 600 ? 190 : (lan ? 120 : 150); // keep clear of the Save / Flip stack
+    const room = phone.matches ? 40 : (lan ? 120 : 150); // keep clear of the Save / Flip stack (on phones they sit in a bottom bar)
     scale = clamp(Math.min((H - room) / natH, (W - 32) / natW), 0.4, lan ? 0.92 : 0.95);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
     mount.style.width = `${natW}px`;
@@ -642,10 +655,25 @@
         onclone: (doc) => doc.documentElement.classList.add('exporting'),
       });
       const url = canvas.toDataURL('image/png');
+      const fileName = `${(state.name.trim() || 'visitor').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'visitor'}-tag.png`;
       $('#saveImg').src = url;
       const link = $('#dlgDownload');
       link.href = url;
-      link.download = `${(state.name.trim() || 'name').toLowerCase().replace(/[^a-z0-9]+/g, '-')}-tag.png`;
+      link.download = fileName;
+      // on phones, offer the share sheet so the tag can go straight to Photos
+      shareFile = null;
+      const shareBtn = $('#dlgShare');
+      shareBtn.hidden = true;
+      link.classList.remove('secondary');
+      const blob = await new Promise((done) => canvas.toBlob(done, 'image/png'));
+      if (blob && typeof File === 'function' && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          shareFile = file;
+          shareBtn.hidden = false;
+          link.classList.add('secondary');
+        }
+      }
       if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
     } catch (err) {
       console.error(err);
@@ -654,6 +682,15 @@
       btn.disabled = false;
       label.textContent = 'Save PNG';
       btn.classList.remove('busy');
+    }
+  });
+  let shareFile = null;
+  $('#dlgShare').addEventListener('click', async () => {
+    if (!shareFile) return;
+    try {
+      await navigator.share({ files: [shareFile], title: 'My name tag' });
+    } catch (err) {
+      if (err && err.name !== 'AbortError') toast('Sharing isn\'t available here. Long-press the picture to save it.');
     }
   });
   $('#dlgClose').addEventListener('click', () => dlg.close());

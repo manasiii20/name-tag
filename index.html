@@ -33,22 +33,21 @@
     </div>
 
     <p class="hint" id="hint"></p>
-
-    <div class="actions">
-      <div class="stack">
-        <button type="button" class="act" id="flipBtn" aria-pressed="false">
-          <span class="act-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6M20 12a8 8 0 0 1-13.7 5.6M18 3v4h-4M6 21v-4h4"/></svg></span>
-          <span class="act-t">Flip it</span>
-          <span class="act-s" id="flipState">Showing the front</span>
-        </button>
-        <button type="button" class="act primary" id="saveBtn">
-          <span class="act-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>
-          <span class="act-t">Save PNG</span>
-          <span class="act-s">Transparent, 3× size</span>
-        </button>
-      </div>
-    </div>
   </section>
+
+  <div class="actions">
+    <div class="stack">
+      <button type="button" class="act" id="flipBtn" aria-pressed="false">
+        <span class="act-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6M20 12a8 8 0 0 1-13.7 5.6M18 3v4h-4M6 21v-4h4"/></svg></span>
+        <span class="act-t">Flip it</span>
+        <span class="act-s" id="flipState">Showing the front</span>
+      </button>
+      <button type="button" class="act primary" id="saveBtn">
+        <span class="act-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></span>
+        <span class="act-t">Save PNG</span>
+      </button>
+    </div>
+  </div>
 
   <aside class="panel" aria-label="Edit your tag">
     <section class="pick" aria-labelledby="h-pick">
@@ -207,6 +206,7 @@
   <p>Right-click or long-press the picture to save it.</p>
   <div class="dlg-actions">
     <button type="button" class="txt" id="dlgClose">Close</button>
+    <button type="button" class="solid" id="dlgShare" hidden>Save to phone</button>
     <a class="solid" id="dlgDownload" download="name-tag.png" href="#">Download PNG</a>
   </div>
 </dialog>

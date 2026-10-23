@@ -20,7 +20,8 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Each field is a small numbered ticket with a question ("What do we call you?"). Click one to open it; Enter moves to the next.
 - Save PNG and Flip are stacked at the bottom left of the stage, so they're always in reach.
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
-- **Save PNG** renders the current side at 3x with a transparent background.
+- **Save PNG** renders the current side as a sharp PNG with a transparent background. On phones the save dialog also offers **Save to phone**, which opens the share sheet (Photos, Files, apps).
+- On phones the tag stays pinned at the top while you edit, shrinks while the keyboard is up, and Flip / Save sit in a bar along the bottom.
 - Your tag is remembered in `localStorage`.
 
 ## Run it
