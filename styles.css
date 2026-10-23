@@ -65,7 +65,7 @@ button, input, select { font: inherit; color: inherit; }
   -webkit-user-select: none;
 }
 .site {
-  position: absolute; z-index: 2; margin: 0;
+  position: absolute; z-index: 5; margin: 0;
   left: max(28px, env(safe-area-inset-left, 0px)); top: 26px;
   font: 600 22px/1 var(--f-ui); letter-spacing: -.035em;
   pointer-events: none;
@@ -344,7 +344,7 @@ button, input, select { font: inherit; color: inherit; }
 .lc-card { position: absolute; left: 14px; right: 14px; top: 34px; bottom: 14px; background: #FFFFFF; border: 2px solid #111; border-radius: 6px; padding: 26px 16px 12px; }
 .lc-mono { font: 400 7.5px/1.2 "Courier Prime", "Courier New", monospace; letter-spacing: .08em; text-transform: uppercase; }
 .lc-stars { position: absolute; left: 22px; right: 22px; top: 8px; display: flex; justify-content: space-between; }
-.lc-stars svg:nth-child(odd) { transform: translateY(3px); }
+.lc-stars svg:nth-child(odd) { margin-top: 3px; }
 .lc-grid { display: grid; grid-template-columns: 142px minmax(0, 1fr); gap: 16px; height: 100%; }
 .lc-left { position: relative; display: flex; flex-direction: column; gap: 4px; }
 .lc-photo { width: 142px; height: 168px; border: 5px solid #111; background: #8E8A84 center / cover no-repeat; filter: grayscale(1) contrast(1.05); }
@@ -398,7 +398,7 @@ button, input, select { font: inherit; color: inherit; }
 .stk-opt:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* glitter stars scattered over the desk while the licence is out */
-.confetti { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; }
+.confetti { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .4s; }
 .confetti span { position: absolute; transform: scale(.4); transition: transform .5s cubic-bezier(.3, 1.4, .5, 1); }
 .stage[data-tpl="licence"] .confetti { opacity: .9; }
 .stage[data-tpl="licence"] .confetti span { transform: scale(1); }

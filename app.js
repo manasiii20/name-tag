@@ -309,7 +309,27 @@
     }
     return out;
   }
-  const blackStars = (n) => Array.from({ length: n }, () => `<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true"><path d="${starPath(10, 10.6, 9.6, 0.45)}" fill="#111"/></svg>`).join('');
+  // the star row along the top of the licence: the same glitter and holo stars as the desk
+  const GLITTER = [
+    ['#E8B730', '#FFF2B0', '#9C7212'], ['#E8457E', '#FFC2DA', '#9C1F4E'], ['#C7242E', '#FF9A9A', '#7E1018'],
+    ['#2E7FD6', '#B9DCFF', '#164E8C'], ['#F2852E', '#FFD1A6', '#A0480E'], ['#7AB648', '#D8F2B8', '#3E6C1E'],
+    ['#8E9AA6', '#EEF2F6', '#4E5862'], ['#5B8FD9', '#C9DEFF', '#2B4F8C'],
+  ];
+  const blackStars = (n) => Array.from({ length: n }, (_, i) => {
+    if (i % 4 === 3) return holoStar(15, i * 9 - 12);
+    const k = GLITTER[i % GLITTER.length];
+    return glitterStar(15, k[0], k[1], k[2], `row${i}`, (i % 3 - 1) * 12);
+  }).join('');
+  function glitterHeart(size, fill, light, dark, seed, rot = 0) {
+    const id = uid('gh');
+    const s = size;
+    const d = `M${s / 2} ${s * 0.86} C${s * 0.14} ${s * 0.62} ${s * 0.05} ${s * 0.44} ${s * 0.05} ${s * 0.3} C${s * 0.05} ${s * 0.14} ${s * 0.18} ${s * 0.05} ${s * 0.3} ${s * 0.05} C${s * 0.4} ${s * 0.05} ${s * 0.47} ${s * 0.11} ${s / 2} ${s * 0.19} C${s * 0.53} ${s * 0.11} ${s * 0.6} ${s * 0.05} ${s * 0.7} ${s * 0.05} C${s * 0.82} ${s * 0.05} ${s * 0.95} ${s * 0.14} ${s * 0.95} ${s * 0.3} C${s * 0.95} ${s * 0.44} ${s * 0.86} ${s * 0.62} ${s / 2} ${s * 0.86} Z`;
+    return `<svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" style="transform:rotate(${rot}deg)" aria-hidden="true">
+      <defs><clipPath id="${id}"><path d="${d}"/></clipPath></defs>
+      <path d="${d}" fill="${fill}" stroke="${dark}" stroke-width="${(s / 40).toFixed(1)}" stroke-linejoin="round"/>
+      <g clip-path="url(#${id})">${speckles(seed + 'l', s, s, light, Math.round(s * 1.4))}${speckles(seed + 'd', s, s, dark, Math.round(s * 0.9))}</g>
+    </svg>`;
+  }
   const initials = () => (state.name.trim().split(/\s+/).map((w) => w[0]).join('').slice(0, 2) || 'v').toUpperCase();
 
   function licenceFront() {
@@ -369,7 +389,11 @@
       const y = Math.floor(i / 6) * 22 + rnd() * 14 - 2;
       const size = Math.round(34 + rnd() * 30);
       const rot = Math.round(rnd() * 60 - 30);
-      const star = rnd() < 0.18 ? holoStar(size, rot) : (() => { const k = kinds[Math.floor(rnd() * kinds.length)]; return glitterStar(size, k[0], k[1], k[2], `c${i}`, rot); })();
+      const pick = rnd();
+      const k = kinds[Math.floor(rnd() * kinds.length)];
+      const star = pick < 0.16 ? holoStar(size, rot)
+        : pick < 0.4 ? glitterHeart(Math.round(size * 0.9), k[0], k[1], k[2], `h${i}`, rot)
+        : glitterStar(size, k[0], k[1], k[2], `c${i}`, rot);
       out += `<span style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%">${star}</span>`;
     }
     return out;
