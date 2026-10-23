@@ -737,6 +737,8 @@
     $('#hint').textContent = lan ? 'Drag to swing it, tap to flip it.' : 'Drag it anywhere, tap to stick it down.';
     $$('#greets .greet').forEach((g) => g.setAttribute('aria-checked', String(+g.dataset.i === state.greet)));
     renderTickets();
+    const on = $(`.tagbar .sty[data-tpl="${state.tpl}"]`);
+    $('#typeName').textContent = on ? on.textContent : '';
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Press Enter to slap it, arrow keys to wiggle it.'}`);
 
     fitAll();
@@ -753,6 +755,13 @@
     if (open && open.hidden) setOpen(null);
   }
 
+  // phones show each field as a short pill; the full question heads its little card
+  const SHORT = { name: 'Name', pronouns: 'Pronouns', role: 'Role', event: 'Event', greet: 'Greeting', shape: 'Shape', statement: 'Motto', critter: 'Buddy', font: 'Font', photo: 'Photo', stickers: 'Stickers', mood: 'Energy', back: 'Back', color: 'Color' };
+  $$('.ticket').forEach((tk) => {
+    $('.t-head', tk).dataset.short = SHORT[tk.dataset.ticket] || tk.dataset.ticket;
+    $('.t-body', tk).dataset.q = $('.t-q', tk).textContent;
+  });
+
   function setOpen(tk, focus = false) {
     $$('.ticket').forEach((t) => {
       const on = t === tk;
@@ -764,7 +773,7 @@
       if (field) setTimeout(() => field.focus({ preventScroll: true }), 120);
     }
     // the panel scrolls; bring a newly opened ticket fully into view once it has expanded
-    if (tk) setTimeout(() => tk.scrollIntoView({ block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' }), 300);
+    if (tk) setTimeout(() => tk.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' }), phone.matches ? 0 : 300);
   }
   $('#tickets').addEventListener('click', (e) => {
     const head = e.target.closest('.t-head');
@@ -825,7 +834,7 @@
     const natW = t.w + 40;
     const natH = mount.offsetHeight || (lan ? 640 : t.h);
     const editingPhone = phone.matches && document.documentElement.classList.contains('editing');
-    const room = editingPhone ? 150 : phone.matches ? 200 : (lan ? 120 : 150); // keep clear of the action stack (desktop) or the tag bar (phones)
+    const room = editingPhone ? 150 : phone.matches ? 230 : (lan ? 120 : 150); // keep clear of the action stack (desktop) or the tag bar (phones)
     const cap = phone.matches ? (lan ? 0.78 : 0.66) : (lan ? 0.92 : 0.95); // stickers sit smaller on a phone screen
     scale = clamp(Math.min((H - room) / natH, (W - (editingPhone ? 16 : 32)) / natW), 0.2, cap);
     const ty = lan ? 0 : Math.max(10, (H - natH * scale) / 2 + 8);
@@ -997,6 +1006,7 @@
     if (!isLanyard()) return;
     state.flipped = !state.flipped;
     card.classList.toggle('is-flipped', state.flipped);
+    if (phone.matches && !reduceMotion.matches) { flipEl.classList.remove('flat-flip'); void flipEl.offsetWidth; flipEl.classList.add('flat-flip'); }
     syncFlip(true);
     if (!reduceMotion.matches) w += (state.flipped ? 1 : -1) * 1.1;
     save();
@@ -1007,7 +1017,7 @@
     flipEl.classList.add('slap');
     vy += 120;
   }
-  flipEl.addEventListener('animationend', () => flipEl.classList.remove('slap', 'stick'));
+  flipEl.addEventListener('animationend', () => flipEl.classList.remove('slap', 'stick', 'flat-flip'));
 
   // ---------- switching styles ----------
   let switching = false;
@@ -1044,7 +1054,20 @@
     const b = e.target.closest('.sty');
     if (!b) return;
     setTemplate(b.dataset.tpl);
-    b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    setTypeMenu(false);
+  });
+  // phones: the tag type is one button whose menu opens upward
+  function setTypeMenu(open) {
+    $('#typeMenu').hidden = !open;
+    $('#typeBtn').setAttribute('aria-expanded', String(open));
+    if (open) setOpen(null);
+  }
+  $('#typeBtn').addEventListener('click', (e) => { e.stopPropagation(); setTypeMenu($('#typeMenu').hidden); });
+  // phones: a tap anywhere outside the open menu or field card folds it away
+  document.addEventListener('pointerdown', (e) => {
+    if (!phone.matches) return;
+    if (!e.target.closest('.tagbar')) setTypeMenu(false);
+    if (!e.target.closest('#tickets') && $('.ticket.is-open')) setOpen(null);
   });
   $('#styles').addEventListener('click', (e) => {
     const b = e.target.closest('.sty');
@@ -1293,6 +1316,7 @@
   $('#clearPhoto').addEventListener('click', () => { state.photo = ''; state.photoBW = false; render(); save(); });
 
   applyShape();
+  if (phone.matches) setOpen(null); // phones start with every field folded into its pill
   syncInputs();
   render();
   layout();

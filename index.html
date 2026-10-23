@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Courier+Prime&family=Comic+Neue:wght@700&family=Lobster&family=Pacifico&family=Fredericka+the+Great&family=Rubik+Wet+Paint&family=Archivo+Narrow:wght@600;700&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="styles.css?v=202610231701">
+<link rel="stylesheet" href="styles.css?v=202610232117">
 </head>
 <body>
 <main class="app">
@@ -56,7 +56,7 @@
     <button type="button" class="tagpill edit-toggle" id="editToggle" aria-controls="panel" aria-expanded="false">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-4-4L4 16v4zM13.5 6.5l4 4"/></svg>Details
     </button>
-    <span class="tagbar-sep" aria-hidden="true"></span>
+    <div class="typemenu" id="typeMenu" hidden>
     <button type="button" class="sty tagpill" data-tpl="classic">Classic</button>
     <button type="button" class="sty tagpill" data-tpl="volunteer">Say Hi</button>
     <button type="button" class="sty tagpill" data-tpl="glow">Montu</button>
@@ -65,6 +65,11 @@
     <button type="button" class="sty tagpill" data-tpl="slogan">Motto</button>
     <button type="button" class="sty tagpill" data-tpl="crayon">Crayons</button>
     <button type="button" class="sty tagpill" data-tpl="licence">Licenced</button>
+    </div>
+    <button type="button" class="typebtn" id="typeBtn" aria-haspopup="true" aria-expanded="false" aria-controls="typeMenu">
+      <span class="typebtn-l">Tag</span><span class="typebtn-v" id="typeName">Say Hi</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+    </button>
   </nav>
 
   <aside class="panel" id="panel" aria-label="Edit your tag">
@@ -321,6 +326,6 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="app.js?v=202610231701"></script>
+<script src="app.js?v=202610232117"></script>
 </body>
 </html>

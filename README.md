@@ -25,7 +25,7 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - Save PNG and Flip are stacked at the bottom left of the stage, so they're always in reach.
 - Glow eyes follow your pointer, blink, go sleepy at low energy and happy at high energy.
 - **Save PNG** renders the current side as a sharp PNG with a transparent background. On phones, Download PNG opens the share sheet so the picture can go straight to Photos.
-- On phones the stage works like desktop (swing, flip, drag). Edit, Flip, Share and Save are icon buttons in the top right (edit opens the tickets beside the tag), and the eight tag types sit in a 2×4 grid along the bottom.
+- On phones the stage works like desktop (swing, drag, flip). Flip, Share and Save are icon buttons in the top right. Along the bottom, each field is a small pill that opens a card to fill in, and a single **Tag** button opens the eight tag types in a menu above it.
 - **Share** (bottom right of the page): email a link, copy a link, or send the picture through the share sheet. The link carries the whole tag (minus the photo), so friends open your exact tag. No backend involved.
 - Your tag is remembered in `localStorage`.
 
