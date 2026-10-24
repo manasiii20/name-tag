@@ -27,7 +27,7 @@ A small name tag maker. Pick a style, type your name, swing the badge around, sa
 - **Save PNG** renders the current side as a sharp PNG with a transparent background. On phones, Download PNG opens the share sheet so the picture can go straight to Photos.
 - On phones the stage works like desktop (swing, drag, flip). Flip, Save and Share are icon buttons in the top right. Along the bottom, each field is a small pill that opens a card to fill in, and a single **Tag** button opens the eight tag types in a menu above it.
 - **Share** (bottom right of the page): email a link, copy a link, or send the picture through the share sheet. The link carries the whole tag (minus the photo), so friends open your exact tag. No backend involved.
-- Your tag is remembered in `localStorage`.
+- The site always opens on Sparky; everything else about your tag is remembered in `localStorage`.
 
 ## Run it
 

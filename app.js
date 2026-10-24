@@ -506,7 +506,7 @@
 
   const now = new Date();
   const DEFAULTS = {
-    tpl: 'volunteer', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
+    tpl: 'coffee', name: '', pronouns: 'they/them', greet: 1, role: 'volunteer', event: 'design week',
     back: 'how can i help?', mood: 64, flipped: false,
     colors: { volunteer: 0, classic: 0, glow: 0, postcard: 0, slogan: 0, coffee: 0, licence: 0, crayon: 0 },
     shape: 'rect', critter: 'fish', statement: 'you belong here', font: 'comic sans, obviously',
@@ -536,7 +536,7 @@
       if (raw) {
         const s = JSON.parse(raw);
         const merged = { ...DEFAULTS, ...s, colors: { ...DEFAULTS.colors, ...(s.colors || {}) } };
-        if (!TPLS[merged.tpl]) merged.tpl = DEFAULTS.tpl;
+        merged.tpl = DEFAULTS.tpl; // every visit opens on Sparky; the rest of the tag is remembered
         if (merged.name === 'Alex') merged.name = ''; // the old sample name, not something a visitor typed
         if (!(merged.greet >= 0 && merged.greet < GREETS.length)) merged.greet = DEFAULTS.greet;
         return merged;
