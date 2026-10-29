@@ -1139,7 +1139,7 @@ export default function NameTagLanyard(props) {
 
 NameTagLanyard.defaultProps = {
     layout: "panel",
-    panelTitle: "Which tag are you?",
+    panelTitle: "",
     panelWidth: 420,
     showTickets: true,
     ticketsGap: 24,
@@ -1188,7 +1188,7 @@ NameTagLanyard.defaultProps = {
 
 addPropertyControls(NameTagLanyard, {
     layout: { type: ControlType.Enum, title: "Layout", options: ["panel", "beside"], optionTitles: ["Panel, top right", "Buttons beside card"], defaultValue: "panel", displaySegmentedControl: true, segmentedControlDirection: "vertical" },
-    panelTitle: { type: ControlType.String, title: "Panel title", defaultValue: "Which tag are you?", hidden: (p) => p.layout !== "panel" },
+    panelTitle: { type: ControlType.String, title: "Panel title", defaultValue: "", placeholder: "No title", hidden: (p) => p.layout !== "panel" },
     panelWidth: { type: ControlType.Number, title: "Panel width", min: 200, max: 800, step: 10, unit: "px", defaultValue: 420, hidden: (p) => p.layout !== "panel" },
     showTickets: { type: ControlType.Boolean, title: "Details", defaultValue: true, enabledTitle: "Show", disabledTitle: "Hide", hidden: (p) => p.layout !== "panel" },
     ticketsGap: { type: ControlType.Number, title: "Buttons ↔ details", min: 0, max: 80, step: 2, unit: "px", defaultValue: 24, hidden: (p) => p.layout !== "panel" },
