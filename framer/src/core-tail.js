@@ -83,7 +83,7 @@
   // ---------- layout: card space on the left, the type buttons beside it ----------
   let scale = 1;
   function layout() {
-    const RW = root.clientWidth;
+    const RW = root.clientWidth - (parseFloat(getComputedStyle(root).paddingLeft) || 0);
     const RH = root.clientHeight;
     if (!RW || !RH) return;
     picker.style.flexWrap = 'nowrap';

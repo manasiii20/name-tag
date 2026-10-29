@@ -103,6 +103,8 @@ export default function NameTagLanyard(props) {
         "--ntag-h": `${props.chipHeight}px`,
         "--ntag-gap": `${props.buttonGap}px`,
         "--ntag-space": `${props.cardGap}px`,
+        "--ntag-pad": `${props.swingRoom}px`,
+        "--ntag-bottom": `${props.buttonsBottom}px`,
         "--ntag-ring": props.selectedOutline ? props.accentColor : "transparent",
         "--ntag-case": props.lowercase ? "lowercase" : "none",
     }
@@ -125,6 +127,8 @@ NameTagLanyard.defaultProps = {
     chipHeight: 27,
     buttonGap: 8,
     cardGap: 40,
+    swingRoom: 120,
+    buttonsBottom: 0,
     lowercase: true,
     stackBelow: 0,
     strapLength: 90,
@@ -195,6 +199,8 @@ addPropertyControls(NameTagLanyard, {
     chipRadius: { type: ControlType.Number, title: "Chip radius", min: 0, max: 20, step: 1, defaultValue: 0 },
     chipHeight: { type: ControlType.Number, title: "Chip height", min: 20, max: 48, step: 1, defaultValue: 27 },
     buttonGap: { type: ControlType.Number, title: "Button gap", min: 0, max: 40, step: 1, defaultValue: 8 },
+    swingRoom: { type: ControlType.Number, title: "Swing room", min: 0, max: 300, step: 4, unit: "px", defaultValue: 120, description: "Space on the left so the card can swing without being cut off." },
+    buttonsBottom: { type: ControlType.Number, title: "Buttons lift", min: 0, max: 200, step: 2, unit: "px", defaultValue: 0, description: "Raise the row of buttons from the bottom edge." },
     cardGap: { type: ControlType.Number, title: "Gap from card", min: 0, max: 200, step: 2, defaultValue: 40 },
     lowercase: { type: ControlType.Boolean, title: "Lowercase", defaultValue: true },
 })

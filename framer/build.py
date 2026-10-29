@@ -48,7 +48,7 @@ extra_css = '''
   --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-narrow: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", sans-serif;
   --f-hand: "Gaegu", "Segoe Print", "Comic Sans MS", cursive;
-  position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--ntag-space, 40px); width: 100%; height: 100%; overflow: visible;
+  position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--ntag-space, 40px); width: 100%; height: 100%; overflow: visible; padding-left: var(--ntag-pad, 120px);
   font: 400 14px/1.45 var(--f-ui); color: var(--ink); -webkit-font-smoothing: antialiased;
   user-select: none; -webkit-user-select: none;
 }
@@ -59,7 +59,7 @@ svg, img { display: block; }
 .ntag-stage { position: relative; z-index: 2; flex: none; height: 100%; min-width: 0; overflow: visible; clip-path: inset(0 -100vw -100vh -100vw); }
 .ntag-hint { position: absolute; left: 0; right: 0; bottom: 2px; margin: 0; text-align: center; font: 400 11px/1.3 var(--ntag-font, var(--f-ui)); color: var(--ntag-hint, #9A9A9A); pointer-events: none; }
 /* type buttons: one row beside the card, styled like the portfolio's chips */
-.ntag-picker { flex: none; align-self: center; display: flex; flex-wrap: nowrap; gap: var(--ntag-gap, 8px); position: relative; z-index: 0; }
+.ntag-picker { flex: none; align-self: flex-end; padding-bottom: var(--ntag-bottom, 0px); display: flex; flex-wrap: nowrap; gap: var(--ntag-gap, 8px); position: relative; z-index: 0; }
 .ntag-picker button {
   height: var(--ntag-h, 27px); padding: 0 10px; border: 1px solid transparent; border-radius: var(--ntag-radius, 0px); cursor: pointer;
   background: var(--ntag-chip, #F1F1F1); color: var(--ntag-chip-ink, #828282);
@@ -67,7 +67,7 @@ svg, img { display: block; }
   transition: color .15s, border-color .15s;
 }
 .ntag-picker button:hover { color: var(--ntag-accent, #135FEC); }
-.ntag-picker button[aria-pressed="true"] { color: var(--ntag-accent, #135FEC); border-color: var(--ntag-ring, transparent); }
+.ntag-picker button[aria-pressed="true"] { color: var(--ntag-accent, #135FEC); font-weight: 500; border-color: var(--ntag-ring, transparent); }
 .ntag-picker button:focus-visible, .card:focus-visible { outline: 2px solid var(--ntag-accent, #135FEC); outline-offset: 2px; }
 /* narrow frames: card on top, buttons wrap underneath */
 &.ntag-narrow { flex-direction: column; }
