@@ -58,8 +58,8 @@ svg, img { display: block; }
 /* only the top is clipped (so the strap comes in from the edge); the card may swing past every other side */
 .ntag-stage { position: relative; z-index: 2; flex: none; height: 100%; min-width: 0; overflow: visible; clip-path: inset(0 -100vw -100vh -100vw); }
 .ntag-hint { position: absolute; left: 0; right: 0; bottom: 2px; margin: 0; text-align: center; font: 400 11px/1.3 var(--ntag-font, var(--f-ui)); color: var(--ntag-hint, #9A9A9A); pointer-events: none; }
-/* type buttons: one row beside the card, styled like the portfolio's chips */
-.ntag-picker { flex: none; align-self: flex-end; padding-bottom: var(--ntag-bottom, 0px); display: flex; flex-wrap: nowrap; gap: var(--ntag-gap, 8px); position: relative; z-index: 0; }
+/* type buttons: a 4 x 2 grid beside the card, styled like the portfolio's chips */
+.ntag-picker { flex: none; align-self: flex-end; padding-bottom: var(--ntag-bottom, 0px); display: grid; grid-template-columns: repeat(var(--ntag-cols, 4), auto); gap: var(--ntag-gap, 8px); position: relative; z-index: 0; }
 .ntag-picker button {
   height: var(--ntag-h, 27px); padding: 0 10px; border: 1px solid transparent; border-radius: var(--ntag-radius, 0px); cursor: pointer;
   background: var(--ntag-chip, #F1F1F1); color: var(--ntag-chip-ink, #828282);
@@ -70,9 +70,9 @@ svg, img { display: block; }
 .ntag-picker button[aria-pressed="true"] { color: var(--ntag-accent, #135FEC); font-weight: 500; border-color: var(--ntag-ring, transparent); }
 .ntag-picker button:focus-visible, .card:focus-visible { outline: 2px solid var(--ntag-accent, #135FEC); outline-offset: 2px; }
 /* narrow frames: card on top, buttons wrap underneath */
-&.ntag-narrow { flex-direction: column; }
+&.ntag-narrow { flex-direction: column; padding-left: 0; }
 &.ntag-narrow .ntag-stage { flex: 1; width: 100%; height: auto; }
-&.ntag-narrow .ntag-picker { align-self: stretch; flex-wrap: wrap; justify-content: center; padding-top: 8px; }
+&.ntag-narrow .ntag-picker { align-self: center; padding-top: 8px; }
 .card.no-box .face { box-shadow: none !important; overflow: visible; }
 .card.no-box .sheen { display: none; }
 .card.no-box:not(.is-flipped) .front .cf, .card.no-box.is-flipped .back .cf { filter: drop-shadow(0 2px 2px rgba(15, 15, 30, .14)) drop-shadow(0 16px 22px rgba(15, 15, 30, .2)); }
