@@ -103,12 +103,10 @@
     const ty = isLanyard() ? 0 : Math.max(6, (H - hintRoom - t.h * scale) / 2 + 6);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
-    // measure the gap to the buttons from the card's own edge, not from the wider card slot
-    // (the card's untransformed right edge, so swinging and stickers' tilt don't change it)
-    let edge = card.offsetWidth;
-    for (let el = card; el && el !== mount; el = el.offsetParent) edge += el.offsetLeft;
-    const cardRight = SLOT_W * scale / 2 + (edge - natW / 2) * scale;
-    picker.style.marginLeft = narrow ? '' : `${-Math.max(0, Math.round(SLOT_W * scale) - cardRight)}px`;
+    // measure the gap to the buttons from the widest card on offer, so the buttons never move when the
+    // type changes and no card covers them while it rests
+    const widest = Math.max(...types.map((k) => TPLS[k].w));
+    picker.style.marginLeft = narrow ? '' : `${-Math.max(0, (SLOT_W - widest) / 2) * scale}px`;
     // and line the bottom row of buttons up with the bottom of a hanging card. It's one fixed line
     // for every type, so the buttons stay put when switching between hanging cards and stickers.
     picker.style.marginBottom = narrow ? '' : `${Math.max(0, Math.round(RH - lanH() * scale))}px`;
