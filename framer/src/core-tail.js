@@ -100,7 +100,8 @@
     stage.style.width = narrow ? '100%' : `${Math.round(SLOT_W * scale)}px`;
     const t = tpl();
     const natW = t.w + 40;
-    const ty = isLanyard() ? 0 : Math.max(6, (H - hintRoom - t.h * scale) / 2 + 6);
+    // stickers rest on the same bottom line as the hanging cards and the buttons
+    const ty = isLanyard() ? 0 : Math.max(6, (lanH() - t.h) * scale);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
     // measure the gap to the buttons from the widest card on offer, so the buttons never move when the
