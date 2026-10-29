@@ -39,6 +39,8 @@ def css_section(start, end):
 
 
 card_css = css_section('/* ---------- the hanging rig ---------- */', '/* ---------- right panel')
+# the site's ticket look, for the read-only panel
+ticket_css = css_section('/* tickets: each field is a small ticket', '.t-input {') + between(CSS, '.range-ends {', '\n', include_end=True)
 
 extra_css = '''
 :root {
@@ -69,10 +71,37 @@ svg, img { display: block; }
 .ntag-picker button:hover { color: var(--ntag-accent, #135FEC); }
 .ntag-picker button[aria-pressed="true"] { color: var(--ntag-accent, #135FEC); font-weight: 500; border-color: var(--ntag-ring, transparent); }
 .ntag-picker button:focus-visible, .card:focus-visible { outline: 2px solid var(--ntag-accent, #135FEC); outline-offset: 2px; }
+/* the side: just the buttons beside the card, or (panel layout) a title, the buttons and the tickets top right */
+.ntag-side { display: contents; }
+.ntag-ph, .ntag-tickets { display: none; }
+&.ntag-panelmode { padding-left: 0; }
+&.ntag-panelmode .ntag-side { flex: none; display: flex; flex-direction: column; align-self: flex-start; max-height: 100%; overflow-y: auto; scrollbar-width: none; padding: 2px; margin: -2px; }
+&.ntag-panelmode .ntag-side::-webkit-scrollbar { display: none; }
+&.ntag-panelmode .ntag-ph { display: block; margin: 0 0 12px; font: 500 16px var(--ntag-title-font, var(--f-ui)); letter-spacing: -.01em; color: var(--ink); }
+&.ntag-panelmode .ntag-ph[hidden] { display: none; }
+&.ntag-panelmode .ntag-picker { align-self: stretch; grid-template-columns: repeat(var(--ntag-cols, 4), minmax(0, 1fr)); margin: 0 !important; padding-bottom: 0; }
+&.ntag-panelmode .ntag-tickets { display: flex; flex-direction: column; gap: 8px; margin-top: var(--ntag-tickets-gap, 24px); font: 400 14px/1.45 var(--f-ui); }
+&.ntag-panelmode .ntag-tickets:empty { display: none; }
+/* on a white page the site's white tickets would vanish, so they take a soft fill (their mask clips any outline) */
+.ntag-tickets .ticket, .ntag-tickets .ticket.is-open, .ntag-tickets .ticket:not(.is-open):hover { background: var(--ntag-ticket, #F1F1F1); box-shadow: none; }
+.ntag-tickets .t-head { font: inherit; color: inherit; }
+.ntag-tickets .t-inner { gap: 10px; }
+.t-val { min-height: 42px; display: flex; align-items: center; padding: 8px 12px; border-radius: 8px; background: var(--white); font: 400 15px/1.3 var(--f-ui); color: var(--ink); overflow-wrap: anywhere; }
+.t-val.t-hand { font: 700 26px/1.1 var(--f-hand); padding-top: 9px; }
+.t-val.t-empty { color: var(--muted); }
+.t-color { gap: 10px; }
+.t-sw { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1); }
+.t-photo { width: 64px; height: 78px; border-radius: 6px; background: #8E8A84 center / cover no-repeat; filter: grayscale(1) contrast(1.05); }
+.t-stks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.t-stk { position: relative; height: 56px; border-radius: 10px; background: var(--white); overflow: hidden; }
+.t-meter { position: relative; height: 22px; }
+.t-meter::before { content: ""; position: absolute; left: 0; right: 0; top: 10px; height: 2px; border-radius: 2px; background: var(--ink); }
+.t-meter i { position: absolute; top: 3px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--white); border: 1.5px solid var(--ink); }
 /* narrow frames: card on top, buttons wrap underneath */
 &.ntag-narrow { flex-direction: column; padding-left: 0; }
 &.ntag-narrow .ntag-stage { flex: 1; width: 100%; height: auto; }
 &.ntag-narrow .ntag-picker { align-self: center; padding-top: 8px; }
+&.ntag-narrow.ntag-panelmode .ntag-side { align-self: stretch; width: 100%; max-height: none; overflow: visible; padding-top: 12px; }
 .card.no-box .face { box-shadow: none !important; overflow: visible; }
 .card.no-box .sheen { display: none; }
 .card.no-box:not(.is-flipped) .front .cf, .card.no-box.is-flipped .back .cf { filter: drop-shadow(0 2px 2px rgba(15, 15, 30, .14)) drop-shadow(0 16px 22px rgba(15, 15, 30, .2)); }
@@ -150,7 +179,7 @@ def scope_css(css, scope, prefix):
     return re.sub(r'[ \t]+', ' ', out)
 
 
-lanyard_css = scope_css(extra_css + card_css, SCOPE, 'ntag-')
+lanyard_css = scope_css(ticket_css + extra_css + card_css, SCOPE, 'ntag-')
 
 # ---------- crayon place card (standalone) ----------
 crayon_js = between(APP, '  function crayonFilters(id, seed) {', '  function crayonFront(p) {')
