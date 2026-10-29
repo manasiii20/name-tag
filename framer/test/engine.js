@@ -728,10 +728,9 @@ function createNameTag(root, opts) {
     for (let el = card; el && el !== mount; el = el.offsetParent) edge += el.offsetLeft;
     const cardRight = SLOT_W * scale / 2 + (edge - natW / 2) * scale;
     picker.style.marginLeft = narrow ? '' : `${-Math.max(0, Math.round(SLOT_W * scale) - cardRight)}px`;
-    // and line the bottom row of buttons up with the card's bottom edge
-    let bottom = card.offsetHeight;
-    for (let el = card; el && el !== mount; el = el.offsetParent) bottom += el.offsetTop;
-    picker.style.marginBottom = narrow ? '' : `${Math.max(0, Math.round(RH - (ty + bottom * scale)))}px`;
+    // and line the bottom row of buttons up with the bottom of a hanging card. It's one fixed line
+    // for every type, so the buttons stay put when switching between hanging cards and stickers.
+    picker.style.marginBottom = narrow ? '' : `${Math.max(0, Math.round(RH - lanH() * scale))}px`;
   }
   const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
   if (ro) ro.observe(root);
