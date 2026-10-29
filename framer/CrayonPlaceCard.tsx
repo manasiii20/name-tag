@@ -6,7 +6,7 @@ import * as React from "react"
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { addPropertyControls, ControlType } from "framer"
 
-const FONTS = "https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Archivo+Narrow:wght@600;700&family=Courier+Prime&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&display=swap"
+const FONTS = "https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,700..900&family=Archivo+Narrow:wght@600;700&family=Courier+Prime&family=Gaegu:wght@400;700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap"
 const W = 440
 const H = 300
 const FOLD = 236

@@ -86,20 +86,21 @@
     const RW = root.clientWidth;
     const RH = root.clientHeight;
     if (!RW || !RH) return;
-    const narrow = RW < (opts.stackBelow || 520);
+    picker.style.flexWrap = 'nowrap';
+    const narrow = RW < (opts.stackBelow || 0) || RW < picker.scrollWidth + 260;
     root.classList.toggle('ntag-narrow', narrow);
-    // buttons: one column when there's height for eight, otherwise two
-    picker.classList.toggle('two-col', !narrow && RH < types.length * 36 + 8);
-    const pickW = narrow ? 0 : picker.offsetWidth + 14;
+    picker.style.flexWrap = narrow ? 'wrap' : 'nowrap';
+    const gap = parseFloat(getComputedStyle(root).columnGap) || 40;
+    const pickW = narrow ? 0 : picker.scrollWidth + gap;
     const H = stage.clientHeight || RH;
-    const hintRoom = opts.showHint ? 26 : 8;
+    const hintRoom = (opts.showHint ? 22 : 0) + 34; // the hint, plus room for the card's shadow
     scale = clamp((H - hintRoom) / lanH(), 0.15, opts.maxScale || 1);
     const avail = narrow ? RW : RW - pickW;
     if (SLOT_W * scale > avail) scale = avail / SLOT_W;
     stage.style.width = narrow ? '100%' : `${Math.round(SLOT_W * scale)}px`;
     const t = tpl();
     const natW = t.w + 40;
-    const ty = isLanyard() ? 0 : Math.max(6, (H - hintRoom - t.h * scale) / 2);
+    const ty = isLanyard() ? 0 : Math.max(6, (H - hintRoom - t.h * scale) / 2 + 6);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
