@@ -19,11 +19,7 @@
       </div></div></div>
       <p class="ntag-hint"></p>
     </div>
-    <div class="ntag-side">
-      <p class="ntag-ph"></p>
-      <div class="ntag-picker" role="group" aria-label="Card type"></div>
-      <div class="ntag-tickets"></div>
-    </div>`;
+    <div class="ntag-picker" role="group" aria-label="Card type"></div>`;
   const stage = $('.ntag-stage');
   const mount = $('.mount');
   const drop = $('.drop');
@@ -33,8 +29,6 @@
   const front = $('.face.front');
   const back = $('.face.back');
   const picker = $('.ntag-picker');
-  const tickets = $('.ntag-tickets');
-  const panelMode = () => opts.layout === 'panel';
 
   function fitAll() {
     $$('.fit', rig).forEach((el) => {
@@ -60,61 +54,6 @@
     picker.innerHTML = types.map((k) => `<button type="button" data-tpl="${k}" aria-pressed="${k === state.tpl}">${esc(LABELS[k] || k)}</button>`).join('');
   }
 
-  // ---------- panel: read-only tickets, one per detail on the card, like the site's editor ----------
-  const QUESTIONS = {
-    name: 'What do we call you?', pronouns: 'How should people refer to you?', role: 'What are you here as?',
-    event: 'Where is this tag going?', greet: 'How do you say hi?', shape: 'Square-ish or round?',
-    statement: "What's your one-liner?", critter: "Who's your little buddy?", font: 'Tell me your least favourite font',
-    photo: 'Got a good photo?', stickers: 'Stick some stickers on it', mood: "How's your energy today?",
-    back: 'Anything for the back?', color: "What's your color?",
-  };
-  const ORDER = ['role', 'event', 'greet', 'shape', 'statement', 'critter', 'font', 'photo', 'stickers', 'mood', 'back'];
-  let openTicket = null;
-  function answer(k) {
-    const val = (v, cls = '') => v && String(v).trim() ? `<div class="t-val ${cls}">${esc(v)}</div>` : '<div class="t-val t-empty">nothing here yet</div>';
-    switch (k) {
-      case 'name': return val(state.name, 't-hand');
-      case 'greet': return val(GREETS[state.greet] || GREETS[0]);
-      case 'shape': return val(state.shape === 'circle' ? 'round' : 'square-ish');
-      case 'critter': return val(state.critter);
-      case 'font': return val(state.font, 't-hand');
-      case 'photo': return state.photo ? `<div class="t-photo" style="background-image:url('${esc(state.photo)}')"></div>` : val('');
-      case 'stickers': {
-        const on = state.stickers.split(',').filter((x) => LIC_STICKERS[x]);
-        return on.length ? `<div class="t-stks">${on.map((x) => `<span class="t-stk" title="${esc(LIC_STICKERS[x].label)}"><span class="stk-prev">${LIC_STICKERS[x].art(esc(initials()))}</span></span>`).join('')}</div>` : val('');
-      }
-      case 'mood': return `<div class="t-meter"><i style="left:${clamp(+state.mood || 0, 0, 100)}%"></i></div><div class="range-ends"><span>sleepy</span><span>radiant</span></div>`;
-      case 'color': { const t = tpl(), p = pal(); return `<div class="t-val t-color"><span class="t-sw" style="--sw:${t.swatch(p)}"></span>${esc(p.n.toLowerCase())}</div>`; }
-      default: return val(state[k]);
-    }
-  }
-  function renderTickets() {
-    if (!panelMode() || opts.showTickets === false) { tickets.innerHTML = ''; return; }
-    const t = tpl();
-    const keys = ['name', ...(t.noPronouns ? [] : ['pronouns']), ...ORDER.filter((k) => t.fields.includes(k)), ...(t.noColor ? [] : ['color'])];
-    if (!keys.includes(openTicket)) openTicket = null;
-    tickets.innerHTML = keys.map((k, i) => `
-      <div class="ticket${k === openTicket ? ' is-open' : ''}" data-ticket="${k}">
-        <button type="button" class="t-head" aria-expanded="${k === openTicket}">
-          <span class="t-no">${String(i + 1).padStart(2, '0')}</span>
-          <span class="t-main"><span class="t-q">${QUESTIONS[k]}</span></span>
-          <span class="t-plus" aria-hidden="true"></span>
-        </button>
-        <div class="t-body"><div class="t-inner">${answer(k)}</div></div>
-      </div>`).join('');
-  }
-  tickets.addEventListener('click', (e) => {
-    const head = e.target.closest('.t-head');
-    if (!head) return;
-    const tk = head.closest('.ticket');
-    openTicket = tk.classList.contains('is-open') ? null : tk.dataset.ticket;
-    $$('.ticket', tickets).forEach((el) => {
-      const on = el.dataset.ticket === openTicket;
-      el.classList.toggle('is-open', on);
-      $('.t-head', el).setAttribute('aria-expanded', String(on));
-    });
-  });
-
   function render() {
     Object.assign(TPLS.classic, state.shape === 'circle' ? { w: 360, h: 360 } : { w: 440, h: 316 });
     const t = tpl();
@@ -139,11 +78,6 @@
     hint.textContent = lan ? 'drag to swing, tap to flip' : 'drag it anywhere, it sticks';
     card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Arrow keys move it.'}`);
     $$('button', picker).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tpl === state.tpl)));
-    root.classList.toggle('ntag-panelmode', panelMode());
-    const ph = $('.ntag-ph');
-    ph.textContent = opts.panelTitle || '';
-    ph.hidden = !panelMode() || !opts.panelTitle;
-    renderTickets();
     fitAll();
   }
 
@@ -153,36 +87,31 @@
     const RW = root.clientWidth - (parseFloat(getComputedStyle(root).paddingLeft) || 0);
     const RH = root.clientHeight;
     if (!RW || !RH) return;
-    const side = $('.ntag-side');
-    const panelW = panelMode() ? clamp(opts.panelWidth || 420, 200, 800) : 0;
     picker.style.flexWrap = 'nowrap';
-    const narrow = RW < (opts.stackBelow || 0) || RW < (panelMode() ? panelW : picker.scrollWidth) + 260;
+    const narrow = RW < (opts.stackBelow || 0) || RW < picker.scrollWidth + 260;
     root.classList.toggle('ntag-narrow', narrow);
     picker.style.flexWrap = narrow ? 'wrap' : 'nowrap';
     const gap = parseFloat(getComputedStyle(root).columnGap) || 40;
-    side.style.width = panelMode() && !narrow ? `${panelW}px` : '';
-    const pickW = narrow ? 0 : (panelMode() ? panelW : picker.scrollWidth) + gap;
+    const pickW = narrow ? 0 : picker.scrollWidth + gap;
     const H = stage.clientHeight || RH;
     const hintRoom = (opts.showHint ? 22 : 0) + 34; // the hint, plus room for the card's shadow
     scale = clamp((H - hintRoom) / lanH(), 0.15, opts.maxScale || 1);
     const avail = narrow ? RW : RW - pickW;
     if (SLOT_W * scale > avail) scale = avail / SLOT_W;
-    // panel mode: the card gets all the room left of the panel and hangs in the middle of it
-    stage.style.width = narrow ? '100%' : `${Math.round(panelMode() ? RW - pickW : SLOT_W * scale)}px`;
+    stage.style.width = narrow ? '100%' : `${Math.round(SLOT_W * scale)}px`;
     const t = tpl();
     const natW = t.w + 40;
     // stickers rest on the same bottom line as the hanging cards and the buttons
-    // (in panel mode they sit where a hanging card's middle would be)
-    const ty = isLanyard() ? 0 : Math.max(6, (panelMode() ? lanH() - 220 - t.h / 2 : lanH() - t.h) * scale);
+    const ty = isLanyard() ? 0 : Math.max(6, (lanH() - t.h) * scale);
     mount.style.width = `${natW}px`;
     mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
     // measure the gap to the buttons from the widest card on offer, so the buttons never move when the
     // type changes and no card covers them while it rests
     const widest = Math.max(...types.map((k) => TPLS[k].w));
-    picker.style.marginLeft = narrow || panelMode() ? '' : `${-Math.max(0, (SLOT_W - widest) / 2) * scale}px`;
+    picker.style.marginLeft = narrow ? '' : `${-Math.max(0, (SLOT_W - widest) / 2) * scale}px`;
     // and line the bottom row of buttons up with the bottom of a hanging card. It's one fixed line
     // for every type, so the buttons stay put when switching between hanging cards and stickers.
-    picker.style.marginBottom = narrow || panelMode() ? '' : `${Math.max(0, Math.round(RH - lanH() * scale))}px`;
+    picker.style.marginBottom = narrow ? '' : `${Math.max(0, Math.round(RH - lanH() * scale))}px`;
   }
   const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
   if (ro) ro.observe(root);

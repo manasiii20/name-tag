@@ -40,10 +40,6 @@ const STICKER_TITLES = ["Certified creative", "Heart bubble", "Pencil", "Pen nib
 function toOpts(p) {
     const types = (p.types && p.types.length ? p.types : TYPES).filter((k) => TYPES.includes(k))
     return {
-        layout: p.layout,
-        panelTitle: p.panelTitle,
-        panelWidth: p.panelWidth,
-        showTickets: p.showTickets,
         showPicker: p.showPicker,
         showHint: p.showHint,
         maxScale: p.maxScale,
@@ -112,19 +108,11 @@ export default function NameTagLanyard(props) {
         "--ntag-bottom": `${props.buttonsBottom}px`,
         "--ntag-ring": props.selectedOutline ? props.accentColor : "transparent",
         "--ntag-case": props.lowercase ? "lowercase" : "none",
-        "--ntag-tickets-gap": `${props.ticketsGap}px`,
-        "--ntag-ticket": props.ticketColor,
     }
     return <div ref={ref} style={{ width: "100%", height: "100%", ...look, ...props.style }} />
 }
 
 NameTagLanyard.defaultProps = {
-    layout: "panel",
-    panelTitle: "",
-    panelWidth: 420,
-    showTickets: true,
-    ticketsGap: 24,
-    ticketColor: "#F1F1F1",
     startWith: "coffee",
     classicShape: "rect",
     postcardBuddy: "fish",
@@ -168,13 +156,7 @@ NameTagLanyard.defaultProps = {
 }
 
 addPropertyControls(NameTagLanyard, {
-    layout: { type: ControlType.Enum, title: "Layout", options: ["panel", "beside"], optionTitles: ["Panel, top right", "Buttons beside card"], defaultValue: "panel", displaySegmentedControl: true, segmentedControlDirection: "vertical" },
-    panelTitle: { type: ControlType.String, title: "Panel title", defaultValue: "", placeholder: "No title", hidden: (p) => p.layout !== "panel" },
-    panelWidth: { type: ControlType.Number, title: "Panel width", min: 200, max: 800, step: 10, unit: "px", defaultValue: 420, hidden: (p) => p.layout !== "panel" },
-    showTickets: { type: ControlType.Boolean, title: "Details", defaultValue: true, enabledTitle: "Show", disabledTitle: "Hide", hidden: (p) => p.layout !== "panel" },
-    ticketsGap: { type: ControlType.Number, title: "Buttons ↔ details", min: 0, max: 80, step: 2, unit: "px", defaultValue: 24, hidden: (p) => p.layout !== "panel" },
-    ticketColor: { type: ControlType.Color, title: "Details fill", defaultValue: "#F1F1F1", hidden: (p) => p.layout !== "panel" },
-    cardGap: { type: ControlType.Number, title: "Card ↔ buttons", min: 0, max: 400, step: 2, unit: "px", defaultValue: 48, description: "Space between the card area and the buttons." },
+    cardGap: { type: ControlType.Number, title: "Card ↔ buttons", min: 0, max: 400, step: 2, unit: "px", defaultValue: 48, description: "Space between the card's edge and the buttons." },
     buttonGap: { type: ControlType.Number, title: "Button spacing", min: 0, max: 40, step: 1, unit: "px", defaultValue: 12 },
     startWith: { type: ControlType.Enum, title: "Opens on", options: TYPES, optionTitles: TYPE_TITLES, defaultValue: "coffee" },
     types: {
@@ -220,8 +202,8 @@ addPropertyControls(NameTagLanyard, {
     selectedOutline: { type: ControlType.Boolean, title: "Selected outline", defaultValue: false },
     chipRadius: { type: ControlType.Number, title: "Chip radius", min: 0, max: 20, step: 1, defaultValue: 0 },
     chipHeight: { type: ControlType.Number, title: "Chip height", min: 20, max: 48, step: 1, defaultValue: 27 },
-    swingRoom: { type: ControlType.Number, title: "Swing room", min: 0, max: 300, step: 4, unit: "px", defaultValue: 120, description: "Space on the left so the card can swing without being cut off.", hidden: (p) => p.layout === "panel" },
+    swingRoom: { type: ControlType.Number, title: "Swing room", min: 0, max: 300, step: 4, unit: "px", defaultValue: 120, description: "Space on the left so the card can swing without being cut off." },
     buttonColumns: { type: ControlType.Number, title: "Button columns", min: 1, max: 8, step: 1, displayStepper: true, defaultValue: 4 },
-    buttonsBottom: { type: ControlType.Number, title: "Buttons lift", min: 0, max: 200, step: 2, unit: "px", defaultValue: 0, description: "Raise the row of buttons from the bottom edge.", hidden: (p) => p.layout === "panel" },
+    buttonsBottom: { type: ControlType.Number, title: "Buttons lift", min: 0, max: 200, step: 2, unit: "px", defaultValue: 0, description: "Raise the row of buttons from the bottom edge." },
     lowercase: { type: ControlType.Boolean, title: "Lowercase", defaultValue: true },
 })
