@@ -689,7 +689,8 @@ function createNameTag(root, opts) {
     const strap = $('.strap');
     if (lan) strap.style.setProperty('--strap', t.strap(p));
     strap.style.setProperty('--strap-ink', t.strapInk || 'rgba(255, 255, 255, .82)');
-    strap.style.setProperty('--strap-h', `${400 + strapLen()}px`);
+    // shorter (or taller) hanging cards get a longer (or shorter) strap, so every card ends on the same line
+    strap.style.setProperty('--strap-h', `${400 + Math.max(20, strapLen() + 440 - tpl().h)}px`);
     $('span', strap).textContent = Array(12).fill((state.event.trim() || 'hello').toUpperCase()).join('  •  ');
     const hint = $('.ntag-hint');
     hint.hidden = !opts.showHint;
