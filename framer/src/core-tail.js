@@ -109,6 +109,10 @@
     for (let el = card; el && el !== mount; el = el.offsetParent) edge += el.offsetLeft;
     const cardRight = SLOT_W * scale / 2 + (edge - natW / 2) * scale;
     picker.style.marginLeft = narrow ? '' : `${-Math.max(0, Math.round(SLOT_W * scale) - cardRight)}px`;
+    // and line the bottom row of buttons up with the card's bottom edge
+    let bottom = card.offsetHeight;
+    for (let el = card; el && el !== mount; el = el.offsetParent) bottom += el.offsetTop;
+    picker.style.marginBottom = narrow ? '' : `${Math.max(0, Math.round(RH - (ty + bottom * scale)))}px`;
   }
   const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
   if (ro) ro.observe(root);
@@ -118,9 +122,18 @@
   const D = 1.15;
   let th = 0.32, w = 0, t = 0, last = performance.now(), drag = null, raf = 0, alive = true;
   let x = 0, y = 0, vx = 0, vy = 0, restRot = -2, lastRot = -2;
+  // a sticker can go anywhere inside the whole component, not just the card's own slot
   function stickerLimits() {
-    const tt = tpl();
-    return { x: Math.max(0, (stage.clientWidth / scale - tt.w) / 2 - 8), y: Math.max(0, (stage.clientHeight / scale - tt.h) / 2 - 8) };
+    const R = root.getBoundingClientRect(), m = mount.getBoundingClientRect(), pad = 8;
+    const w = card.offsetWidth * scale, h = card.offsetHeight * scale;
+    const left = m.left + (m.width - w) / 2, top = m.top;
+    // room for the sticker's tilt, so its corners stay inside too
+    const r = Math.abs(restRot) * Math.PI / 180, sn = Math.sin(r), cs = Math.cos(r);
+    const ex = pad + (w * cs + h * sn - w) / 2, ey = pad + (w * sn + h * cs - h) / 2;
+    return {
+      x0: Math.min(0, (R.left + ex - left) / scale), x1: Math.max(0, (R.right - ex - left - w) / scale),
+      y0: Math.min(0, (R.top + ey - top) / scale), y1: Math.max(0, (R.bottom - ey - top - h) / scale),
+    };
   }
   function frame(time) {
     if (!alive) return;
@@ -142,8 +155,8 @@
       // stickers lift while dragged and stick flat wherever they're dropped
       if (held) { vx *= Math.pow(0.03, dt); vy *= Math.pow(0.03, dt); } else { vx = 0; vy = 0; }
       const lim = stickerLimits();
-      x = clamp(x, -lim.x, lim.x);
-      y = clamp(y, -lim.y, lim.y);
+      x = clamp(x, lim.x0, lim.x1);
+      y = clamp(y, lim.y0, lim.y1);
       const rot = held ? restRot + clamp(vx * 0.02, -14, 14) : restRot;
       lastRot = rot;
       rig.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;

@@ -48,7 +48,7 @@ extra_css = '''
   --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-narrow: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", sans-serif;
   --f-hand: "Gaegu", "Segoe Print", "Comic Sans MS", cursive;
-  position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--ntag-space, 40px); width: 100%; height: 100%; overflow: visible; padding-left: var(--ntag-pad, 120px);
+  box-sizing: border-box; position: relative; display: flex; flex-direction: row; align-items: stretch; gap: var(--ntag-space, 40px); width: 100%; height: 100%; overflow: visible; padding-left: var(--ntag-pad, 120px);
   font: 400 14px/1.45 var(--f-ui); color: var(--ink); -webkit-font-smoothing: antialiased;
   user-select: none; -webkit-user-select: none;
 }

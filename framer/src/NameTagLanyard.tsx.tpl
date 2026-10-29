@@ -151,7 +151,7 @@ NameTagLanyard.defaultProps = {
     mottoColor: "0",
     sparkyColor: "0",
     showPicker: true,
-    showHint: true,
+    showHint: false,
     maxScale: 1,
 }
 
@@ -166,7 +166,7 @@ addPropertyControls(NameTagLanyard, {
         defaultValue: TYPES,
     },
     showPicker: { type: ControlType.Boolean, title: "Type picker", defaultValue: true },
-    showHint: { type: ControlType.Boolean, title: "Hint", defaultValue: true },
+    showHint: { type: ControlType.Boolean, title: "Hint", defaultValue: false },
     name: { type: ControlType.String, title: "Name", defaultValue: "manasi" },
     pronouns: { type: ControlType.String, title: "Pronouns", defaultValue: "she/her" },
     role: { type: ControlType.String, title: "Here as", defaultValue: "designer" },
