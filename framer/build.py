@@ -38,12 +38,7 @@ def css_section(start, end):
     return between(CSS, start, end)
 
 
-card_css = ''.join([
-    css_section('/* ---------- the hanging rig ---------- */', '/* --- classic: HELLO'),
-    css_section('/* --- volunteer:', '/* --- postcard:'),
-    css_section('/* --- slogan:', '/* --- crayon:'),
-    css_section('/* --- glow:', '/* ---------- right panel'),
-])
+card_css = css_section('/* ---------- the hanging rig ---------- */', '/* ---------- right panel')
 
 extra_css = '''
 :root {
@@ -53,25 +48,31 @@ extra_css = '''
   --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --f-narrow: "Archivo Narrow", "Arial Narrow", "Helvetica Neue", sans-serif;
   --f-hand: "Gaegu", "Segoe Print", "Comic Sans MS", cursive;
-  position: relative; display: flex; flex-direction: column; width: 100%; height: 100%;
+  position: relative; display: flex; flex-direction: row; align-items: stretch; gap: 14px; width: 100%; height: 100%;
   font: 400 14px/1.45 var(--f-ui); color: var(--ink); -webkit-font-smoothing: antialiased;
   user-select: none; -webkit-user-select: none;
 }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 svg, img { display: block; }
-.ntag-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
-.ntag-hint { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; font-size: 12px; color: var(--muted); pointer-events: none; }
-.ntag-picker { flex: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 10px 8px 2px; }
+.ntag-stage { position: relative; flex: none; height: 100%; min-width: 0; overflow: hidden; }
+.ntag-hint { position: absolute; left: 0; right: 0; bottom: 4px; margin: 0; text-align: center; font: 400 11px/1.3 var(--ntag-font, var(--f-ui)); color: var(--ntag-hint, #9A9A9A); pointer-events: none; }
+/* type buttons: a column beside the card, styled like plain portfolio chips */
+.ntag-picker { flex: none; align-self: center; display: grid; grid-auto-flow: row; gap: 6px; }
+.ntag-picker.two-col { grid-template-columns: repeat(2, auto); }
 .ntag-picker button {
-  height: 32px; padding: 0 12px; border: 0; border-radius: 8px; cursor: pointer;
-  background: var(--white); color: var(--ink-2); font: 500 13px var(--f-ui); white-space: nowrap;
-  box-shadow: 0 0 0 1px var(--edge), 0 1px 2px rgba(20, 20, 10, .04);
-  transition: background .15s, color .15s, box-shadow .15s;
+  height: 28px; padding: 0 12px; border: 1px solid transparent; border-radius: var(--ntag-radius, 2px); cursor: pointer; text-align: left;
+  background: var(--ntag-chip, #EFEFEF); color: var(--ntag-chip-ink, #6B6B6B);
+  font: 400 12px/1 var(--ntag-font, ui-monospace, "SF Mono", Menlo, monospace); letter-spacing: .02em; text-transform: var(--ntag-case, lowercase); white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
 }
-.ntag-picker button:hover { box-shadow: 0 0 0 1px var(--edge-strong), 0 1px 2px rgba(20, 20, 10, .04); color: var(--ink); }
-.ntag-picker button[aria-pressed="true"] { background: var(--ink); color: var(--white); box-shadow: none; }
-.ntag-picker button:focus-visible, .card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ntag-picker button:hover { color: var(--ntag-accent, #2F6BEB); }
+.ntag-picker button[aria-pressed="true"] { background: var(--ntag-chip-on, #FFFFFF); color: var(--ntag-accent, #2F6BEB); border-color: var(--ntag-accent, #2F6BEB); }
+.ntag-picker button:focus-visible, .card:focus-visible { outline: 2px solid var(--ntag-accent, #2F6BEB); outline-offset: 2px; }
+/* narrow frames: card on top, buttons wrap underneath */
+&.ntag-narrow { flex-direction: column; }
+&.ntag-narrow .ntag-stage { flex: 1; width: 100%; height: auto; }
+&.ntag-narrow .ntag-picker { align-self: stretch; display: flex; flex-wrap: wrap; justify-content: center; padding-top: 8px; }
 .card.no-box .face { box-shadow: none !important; overflow: visible; }
 .card.no-box .sheen { display: none; }
 .card.no-box:not(.is-flipped) .front .cf, .card.no-box.is-flipped .back .cf { filter: drop-shadow(0 2px 2px rgba(15, 15, 30, .14)) drop-shadow(0 16px 22px rgba(15, 15, 30, .2)); }
@@ -125,6 +126,8 @@ def scope_css(css, scope, prefix):
         s = s.strip()
         if s in (':root', 'html', 'body'):
             return scope
+        if s.startswith('&'):
+            return scope + s[1:]
         return f'{scope} {s}'
 
     def walk(text):

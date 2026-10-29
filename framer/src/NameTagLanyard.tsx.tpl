@@ -1,6 +1,6 @@
 // @ts-nocheck
-// Name Tag (lanyard) — a hanging ID card for an About section.
-// You set the details in Framer's properties panel; viewers can swing it, flip it and switch the card type.
+// Name Tag — a hanging ID card (or a sticker) for an About section, with the card types listed beside it.
+// You set the details in Framer's properties panel; viewers swing, flip or drag it and switch the card type.
 import * as React from "react"
 import { useEffect, useRef } from "react"
 import { addPropertyControls, ControlType } from "framer"
@@ -27,8 +27,8 @@ function ensureStyles() {
 
 /*__ENGINE__*/
 
-const TYPES = ["coffee", "volunteer", "glow", "slogan", "licence"]
-const TYPE_TITLES = ["Sparky", "Say Hi", "Montu", "Motto", "Licenced"]
+const TYPES = ["classic", "volunteer", "glow", "postcard", "coffee", "slogan", "crayon", "licence"]
+const TYPE_TITLES = ["Classic", "Say Hi", "Montu", "Postcard", "Sparky", "Motto", "Crayons", "Licenced"]
 const GREETINGS = ["hello, i'm", "hi, i'm", "hello, my name is", "hey, i'm", "hello, who am i again?", "arree, mai hoon", "hola, soy"]
 const STICKERS = ["certified", "heart", "pencil", "nib", "gold", "holo", "smiley", "rainbow"]
 const STICKER_TITLES = ["Certified creative", "Heart bubble", "Pencil", "Pen nib", "Gold star", "Holo star", "Smiley", "Rainbow"]
@@ -39,6 +39,8 @@ function toOpts(p) {
         showPicker: p.showPicker,
         showHint: p.showHint,
         maxScale: p.maxScale,
+        stackBelow: p.stackBelow,
+        strapLength: p.strapLength,
         types,
         state: {
             tpl: types.includes(p.startWith) ? p.startWith : types[0],
@@ -53,7 +55,12 @@ function toOpts(p) {
             photo: p.photo || "",
             stickers: (p.stickers || []).join(","),
             mood: p.energy,
-            colors: { volunteer: +p.sayHiColor || 0, glow: +p.montuColor || 0, slogan: +p.mottoColor || 0, coffee: +p.sparkyColor || 0, licence: 0 },
+            shape: p.classicShape === "circle" ? "circle" : "rect",
+            critter: p.postcardBuddy || "fish",
+            colors: {
+                classic: +p.classicColor || 0, volunteer: +p.sayHiColor || 0, glow: +p.montuColor || 0, postcard: +p.postcardColor || 0,
+                coffee: +p.sparkyColor || 0, slogan: +p.mottoColor || 0, crayon: +p.crayonsColor || 0, licence: 0,
+            },
         },
     }
 }
@@ -83,11 +90,32 @@ export default function NameTagLanyard(props) {
         if (api.current) api.current.update(opts)
     }, [key])
 
-    return <div ref={ref} style={{ width: "100%", height: "100%", ...props.style }} />
+    const look = {
+        "--ntag-font": props.buttonFont || undefined,
+        "--ntag-chip": props.chipColor,
+        "--ntag-chip-ink": props.chipTextColor,
+        "--ntag-accent": props.accentColor,
+        "--ntag-radius": `${props.chipRadius}px`,
+        "--ntag-case": props.lowercase ? "lowercase" : "none",
+    }
+    return <div ref={ref} style={{ width: "100%", height: "100%", ...look, ...props.style }} />
 }
 
 NameTagLanyard.defaultProps = {
     startWith: "coffee",
+    classicShape: "rect",
+    postcardBuddy: "fish",
+    classicColor: "0",
+    postcardColor: "0",
+    crayonsColor: "0",
+    buttonFont: "",
+    chipColor: "#EFEFEF",
+    chipTextColor: "#6B6B6B",
+    accentColor: "#2F6BEB",
+    chipRadius: 2,
+    lowercase: true,
+    stackBelow: 520,
+    strapLength: 90,
     types: TYPES,
     name: "manasi",
     pronouns: "she/her",
@@ -139,5 +167,18 @@ addPropertyControls(NameTagLanyard, {
     montuColor: { type: ControlType.Enum, title: "Montu color", options: ["0", "1", "2", "3", "4"], optionTitles: ["Amber", "Rose", "Lime", "Sky", "Violet"], defaultValue: "0" },
     mottoColor: { type: ControlType.Enum, title: "Motto color", options: ["0", "1", "2", "3"], optionTitles: ["Mint", "Sky", "Blush", "Lemon"], defaultValue: "0" },
     sparkyColor: { type: ControlType.Enum, title: "Sparky color", options: ["0", "1", "2", "3"], optionTitles: ["Sky", "Pink", "Lime", "Tangerine"], defaultValue: "0" },
+    classicShape: { type: ControlType.Enum, title: "Classic shape", options: ["rect", "circle"], optionTitles: ["Rectangle", "Circle"], defaultValue: "rect" },
+    classicColor: { type: ControlType.Enum, title: "Classic color", options: ["0", "1", "2", "3", "4"], optionTitles: ["Tomato", "Cobalt", "Grass", "Bubblegum", "Licorice"], defaultValue: "0" },
+    postcardBuddy: { type: ControlType.Enum, title: "Postcard buddy", options: ["fish", "narwhal", "puffer"], optionTitles: ["Fish", "Narwhal", "Puffer"], defaultValue: "fish" },
+    postcardColor: { type: ControlType.Enum, title: "Postcard color", options: ["0", "1", "2", "3"], optionTitles: ["Periwinkle", "Sunflower", "Cherry", "Sea glass"], defaultValue: "0" },
+    crayonsColor: { type: ControlType.Enum, title: "Crayons color", options: ["0", "1", "2", "3", "4"], optionTitles: ["Sunshine", "Lagoon", "Bubblegum", "Sky", "Coral"], defaultValue: "0" },
+    strapLength: { type: ControlType.Number, title: "Strap length", min: 20, max: 400, step: 5, unit: "px", defaultValue: 90 },
     maxScale: { type: ControlType.Number, title: "Max size", min: 0.3, max: 1.5, step: 0.05, defaultValue: 1 },
+    stackBelow: { type: ControlType.Number, title: "Stack below", min: 0, max: 1200, step: 10, unit: "px", defaultValue: 520, description: "Under this width the buttons move under the card." },
+    buttonFont: { type: ControlType.String, title: "Button font", defaultValue: "", placeholder: "Your site's font, e.g. IBM Plex Mono" },
+    chipColor: { type: ControlType.Color, title: "Chip", defaultValue: "#EFEFEF" },
+    chipTextColor: { type: ControlType.Color, title: "Chip text", defaultValue: "#6B6B6B" },
+    accentColor: { type: ControlType.Color, title: "Selected", defaultValue: "#2F6BEB" },
+    chipRadius: { type: ControlType.Number, title: "Chip radius", min: 0, max: 20, step: 1, defaultValue: 2 },
+    lowercase: { type: ControlType.Boolean, title: "Lowercase", defaultValue: true },
 })

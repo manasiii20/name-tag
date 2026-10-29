@@ -1,7 +1,10 @@
   const tpl = () => TPLS[state.tpl];
   const pal = (key = state.tpl) => { const t = TPLS[key]; return t.palettes[(state.colors[key] || 0) % t.palettes.length]; };
-  const LABELS = { volunteer: 'Say Hi', glow: 'Montu', slogan: 'Motto', coffee: 'Sparky', licence: 'Licenced' };
-  const DROP = { licence: 60 };
+  const LABELS = { classic: 'Classic', volunteer: 'Say Hi', glow: 'Montu', postcard: 'Postcard', coffee: 'Sparky', slogan: 'Motto', crayon: 'Crayons', licence: 'Licenced' };
+  const isLanyard = () => tpl().kind === 'lanyard';
+  const strapLen = () => clamp(opts.strapLength == null ? 90 : opts.strapLength, 20, 400); // visible strap above the clip
+  const lanH = () => strapLen() + 24 + 440; // tallest hanging rig (strap + clip + portrait card)
+  const SLOT_W = 500; // width the card area is sized for, so it doesn't jump between types
 
   // ---------- dom ----------
   root.classList.add('ntag');
@@ -14,7 +17,7 @@
           <div class="flip"><div class="face front"></div><div class="face back"></div></div>
         </div>
       </div></div></div>
-      <p class="ntag-hint">drag to swing it, tap to flip it</p>
+      <p class="ntag-hint"></p>
     </div>
     <div class="ntag-picker" role="group" aria-label="Card type"></div>`;
   const stage = $('.ntag-stage');
@@ -52,58 +55,94 @@
   }
 
   function render() {
+    Object.assign(TPLS.classic, state.shape === 'circle' ? { w: 360, h: 360 } : { w: 440, h: 316 });
     const t = tpl();
+    const lan = t.kind === 'lanyard';
+    rig.classList.toggle('sticker', !lan);
+    card.classList.toggle('is-circle', state.tpl === 'classic' && state.shape === 'circle');
     const p = pal();
     card.style.setProperty('--cw', `${t.w}px`);
     card.style.setProperty('--ch', `${t.h}px`);
     card.classList.toggle('no-box', !!t.noBox);
     front.innerHTML = frontHTML() + '<div class="sheen"></div>';
-    back.innerHTML = backHTML() + '<div class="sheen"></div>';
-    card.classList.toggle('is-flipped', state.flipped);
+    back.innerHTML = lan ? backHTML() + '<div class="sheen"></div>' : '';
+    card.classList.toggle('is-flipped', lan && state.flipped);
     const strap = $('.strap');
-    strap.style.setProperty('--strap', t.strap(p));
+    if (lan) strap.style.setProperty('--strap', t.strap(p));
     strap.style.setProperty('--strap-ink', t.strapInk || 'rgba(255, 255, 255, .82)');
-    strap.style.setProperty('--strap-h', `${610 + (DROP[state.tpl] || 0)}px`);
+    strap.style.setProperty('--strap-h', `${400 + strapLen()}px`);
     $('span', strap).textContent = Array(12).fill((state.event.trim() || 'hello').toUpperCase()).join('  •  ');
-    $('.ntag-hint').hidden = !opts.showHint;
-    card.setAttribute('aria-label', `Name tag for ${nameOr()}. Press Enter to flip it, arrow keys to swing it.`);
+    const hint = $('.ntag-hint');
+    hint.hidden = !opts.showHint;
+    hint.textContent = lan ? 'drag to swing, tap to flip' : 'drag it anywhere, it sticks';
+    card.setAttribute('aria-label', `Name tag for ${nameOr()}. ${lan ? 'Press Enter to flip it, arrow keys to swing it.' : 'Arrow keys move it.'}`);
     $$('button', picker).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tpl === state.tpl)));
     fitAll();
   }
 
-  // ---------- layout: scale the card to the component's size ----------
+  // ---------- layout: card space on the left, the type buttons beside it ----------
+  let scale = 1;
   function layout() {
+    const RW = root.clientWidth;
+    const RH = root.clientHeight;
+    if (!RW || !RH) return;
+    const narrow = RW < (opts.stackBelow || 520);
+    root.classList.toggle('ntag-narrow', narrow);
+    // buttons: one column when there's height for eight, otherwise two
+    picker.classList.toggle('two-col', !narrow && RH < types.length * 36 + 8);
+    const pickW = narrow ? 0 : picker.offsetWidth + 14;
+    const H = stage.clientHeight || RH;
+    const hintRoom = opts.showHint ? 26 : 8;
+    scale = clamp((H - hintRoom) / lanH(), 0.15, opts.maxScale || 1);
+    const avail = narrow ? RW : RW - pickW;
+    if (SLOT_W * scale > avail) scale = avail / SLOT_W;
+    stage.style.width = narrow ? '100%' : `${Math.round(SLOT_W * scale)}px`;
     const t = tpl();
-    const W = stage.clientWidth;
-    const H = stage.clientHeight;
-    if (!W || !H) return;
     const natW = t.w + 40;
-    const natH = mount.offsetHeight || 640;
-    const scale = clamp(Math.min((H - (opts.showHint ? 34 : 14)) / natH, (W - 24) / natW), 0.15, opts.maxScale || 1);
+    const ty = isLanyard() ? 0 : Math.max(6, (H - hintRoom - t.h * scale) / 2);
     mount.style.width = `${natW}px`;
-    mount.style.transform = `translate(-50%, 0) scale(${scale})`;
+    mount.style.transform = `translate(-50%, ${ty}px) scale(${scale})`;
   }
   const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(layout) : null;
-  if (ro) ro.observe(stage);
+  if (ro) ro.observe(root);
 
   // ---------- physics: a pendulum on the lanyard ----------
   const K = 17;
   const D = 1.15;
   let th = 0.32, w = 0, t = 0, last = performance.now(), drag = null, raf = 0, alive = true;
+  let x = 0, y = 0, vx = 0, vy = 0, restRot = -2, lastRot = -2;
+  function stickerLimits() {
+    const tt = tpl();
+    return { x: Math.max(0, (stage.clientWidth / scale - tt.w) / 2 - 8), y: Math.max(0, (stage.clientHeight / scale - tt.h) / 2 - 8) };
+  }
   function frame(time) {
     if (!alive) return;
     const dt = Math.min(0.033, (time - last) / 1000);
     last = time; t += dt;
-    if (drag && drag.moved) w *= Math.pow(0.03, dt);
-    else {
-      const breeze = reduceMotion.matches ? 0 : Math.sin(t * 0.9) * 0.16 + Math.sin(t * 2.3) * 0.06;
-      w += (-K * Math.sin(th) - D * w + breeze) * dt;
-      th += w * dt;
+    const held = drag && drag.moved;
+    if (isLanyard()) {
+      if (held) w *= Math.pow(0.03, dt);
+      else {
+        const breeze = reduceMotion.matches ? 0 : Math.sin(t * 0.9) * 0.16 + Math.sin(t * 2.3) * 0.06;
+        w += (-K * Math.sin(th) - D * w + breeze) * dt;
+        th += w * dt;
+      }
+      const twist = flat3d ? 0 : clamp(-w * 6 + th * 12, -32, 32);
+      rig.style.transform = `rotate(${th.toFixed(4)}rad)`;
+      card.style.setProperty('--twist', `${twist.toFixed(2)}deg`);
+      card.style.setProperty('--sh', (th * 1.3 + twist / 70).toFixed(3));
+    } else {
+      // stickers lift while dragged and stick flat wherever they're dropped
+      if (held) { vx *= Math.pow(0.03, dt); vy *= Math.pow(0.03, dt); } else { vx = 0; vy = 0; }
+      const lim = stickerLimits();
+      x = clamp(x, -lim.x, lim.x);
+      y = clamp(y, -lim.y, lim.y);
+      const rot = held ? restRot + clamp(vx * 0.02, -14, 14) : restRot;
+      lastRot = rot;
+      rig.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;
+      card.style.setProperty('--twist', '0deg');
+      card.style.setProperty('--sh', (x / 260).toFixed(3));
     }
-    const twist = flat3d ? 0 : clamp(-w * 6 + th * 12, -32, 32);
-    rig.style.transform = `rotate(${th.toFixed(4)}rad)`;
-    card.style.setProperty('--twist', `${twist.toFixed(2)}deg`);
-    card.style.setProperty('--sh', (th * 1.3 + twist / 70).toFixed(3));
     updateEyes();
     raf = requestAnimationFrame(frame);
   }
@@ -146,41 +185,66 @@
     const m = mount.getBoundingClientRect();
     const px = m.left + m.width / 2;
     const py = m.top;
-    drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false, px, py, a0: Math.atan2(e.clientX - px, e.clientY - py), th0: th, lastT: performance.now(), lastTh: th };
+    drag = { id: e.pointerId, sx: e.clientX, sy: e.clientY, moved: false, px, py, a0: Math.atan2(e.clientX - px, e.clientY - py), th0: th, x0: x, y0: y, lastT: performance.now(), lastTh: th };
     rig.classList.add('grabbing');
   });
   card.addEventListener('pointermove', (e) => {
     if (!drag || e.pointerId !== drag.id) return;
-    if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 6) drag.moved = true;
+    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    if (!drag.moved && Math.hypot(dx, dy) > 6) {
+      drag.moved = true;
+      if (!isLanyard()) { rig.classList.add('lifted'); flipEl.classList.remove('stick', 'slap'); }
+    }
     if (!drag.moved) return;
     const tnow = performance.now();
     const dt = Math.max(8, tnow - drag.lastT) / 1000;
-    const a = Math.atan2(e.clientX - drag.px, e.clientY - drag.py);
-    const next = clamp(drag.th0 - (a - drag.a0), -1.3, 1.3);
-    w = lerp(w, (next - drag.lastTh) / dt, 0.5);
-    th = next; drag.lastTh = th; drag.lastT = tnow;
+    if (isLanyard()) {
+      const a = Math.atan2(e.clientX - drag.px, e.clientY - drag.py);
+      const next = clamp(drag.th0 - (a - drag.a0), -1.3, 1.3);
+      w = lerp(w, (next - drag.lastTh) / dt, 0.5);
+      th = next; drag.lastTh = th;
+    } else {
+      const nx = drag.x0 + dx / scale, ny = drag.y0 + dy / scale;
+      vx = lerp(vx, (nx - x) / dt, 0.5); vy = lerp(vy, (ny - y) / dt, 0.5);
+      x = nx; y = ny;
+    }
+    drag.lastT = tnow;
   });
   const endDrag = (e) => {
     if (!drag || e.pointerId !== drag.id) return;
     const wasTap = !drag.moved && e.type === 'pointerup';
+    const placed = drag.moved && !isLanyard();
     drag = null;
     rig.classList.remove('grabbing');
+    if (placed) stickDown();
     w = clamp(w, -9, 9);
-    if (wasTap) flip();
+    if (wasTap) { if (isLanyard()) flip(); else slap(); }
   };
   card.addEventListener('pointerup', endDrag);
   card.addEventListener('pointercancel', endDrag);
   card.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); }
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); w -= (e.key === 'ArrowLeft' ? -1 : 1) * 1.6; }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (isLanyard()) flip(); else slap(); }
+    else if (e.key.startsWith('Arrow')) {
+      e.preventDefault();
+      const dir = e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 1;
+      if (isLanyard()) w -= dir * 1.6;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') x += dir * 24; else y += dir * 24;
+    }
   });
+  function stickDown() {
+    restRot = clamp(lastRot * 0.35 + (Math.random() * 10 - 5), -6, 6);
+    vx = vy = 0;
+    rig.classList.remove('lifted');
+    flipEl.classList.remove('stick', 'slap'); void flipEl.offsetWidth; flipEl.classList.add('stick');
+  }
+  function slap() { flipEl.classList.remove('slap'); void flipEl.offsetWidth; flipEl.classList.add('slap'); }
   function flip() {
     state.flipped = !state.flipped;
     card.classList.toggle('is-flipped', state.flipped);
     if (flat3d && !reduceMotion.matches) { flipEl.classList.remove('flat-flip'); void flipEl.offsetWidth; flipEl.classList.add('flat-flip'); }
     if (!reduceMotion.matches) w += (state.flipped ? 1 : -1) * 1.1;
   }
-  flipEl.addEventListener('animationend', () => flipEl.classList.remove('flat-flip'));
+  flipEl.addEventListener('animationend', () => flipEl.classList.remove('flat-flip', 'slap', 'stick'));
 
   // ---------- switching card types ----------
   let switching = false, switchTimer = 0;
@@ -190,7 +254,8 @@
       state.tpl = next;
       state.flipped = false;
       render(); layout();
-      th = (Math.random() < 0.5 ? -1 : 1) * 0.4; w = 0;
+      th = TPLS[next].kind === 'lanyard' ? (Math.random() < 0.5 ? -1 : 1) * 0.4 : 0; w = 0;
+      x = y = vx = vy = 0; restRot = lastRot = Math.random() * 6 - 3;
       if (opts.onType) opts.onType(next);
     };
     if (!animate || reduceMotion.matches) { swap(); return; }
