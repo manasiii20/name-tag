@@ -126,8 +126,8 @@ NameTagLanyard.defaultProps = {
     selectedOutline: false,
     chipRadius: 0,
     chipHeight: 27,
-    buttonGap: 8,
-    cardGap: 40,
+    buttonGap: 12,
+    cardGap: 48,
     swingRoom: 120,
     buttonColumns: 4,
     buttonsBottom: 0,
@@ -156,6 +156,8 @@ NameTagLanyard.defaultProps = {
 }
 
 addPropertyControls(NameTagLanyard, {
+    cardGap: { type: ControlType.Number, title: "Card ↔ buttons", min: 0, max: 400, step: 2, unit: "px", defaultValue: 48, description: "Space between the card's edge and the buttons." },
+    buttonGap: { type: ControlType.Number, title: "Button spacing", min: 0, max: 40, step: 1, unit: "px", defaultValue: 12 },
     startWith: { type: ControlType.Enum, title: "Opens on", options: TYPES, optionTitles: TYPE_TITLES, defaultValue: "coffee" },
     types: {
         type: ControlType.Array,
@@ -200,10 +202,8 @@ addPropertyControls(NameTagLanyard, {
     selectedOutline: { type: ControlType.Boolean, title: "Selected outline", defaultValue: false },
     chipRadius: { type: ControlType.Number, title: "Chip radius", min: 0, max: 20, step: 1, defaultValue: 0 },
     chipHeight: { type: ControlType.Number, title: "Chip height", min: 20, max: 48, step: 1, defaultValue: 27 },
-    buttonGap: { type: ControlType.Number, title: "Button gap", min: 0, max: 40, step: 1, defaultValue: 8 },
     swingRoom: { type: ControlType.Number, title: "Swing room", min: 0, max: 300, step: 4, unit: "px", defaultValue: 120, description: "Space on the left so the card can swing without being cut off." },
     buttonColumns: { type: ControlType.Number, title: "Button columns", min: 1, max: 8, step: 1, displayStepper: true, defaultValue: 4 },
     buttonsBottom: { type: ControlType.Number, title: "Buttons lift", min: 0, max: 200, step: 2, unit: "px", defaultValue: 0, description: "Raise the row of buttons from the bottom edge." },
-    cardGap: { type: ControlType.Number, title: "Gap from card", min: 0, max: 200, step: 2, defaultValue: 40 },
     lowercase: { type: ControlType.Boolean, title: "Lowercase", defaultValue: true },
 })
