@@ -8,21 +8,25 @@ import { addPropertyControls, ControlType } from "framer"
 const CSS = __CSS__
 const FONTS = __FONTS__
 
+// Always (re)write the styles: Framer keeps the page alive while you edit code, so an older
+// version's styles can still be sitting in the page from a previous paste.
 function ensureStyles() {
     if (typeof document === "undefined") return
-    if (!document.getElementById("ntag-fonts")) {
-        const link = document.createElement("link")
+    let link = document.getElementById("ntag-fonts")
+    if (!link) {
+        link = document.createElement("link")
         link.id = "ntag-fonts"
         link.rel = "stylesheet"
-        link.href = FONTS
         document.head.appendChild(link)
     }
-    if (!document.getElementById("ntag-styles")) {
-        const style = document.createElement("style")
-        style.id = "ntag-styles"
-        style.textContent = CSS
-        document.head.appendChild(style)
-    }
+    if (link.getAttribute("href") !== FONTS) link.setAttribute("href", FONTS)
+    const styles = [...document.querySelectorAll("style#ntag-styles")]
+    if (styles.length === 1 && styles[0].textContent === CSS) return
+    styles.forEach((el) => el.remove())
+    const style = document.createElement("style")
+    style.id = "ntag-styles"
+    style.textContent = CSS
+    document.head.appendChild(style)
 }
 
 /*__ENGINE__*/

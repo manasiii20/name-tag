@@ -78,12 +78,15 @@ function artSVG(p, seed) {
 }
 
 function ensureFonts() {
-    if (typeof document === "undefined" || document.getElementById("ntag-fonts")) return
-    const link = document.createElement("link")
-    link.id = "ntag-fonts"
-    link.rel = "stylesheet"
-    link.href = FONTS
-    document.head.appendChild(link)
+    if (typeof document === "undefined") return
+    let link = document.getElementById("ntag-fonts")
+    if (!link) {
+        link = document.createElement("link")
+        link.id = "ntag-fonts"
+        link.rel = "stylesheet"
+        document.head.appendChild(link)
+    }
+    if (link.getAttribute("href") !== FONTS) link.setAttribute("href", FONTS)
 }
 
 const HAND = '"Gaegu", "Segoe Print", "Comic Sans MS", cursive'
