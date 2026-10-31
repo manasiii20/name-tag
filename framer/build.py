@@ -163,9 +163,16 @@ lan_tsx = (HERE / 'src/NameTagLanyard.tsx.tpl').read_text()
 lan_tsx = lan_tsx.replace('/*__ENGINE__*/', engine).replace('__CSS__', json.dumps(lanyard_css)).replace('__FONTS__', json.dumps(FONTS))
 (HERE / 'NameTagLanyard.tsx').write_text(banner + lan_tsx)
 
+drag_js = (HERE / 'src/sticker-drag.js').read_text()
 cr_tsx = (HERE / 'src/CrayonPlaceCard.tsx.tpl').read_text()
-cr_tsx = cr_tsx.replace('/*__CRAYON__*/', hash_js + speckles_js + crayon_js).replace('__FONTS__', json.dumps(FONTS))
+cr_tsx = cr_tsx.replace('/*__CRAYON__*/', hash_js + speckles_js + crayon_js).replace('/*__DRAG__*/', drag_js).replace('__FONTS__', json.dumps(FONTS))
 (HERE / 'CrayonPlaceCard.tsx').write_text(banner + cr_tsx)
+
+# the postcard tag on its own (wavy edge, stamp frame, speckles and the sea buddies come from the site)
+postcard_js = between(APP, '  function wavyPath(', '  function postcardFront(p) {').replace(' class="pc-critter"', ' style="display:block;width:172px;height:auto"')
+pc_tsx = (HERE / 'src/EndingNotesPostcard.tsx.tpl').read_text()
+pc_tsx = pc_tsx.replace('/*__POSTCARD__*/', hash_js + postcard_js).replace('/*__DRAG__*/', drag_js).replace('__FONTS__', json.dumps(FONTS))
+(HERE / 'EndingNotesPostcard.tsx').write_text(banner + pc_tsx)
 
 # plain-JS copy of the engine for the local test page
 (HERE / 'test' ).mkdir(exist_ok=True)
