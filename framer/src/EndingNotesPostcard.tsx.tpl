@@ -22,13 +22,6 @@ const SHADOW_LIFT = "drop-shadow(0 4px 6px rgba(15,15,30,.12)) drop-shadow(0 32p
 
 /*__POSTCARD__*/
 
-// the buddies' own oranges and yellows, swapped for purples
-const PURPLE = {
-    "#E8693A": "#8E7FE8", "#C9512A": "#5E4FC4", "#F9A88A": "#F2A7CF",
-    "#E8432E": "#8E7FE8", "#F27B3C": "#B3A7F5", "#F7A07A": "#F2A7CF", "#F9B36B": "#E4DEFF",
-    "#F2B530": "#8E7FE8", "#E59A1E": "#6F60D6", "#F7C84A": "#A99CF2", "#FFF3CF": "#F1EEFF", "#F59C7A": "#F2A7CF",
-}
-const tint = (svg) => svg.replace(/#[0-9A-F]{6}/g, (c) => PURPLE[c] || c)
 
 function postcardSVG(p, seed) {
     const inner = wavyPath(26, 26, W - 52, H - 52, 3.2, 22)
@@ -60,13 +53,10 @@ function ensureFonts() {
  * @framerIntrinsicHeight 420
  */
 export default function EndingNotesPostcard(props) {
-    const { greeting, text, colorway, buddy, buddyColor, tilt, shadow, draggable, cardWidth } = props
+    const { greeting, text, colorway, buddy, tilt, shadow, draggable, cardWidth } = props
     const p = PALETTES[colorway] || PALETTES.Periwinkle
     const art = useMemo(() => postcardSVG(p, text + colorway), [colorway, text])
-    const critter = useMemo(() => {
-        const svg = CRITTERS[buddy] || CRITTERS.narwhal
-        return buddyColor === "original" ? svg : tint(svg)
-    }, [buddy, buddyColor])
+    const critter = CRITTERS[buddy] || CRITTERS.narwhal
 
     const face = useRef(null)
     const textRef = useRef(null)
@@ -128,7 +118,6 @@ EndingNotesPostcard.defaultProps = {
     text: "building more stuff, brb",
     colorway: "Periwinkle",
     buddy: "narwhal",
-    buddyColor: "purple",
     tilt: 2,
     shadow: true,
     draggable: true,
@@ -140,7 +129,6 @@ addPropertyControls(EndingNotesPostcard, {
     text: { type: ControlType.String, title: "Message", defaultValue: "building more stuff, brb", displayTextArea: true },
     colorway: { type: ControlType.Enum, title: "Colors", options: Object.keys(PALETTES), defaultValue: "Periwinkle" },
     buddy: { type: ControlType.Enum, title: "Buddy", options: ["fish", "narwhal", "puffer"], optionTitles: ["Fish", "Narwhal", "Puffer"], defaultValue: "narwhal" },
-    buddyColor: { type: ControlType.Enum, title: "Buddy color", options: ["purple", "original"], optionTitles: ["Purple", "Original"], defaultValue: "purple", displaySegmentedControl: true },
     cardWidth: { type: ControlType.Number, title: "Card width", min: 160, max: 1200, step: 10, unit: "px", defaultValue: 460, description: "The card's size. It shrinks to fit if the frame is smaller; any space left over is room to drag it around." },
     tilt: { type: ControlType.Number, title: "Tilt", min: -10, max: 10, step: 0.5, unit: "°", defaultValue: 2 },
     draggable: { type: ControlType.Boolean, title: "Draggable", defaultValue: true },
