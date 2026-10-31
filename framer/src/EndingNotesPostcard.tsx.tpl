@@ -53,7 +53,7 @@ function ensureFonts() {
  * @framerIntrinsicHeight 420
  */
 export default function EndingNotesPostcard(props) {
-    const { greeting, text, colorway, buddy, tilt, shadow, draggable, cardWidth } = props
+    const { greeting, text, colorway, buddy, tilt, shadow, draggable, cardWidth, posX, posY } = props
     const p = PALETTES[colorway] || PALETTES.Periwinkle
     const art = useMemo(() => postcardSVG(p, text + colorway), [colorway, text])
     const critter = CRITTERS[buddy] || CRITTERS.narwhal
@@ -62,7 +62,7 @@ export default function EndingNotesPostcard(props) {
     const textRef = useRef(null)
     const [size, setSize] = useState(46)
     const { box, lift, moverProps } = useStickerDrag(W, H, {
-        tilt, draggable, cardWidth,
+        tilt, draggable, cardWidth, posX, posY,
         onLift: (on) => { face.current.style.filter = shadow ? (on ? SHADOW_LIFT : SHADOW_REST) : "none" },
     })
 
@@ -121,6 +121,8 @@ EndingNotesPostcard.defaultProps = {
     tilt: 2,
     shadow: true,
     draggable: true,
+    posX: 50,
+    posY: 50,
     cardWidth: 460,
 }
 
@@ -130,6 +132,8 @@ addPropertyControls(EndingNotesPostcard, {
     colorway: { type: ControlType.Enum, title: "Colors", options: Object.keys(PALETTES), defaultValue: "Periwinkle" },
     buddy: { type: ControlType.Enum, title: "Buddy", options: ["fish", "narwhal", "puffer"], optionTitles: ["Fish", "Narwhal", "Puffer"], defaultValue: "narwhal" },
     cardWidth: { type: ControlType.Number, title: "Card width", min: 160, max: 1200, step: 10, unit: "px", defaultValue: 460, description: "The card's size. It shrinks to fit if the frame is smaller; any space left over is room to drag it around." },
+    posX: { type: ControlType.Number, title: "Start X", min: 0, max: 100, step: 1, unit: "%", defaultValue: 50, description: "Where the card starts, left to right: 0% at the left edge, 50% in the middle, 100% at the right edge." },
+    posY: { type: ControlType.Number, title: "Start Y", min: 0, max: 100, step: 1, unit: "%", defaultValue: 50, description: "Where the card starts, top to bottom." },
     tilt: { type: ControlType.Number, title: "Tilt", min: -10, max: 10, step: 0.5, unit: "°", defaultValue: 2 },
     draggable: { type: ControlType.Boolean, title: "Draggable", defaultValue: true },
     shadow: { type: ControlType.Boolean, title: "Shadow", defaultValue: true },

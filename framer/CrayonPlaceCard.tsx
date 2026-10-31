@@ -101,14 +101,14 @@ const SLAP = [{ transform: "scale(1)" }, { transform: "scale(1.07, .9)", offset:
 
 // W x H is the card's own size. Returns refs for the frame (box), the moving card (mover) and the part
 // that lifts and squishes (lift), plus the handlers to put on the mover.
-function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
+function useStickerDrag(W, H, { tilt, draggable, cardWidth, posX = 50, posY = 50, onLift }) {
     const box = useRef(null)
     const mover = useRef(null)
     const lift = useRef(null)
     const liftCb = useRef(onLift)
     liftCb.current = onLift
     // where the card is, kept outside React so dragging stays smooth
-    const m = useRef({ x: 0, y: 0, vx: 0, rot: tilt, rest: tilt, scale: 1, drag: null })
+    const m = useRef({ x: 0, y: 0, vx: 0, rot: tilt, rest: tilt, scale: 1, drag: null, placed: false })
 
     // keep the card inside the frame, corners and tilt included
     // (measured at its resting angle, so the lean while it is dragged doesn't push it off the edges)
@@ -117,6 +117,12 @@ function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
         const r = (Math.abs(s.rest) * Math.PI) / 180, w = W * s.scale, h = H * s.scale
         const ex = (w * Math.cos(r) + h * Math.sin(r)) / 2 + 8, ey = (w * Math.sin(r) + h * Math.cos(r)) / 2 + 8
         return { x: Math.max(0, el.clientWidth / 2 - ex), y: Math.max(0, el.clientHeight / 2 - ey) }
+    }
+    // the starting spot: 0% hugs the left (or top) edge, 50% is the middle, 100% the right (or bottom)
+    const home = () => {
+        const s = m.current, lim = limits()
+        s.x = ((clamp(posX, 0, 100) - 50) / 50) * lim.x
+        s.y = ((clamp(posY, 0, 100) - 50) / 50) * lim.y
     }
     const apply = () => {
         const s = m.current
@@ -134,6 +140,8 @@ function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
         const fit = () => {
             const f = Math.min(el.clientWidth / W, el.clientHeight / H) * 0.94
             if (f > 0) m.current.scale = Math.min(f, (cardWidth || W) / W)
+            // until a viewer moves it, the card keeps to its starting spot as the frame resizes
+            if (!m.current.placed) home()
             apply()
         }
         fit()
@@ -144,8 +152,8 @@ function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
 
     useLayoutEffect(() => {
         const s = m.current
-        if (!s.drag) { s.rest = s.rot = tilt; apply() }
-    }, [tilt])
+        if (!s.drag) { s.rest = s.rot = tilt; s.placed = false; home(); apply() }
+    }, [tilt, posX, posY])
 
     const squish = (frames, ms) => {
         if (lift.current.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches)
@@ -190,6 +198,7 @@ function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
             s.rest = clamp(s.rot * 0.35 + tilt + (Math.random() * 8 - 4), tilt - 7, tilt + 7)
             s.rot = s.rest
             s.vx = 0
+            s.placed = true
             setLifted(false)
             squish(STICK, 380)
             apply()
@@ -205,6 +214,7 @@ function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
             if (e.key === "ArrowRight") s.x += 24
             if (e.key === "ArrowUp") s.y -= 24
             if (e.key === "ArrowDown") s.y += 24
+            s.placed = true
             mover.current.style.transition = "transform .25s ease"
             apply()
         }
@@ -232,7 +242,7 @@ function useStickerDrag(W, H, { tilt, draggable, cardWidth, onLift }) {
  * @framerIntrinsicHeight 480
  */
 export default function CrayonPlaceCard(props) {
-    const { text, sub, colorway, tilt, shadow, draggable, cardWidth } = props
+    const { text, sub, colorway, tilt, shadow, draggable, cardWidth, posX, posY } = props
     const p = PALETTES[colorway] || PALETTES.Sunshine
     const seed = (hash(text + colorway) % 50) + 1
     const art = useMemo(() => artSVG(p, seed), [colorway, seed])
@@ -242,7 +252,7 @@ export default function CrayonPlaceCard(props) {
     const textRef = useRef(null)
     const [size, setSize] = useState(56)
     const { box, lift, moverProps } = useStickerDrag(W, H, {
-        tilt, draggable, cardWidth,
+        tilt, draggable, cardWidth, posX, posY,
         onLift: (on) => { face.current.style.boxShadow = shadow ? (on ? SHADOW_LIFT : SHADOW_REST) : "none" },
     })
 
@@ -319,6 +329,8 @@ CrayonPlaceCard.defaultProps = {
     tilt: -2,
     shadow: true,
     draggable: true,
+    posX: 50,
+    posY: 50,
     cardWidth: 440,
 }
 
@@ -327,6 +339,8 @@ addPropertyControls(CrayonPlaceCard, {
     sub: { type: ControlType.String, title: "Corner note", defaultValue: "manasi :)" },
     colorway: { type: ControlType.Enum, title: "Colors", options: Object.keys(PALETTES), defaultValue: "Sunshine" },
     cardWidth: { type: ControlType.Number, title: "Card width", min: 160, max: 1200, step: 10, unit: "px", defaultValue: 440, description: "The card's size. It shrinks to fit if the frame is smaller; any space left over is room to drag it around." },
+    posX: { type: ControlType.Number, title: "Start X", min: 0, max: 100, step: 1, unit: "%", defaultValue: 50, description: "Where the card starts, left to right: 0% at the left edge, 50% in the middle, 100% at the right edge." },
+    posY: { type: ControlType.Number, title: "Start Y", min: 0, max: 100, step: 1, unit: "%", defaultValue: 50, description: "Where the card starts, top to bottom." },
     tilt: { type: ControlType.Number, title: "Tilt", min: -10, max: 10, step: 0.5, unit: "°", defaultValue: -2 },
     draggable: { type: ControlType.Boolean, title: "Draggable", defaultValue: true },
     shadow: { type: ControlType.Boolean, title: "Shadow", defaultValue: true },

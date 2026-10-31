@@ -64,7 +64,7 @@ const SHADOW_LIFT = "0 2px 6px rgba(15,15,30,.1), 0 30px 46px -16px rgba(15,15,3
  * @framerIntrinsicHeight 480
  */
 export default function CrayonPlaceCard(props) {
-    const { text, sub, colorway, tilt, shadow, draggable, cardWidth } = props
+    const { text, sub, colorway, tilt, shadow, draggable, cardWidth, posX, posY } = props
     const p = PALETTES[colorway] || PALETTES.Sunshine
     const seed = (hash(text + colorway) % 50) + 1
     const art = useMemo(() => artSVG(p, seed), [colorway, seed])
@@ -74,7 +74,7 @@ export default function CrayonPlaceCard(props) {
     const textRef = useRef(null)
     const [size, setSize] = useState(56)
     const { box, lift, moverProps } = useStickerDrag(W, H, {
-        tilt, draggable, cardWidth,
+        tilt, draggable, cardWidth, posX, posY,
         onLift: (on) => { face.current.style.boxShadow = shadow ? (on ? SHADOW_LIFT : SHADOW_REST) : "none" },
     })
 
@@ -151,6 +151,8 @@ CrayonPlaceCard.defaultProps = {
     tilt: -2,
     shadow: true,
     draggable: true,
+    posX: 50,
+    posY: 50,
     cardWidth: 440,
 }
 
@@ -159,6 +161,8 @@ addPropertyControls(CrayonPlaceCard, {
     sub: { type: ControlType.String, title: "Corner note", defaultValue: "manasi :)" },
     colorway: { type: ControlType.Enum, title: "Colors", options: Object.keys(PALETTES), defaultValue: "Sunshine" },
     cardWidth: { type: ControlType.Number, title: "Card width", min: 160, max: 1200, step: 10, unit: "px", defaultValue: 440, description: "The card's size. It shrinks to fit if the frame is smaller; any space left over is room to drag it around." },
+    posX: { type: ControlType.Number, title: "Start X", min: 0, max: 100, step: 1, unit: "%", defaultValue: 50, description: "Where the card starts, left to right: 0% at the left edge, 50% in the middle, 100% at the right edge." },
+    posY: { type: ControlType.Number, title: "Start Y", min: 0, max: 100, step: 1, unit: "%", defaultValue: 50, description: "Where the card starts, top to bottom." },
     tilt: { type: ControlType.Number, title: "Tilt", min: -10, max: 10, step: 0.5, unit: "°", defaultValue: -2 },
     draggable: { type: ControlType.Boolean, title: "Draggable", defaultValue: true },
     shadow: { type: ControlType.Boolean, title: "Shadow", defaultValue: true },
