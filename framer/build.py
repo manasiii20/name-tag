@@ -76,17 +76,6 @@ svg, img { display: block; }
 .card.no-box .face { box-shadow: none !important; overflow: visible; }
 .card.no-box .sheen { display: none; }
 .card.no-box:not(.is-flipped) .front .cf, .card.no-box.is-flipped .back .cf { filter: drop-shadow(0 2px 2px rgba(15, 15, 30, .14)) drop-shadow(0 16px 22px rgba(15, 15, 30, .2)); }
-/* iOS draws black corners on rounded 3D layers, so there the card flips flat */
-@supports (-webkit-touch-callout: none) {
-  .card { transform: none !important; }
-  .flip { transform: none !important; transition: none; transform-style: flat; }
-  .face { -webkit-backface-visibility: visible; backface-visibility: visible; }
-  .face.back { transform: none; }
-  .flip.flat-flip { animation: flat-flip .38s cubic-bezier(.4, 0, .2, 1); }
-  .card:not(.no-box) .face { box-shadow: none; clip-path: inset(0 round 18px); }
-  .card:not(.no-box) .flip { filter: drop-shadow(0 2px 3px rgba(15, 15, 30, .14)) drop-shadow(0 18px 22px rgba(15, 15, 30, .22)); }
-}
-@keyframes flat-flip { 50% { transform: scaleX(.02); } }
 @media (prefers-reduced-motion: reduce) {
   .drop, .flip { transition-duration: .01s !important; animation: none !important; }
   .gl-orb { animation: none; }
@@ -150,7 +139,22 @@ def scope_css(css, scope, prefix):
     return re.sub(r'[ \t]+', ' ', out)
 
 
-lanyard_css = scope_css(extra_css + card_css, SCOPE, 'ntag-')
+# after the card's own rules, so the flat iOS flip wins over the 3D one (same specificity, later wins)
+ios_css = '''
+/* iOS draws black corners on rounded 3D layers, so there the card flips flat */
+@supports (-webkit-touch-callout: none) {
+  .card { transform: none !important; }
+  .flip { transform: none !important; transition: none; transform-style: flat; }
+  .face { -webkit-backface-visibility: visible; backface-visibility: visible; }
+  .face.back { transform: none; }
+  .flip.flat-flip { animation: flat-flip .38s cubic-bezier(.4, 0, .2, 1); }
+  .card:not(.no-box) .face { box-shadow: none; clip-path: inset(0 round 18px); }
+  .card:not(.no-box) .flip { filter: drop-shadow(0 2px 3px rgba(15, 15, 30, .14)) drop-shadow(0 18px 22px rgba(15, 15, 30, .22)); }
+}
+@keyframes flat-flip { 50% { transform: scaleX(.02); } }
+'''
+
+lanyard_css = scope_css(extra_css + card_css + ios_css, SCOPE, 'ntag-')
 
 # ---------- crayon place card (standalone) ----------
 crayon_js = between(APP, '  function crayonFilters(id, seed) {', '  function crayonFront(p) {')
