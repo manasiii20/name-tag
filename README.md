@@ -40,6 +40,8 @@ python3 -m http.server 8000
 
 Fonts come from Google Fonts; PNG export uses [html2canvas](https://html2canvas.hertzen.com/) from cdnjs.
 
+Visits are counted with [GoatCounter](https://www.goatcounter.com/) (no cookies, nothing shown on the page); the dashboard is at manasi.goatcounter.com.
+
 ## Files
 
 - `index.html` – markup for the stage and editor panel
